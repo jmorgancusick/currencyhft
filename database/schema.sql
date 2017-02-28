@@ -1,7 +1,7 @@
-drop table forex;
-drop table bank_rates;
-drop table profitable_trends;
-drop table efficient_trends;
+drop table if exists forex;
+drop table if exists bank_rates;
+drop table if exists profitable_trends;
+drop table if exists efficient_trends;
 
 
 create table Forex ( --extraneous probly
