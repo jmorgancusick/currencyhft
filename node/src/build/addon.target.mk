@@ -4,9 +4,6 @@ TOOLSET := target
 TARGET := addon
 DEFS_Debug := \
 	'-DNODE_GYP_MODULE_NAME=addon' \
-	'-DUSING_UV_SHARED=1' \
-	'-DUSING_V8_SHARED=1' \
-	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
 	'-DBUILDING_NODE_EXTENSION' \
@@ -31,19 +28,21 @@ CFLAGS_C_Debug :=
 CFLAGS_CC_Debug := \
 	-fno-rtti \
 	-fno-exceptions \
-	-std=gnu++0x
+	-std=gnu++0x \
+	-fexceptions \
+	-frtti \
+	-std=c++11
 
 INCS_Debug := \
-	-I/home/sdd/.node-gyp/4.2.6/include/node \
-	-I/home/sdd/.node-gyp/4.2.6/src \
-	-I/home/sdd/.node-gyp/4.2.6/deps/uv/include \
-	-I/home/sdd/.node-gyp/4.2.6/deps/v8/include
+	-I/usr/include/nodejs/include/node \
+	-I/usr/include/nodejs/src \
+	-I/usr/include/nodejs/deps/uv/include \
+	-I/usr/include/nodejs/deps/v8/include \
+	-I/usr/include \
+	-I/usr/include/cppconn
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=addon' \
-	'-DUSING_UV_SHARED=1' \
-	'-DUSING_V8_SHARED=1' \
-	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
 	'-DBUILDING_NODE_EXTENSION'
@@ -68,16 +67,21 @@ CFLAGS_C_Release :=
 CFLAGS_CC_Release := \
 	-fno-rtti \
 	-fno-exceptions \
-	-std=gnu++0x
+	-std=gnu++0x \
+	-fexceptions \
+	-frtti \
+	-std=c++11
 
 INCS_Release := \
-	-I/home/sdd/.node-gyp/4.2.6/include/node \
-	-I/home/sdd/.node-gyp/4.2.6/src \
-	-I/home/sdd/.node-gyp/4.2.6/deps/uv/include \
-	-I/home/sdd/.node-gyp/4.2.6/deps/v8/include
+	-I/usr/include/nodejs/include/node \
+	-I/usr/include/nodejs/src \
+	-I/usr/include/nodejs/deps/uv/include \
+	-I/usr/include/nodejs/deps/v8/include \
+	-I/usr/include \
+	-I/usr/include/cppconn
 
 OBJS := \
-	$(obj).target/$(TARGET)/hello.o
+	$(obj).target/$(TARGET)/query.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)
@@ -90,15 +94,15 @@ $(OBJS): GYP_CXXFLAGS := $(DEFS_$(BUILDTYPE)) $(INCS_$(BUILDTYPE))  $(CFLAGS_$(B
 
 # Suffix rules, putting all outputs into $(obj).
 
-$(obj).$(TOOLSET)/$(TARGET)/%.o: $(srcdir)/%.cc FORCE_DO_CMD
+$(obj).$(TOOLSET)/$(TARGET)/%.o: $(srcdir)/%.cpp FORCE_DO_CMD
 	@$(call do_cmd,cxx,1)
 
 # Try building from generated source, too.
 
-$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj).$(TOOLSET)/%.cc FORCE_DO_CMD
+$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj).$(TOOLSET)/%.cpp FORCE_DO_CMD
 	@$(call do_cmd,cxx,1)
 
-$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj)/%.cc FORCE_DO_CMD
+$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj)/%.cpp FORCE_DO_CMD
 	@$(call do_cmd,cxx,1)
 
 # End of this set of suffix rules
@@ -113,7 +117,9 @@ LDFLAGS_Release := \
 	-rdynamic \
 	-m64
 
-LIBS :=
+LIBS := \
+	/usr/lib/libmysqlcppconn.a \
+	/usr/lib/x86_64-linux-gnu/libmysqlclient.so.20
 
 $(obj).target/addon.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
 $(obj).target/addon.node: LIBS := $(LIBS)

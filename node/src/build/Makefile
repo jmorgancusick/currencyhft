@@ -41,9 +41,9 @@ all_deps :=
 
 
 CC.target ?= $(CC)
-CFLAGS.target ?= $(CPPFLAGS) $(CFLAGS)
+CFLAGS.target ?= $(CFLAGS)
 CXX.target ?= $(CXX)
-CXXFLAGS.target ?= $(CPPFLAGS) $(CXXFLAGS)
+CXXFLAGS.target ?= $(CXXFLAGS) $(CPPFLAGS)
 LINK.target ?= $(LINK)
 LDFLAGS.target ?= $(LDFLAGS)
 AR.target ?= $(AR)
@@ -54,9 +54,9 @@ LINK ?= $(CXX.target)
 # TODO(evan): move all cross-compilation logic to gyp-time so we don't need
 # to replicate this environment fallback in make as well.
 CC.host ?= gcc
-CFLAGS.host ?= $(CPPFLAGS_host) $(CFLAGS_host)
+CFLAGS.host ?=
 CXX.host ?= g++
-CXXFLAGS.host ?= $(CPPFLAGS_host) $(CXXFLAGS_host)
+CXXFLAGS.host ?=
 LINK.host ?= $(CXX.host)
 LDFLAGS.host ?=
 AR.host ?= ar
@@ -131,7 +131,7 @@ cmd_touch = touch $@
 
 quiet_cmd_copy = COPY $@
 # send stderr to /dev/null to ignore messages when linking directories.
-cmd_copy = rm -rf "$@" && cp -af "$<" "$@"
+cmd_copy = ln -f "$<" "$@" 2>/dev/null || (rm -rf "$@" && cp -af "$<" "$@")
 
 quiet_cmd_alink = AR($(TOOLSET)) $@
 cmd_alink = rm -f $@ && $(AR.$(TOOLSET)) crs $@ $(filter %.o,$^)
@@ -308,8 +308,8 @@ ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
 endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
-cmd_regen_makefile = cd $(srcdir); /usr/local/lib/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "--toplevel-dir=." -I/home/sdd/Documents/currencyhft/node/src/test/build/config.gypi -I/usr/local/lib/node_modules/node-gyp/addon.gypi -I/home/sdd/.node-gyp/4.2.6/include/node/common.gypi "--depth=." "-Goutput_dir=." "--generator-output=build" "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/home/sdd/.node-gyp/4.2.6" "-Dnode_gyp_dir=/usr/local/lib/node_modules/node-gyp" "-Dnode_lib_file=node.lib" "-Dmodule_root_dir=/home/sdd/Documents/currencyhft/node/src/test" binding.gyp
-Makefile: $(srcdir)/../../../../../../../usr/local/lib/node_modules/node-gyp/addon.gypi $(srcdir)/build/config.gypi $(srcdir)/binding.gyp $(srcdir)/../../../../../.node-gyp/4.2.6/include/node/common.gypi
+cmd_regen_makefile = cd $(srcdir); /usr/share/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "--toplevel-dir=." -I/home/john/Documents/sdd/currencyhft/node/src/build/config.gypi -I/usr/share/node-gyp/addon.gypi -I/usr/include/nodejs/common.gypi "--depth=." "-Goutput_dir=." "--generator-output=build" "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/usr/include/nodejs" "-Dnode_gyp_dir=/usr/share/node-gyp" "-Dnode_lib_file=node.lib" "-Dmodule_root_dir=/home/john/Documents/sdd/currencyhft/node/src" binding.gyp
+Makefile: $(srcdir)/../../../../../../../usr/share/node-gyp/addon.gypi $(srcdir)/../../../../../../../usr/include/nodejs/common.gypi $(srcdir)/build/config.gypi $(srcdir)/binding.gyp
 	$(call do_cmd,regen_makefile)
 
 # "all" is a concatenation of the "all" targets from all the included
