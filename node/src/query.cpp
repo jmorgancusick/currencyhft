@@ -39,7 +39,7 @@ void Method(const FunctionCallbackInfo<Value>& args) {
     //Can call a pack function here to be cleaner once more data
     // Transfers the data from result, to obj (see below)
     obj->Set(String::NewFromUtf8(isolate, "id"),
-	     String::NewFromUtf8(isolate, "test"));
+	     String::NewFromUtf8(isolate, itr->first.data()));
     obj->Set(String::NewFromUtf8(isolate, "close"),
 	     Number::New(isolate, itr->second));
 
