@@ -22,13 +22,23 @@ app.listen(3000, function () {
   console.log('photosbyjac.com node server listening on port 3000');
 });
 
-app.get('/db/:table', function(req, res) {
+app.get('/exchange/:id', function(req, res) {
 
     // log table name
-    console.log(req.params.table);
+    console.log(req.params.id);
 
-    ret = addon.hello();
+    ret = addon.exchange(req.params.id);
     console.log(ret);
     
+    res.send(ret);
+});
+
+app.get('/table/:tableName', function(req, res) {
+    // log table name
+    console.log(req.params.tableName);
+
+    ret = addon.table(req.params.tableName);
+    console.log(ret);
+
     res.send(ret);
 });

@@ -13,10 +13,11 @@
   <body>
     <h1>Currency HFT</h1>
     <form id="dbForm">
-      Table Name:<br>
-      <input type="text" id="tableName"></input>
+      Exchange ID:<br>
+      <input type="text" id="exchangeID"></input>
       <br>
-      <button type="button" onclick="getTable()">Submit</button>
+      <button type="button" onclick="getExchange()">Submit</button>
+      <button type="button" onclick="getAllExchanges()">See all</button>
     </form>
 
     <table id="stockTable">

@@ -1,12 +1,20 @@
 
-function getTable(){
+function getExchange(){
     document.getElementById("stockTable").innerHTML="";
 
-    name = document.getElementById("tableName").value;
-    console.log("getTable called with name: "+name);
-    ajax("db/"+name, populateTable);
+    exchangeID = document.getElementById("exchangeID").value;
+    console.log("getExchanged called with id: "+exchangeID);
+    ajax("exchange/"+exchangeID, populateTable);
+}
+
+function getAllExchanges(){
+    document.getElementById("stockTable").innerHTML="";
+
+    console.log("getAllExchanges called");
+    ajax("/table/stock", populateTable);
 
 }
+
 
 function populateTable(data){
     console.log("in function!");

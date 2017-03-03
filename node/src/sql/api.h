@@ -61,26 +61,61 @@ class API{
 	} catch(sql::SQLException &e){
 	  printError(e);
 	  con.reset();
-	  return EXIT_FAILURE;
+	  return 1;
 	}
     }
     else{
       cout << "Unable to open file" << endl;
+      return 2;
     }
+    return 0;
   }
 
   //only works for string, double pairs
+  unordered_map<string, double> * selectExchangeWithID(string id){
+    unordered_map<string, double> *rows = new unordered_map<string, double>();
+
+    cout<<"id: "<<id<<endl;
+    try{
+
+      pstmt.reset(con->prepareStatement("select * from stock where id=?"));
+      pstmt->setString(1,id);
+      
+      res.reset(pstmt->executeQuery());
+
+      for(;;)
+	{
+	  while (res->next()) {
+	    (*rows)[res->getString("id")] = res->getDouble("close");
+	  }
+	  if (pstmt->getMoreResults())
+	    {
+	      res.reset(pstmt->getResultSet());
+	      continue;
+	    }
+	  break;
+	}
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+    //only works for string, double pairs
   unordered_map<string, double> * selectAllFromTable(string table){
     unordered_map<string, double> *rows = new unordered_map<string, double>();
 
-    cout<<"table: "<<table<<endl;
     try{
+
+      if(!hasTable(table)){
+	cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
+	return NULL; 
+      }
+
       
-      pstmt.reset(con->prepareStatement("SELECT * from stock"));
-      //sql::SQLString sqlStr("stock");
-      //pstmt->setString(1,table);
-      //pstmt->setString(1,"stock");
-      //pstmt->setInt(1,10);
+      pstmt.reset(con->prepareStatement("select * from "+table));
       
       res.reset(pstmt->executeQuery());
 
@@ -111,6 +146,10 @@ class API{
   string db;
 
 
+  int numTables = 1;
+  string tablesWhiteList[1] = {"stock"};
+
+
   sql::Driver * driver;
  
   std::auto_ptr< sql::Connection > con;
@@ -133,6 +172,16 @@ class API{
     cout << " (MySQL error code: " << e.getErrorCode();
     cout << ", SQLState: " << e.getSQLState() << " )" << endl;
   }
+
+  bool hasTable(string tableName){
+    for(int i = 0; i < numTables; i++){
+      if(tableName.compare(tablesWhiteList[i]) == 0){
+	return true;
+      }
+    }
+    return false;
+  }
+  
 };
 
 
