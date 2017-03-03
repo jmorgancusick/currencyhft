@@ -1,16 +1,31 @@
 <!doctype html>
 
 <html lang="en">
-<head>
-  <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Currency HFT</title>
+  
+    <link rel="stylesheet" href="css/style.css">
+    
+  </head>
+  
+  <body>
+    <h1>Currency HFT</h1>
+    <form id="dbForm">
+      Exchange ID:<br>
+      <input type="text" id="exchangeID"></input>
+      <br>
+      <button type="button" onclick="getExchange()">Submit</button>
+      <button type="button" onclick="getAllExchanges()">See all</button>
+    </form>
 
-  <title>Currency HFT</title>
+    <table id="stockTable">
 
-  <link rel="stylesheet" href="css/style.css">
+    </table>
+    
+  </body>
 
-</head>
-
-<body>
-  <h1>Currency HFT</h1>
-</body>
+  <script src="scripts/query.js"></script>
+  
 </html>
