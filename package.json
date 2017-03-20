@@ -11,9 +11,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "babel": {
-    // my babel config here
-  },
+  "babel": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jmcusick/currencyhft.git"
