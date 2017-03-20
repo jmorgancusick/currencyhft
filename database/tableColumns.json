@@ -1,0 +1,68 @@
+{"forex_dash" : { "cols" : [
+		"datetime" 		
+		, "exstr" 		
+		, "start"	 			
+		, "start_full" 		 	
+		, "end" 			
+		, "end_full" 		
+		, "high"
+		, "volume"
+		, "open"
+		, "low"
+		, "close"			
+		, "ex_id"]
+	, "keys" : [
+		"datetime"
+		, "exstr"]}
+
+, "forex" : { "cols" : [
+		"datetime" 		
+		, "exstr" 		
+		, "start"	 			
+		, "start_full" 		 	
+		, "end" 			
+		, "end_full" 		
+		, "rate" 			
+		, "ex_id"]
+	, "keys" : [
+		"datetime"
+		, "exstr"]}
+	 
+, "bank_rates" : { "cols" : [	
+		"start" 			 	
+		, "start_full" 		  	
+		, "end" 			
+		, "end_full" 		
+		, "bank" 	 		
+		, "bank_full" 		
+		, "rate"	 		
+		, "ex_id"]	
+	, "keys" : [
+		"ex_id"]}	
+
+, "profitable_trends" :{ "cols" : [
+	"start"	 			
+		, "start_full" 		 	
+		, "end"	 		
+		, "end_full" 		
+		, "profit"  		
+		, "length" 		
+		, "expath"   			
+		, "frequency"		
+		, "path_id"]
+	, "keys" : [
+		"path_id"]}
+
+, "efficient_trends" :{ "cols" : [
+		"start"	 			
+		, "start_full" 		 	
+		, "end"	 		
+		, "end_full" 		
+		, "end_value"		
+		, "length" 		
+		, "expath"   			
+		, "frequency" 	
+		, "path_id"]
+	, "keys" : [
+		"path_id"]}
+}
