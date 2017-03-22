@@ -1,13 +1,14 @@
-drop table if exists forex_dash;
+drop table if exists forexDashMinute;
+drop table if exists forexDashDaily;
 drop table if exists forex;
-drop table if exists bank_rates;
-drop table if exists profitable_trends;
-drop table if exists efficient_trends;
+drop table if exists bankRates;
+drop table if exists profitableTrends;
+drop table if exists efficientTrends;
 
 
-create table forex_dash ( 
-	datetime 		varchar(40)	-- hhmmssddMMyy
-	, exstr	 		varchar(40)	-- ie "USDEUR" for usd to eur
+create table forexDashMinute ( 
+	timestamp 		bigint		-- hhmmssddMMyy
+	, ticker  		varchar(40)	-- ie "USDEUR" for usd to eur
 	, start	 		varchar(40) 	-- might not need this abv
 	, start_full 		varchar(255) 	-- full name of currency
 	, end 			varchar(40) 
@@ -18,22 +19,36 @@ create table forex_dash (
 	, low 			double
 	, close 		double
 	, ex_id 		varchar(40)	-- hash based on start and end currency
-	, primary key(datetime, exstr) 
+	, primary key(timestamp, ticker) 
 );
 
-create table forex ( -- extraneous probly
-	datetime 		varchar(40)	-- hhmmssddMMyy
-	, exstr	 		varchar(40)	-- ie "USDEUR" for usd to eur
+create table forexDashDaily ( 
+	timestamp 		bigint		-- hhmmssddMMyy
+	, ticker  		varchar(40)	-- ie "USDEUR" for usd to eur
+	, start	 		varchar(40) 	-- might not need this abv
+	, start_full 		varchar(255) 	-- full name of currency
+	, end 			varchar(40) 
+	, end_full 		varchar(255)
+	, high  		double		
+	, volume 		double
+	, open 			double
+	, low 			double
+	, close 		double
+	, ex_id 		varchar(40)	-- hash based on start and end currency
+	, primary key(timestamp, ticker) 
+);
+
+create table forex ( 
+	ticker 	 		varchar(40) primary key	-- ie "USDEUR" for usd to eur
 	, start	 		varchar(40) 	-- might not need this abv
 	, start_full 		varchar(255) 	-- full name of currency
 	, end 			varchar(40) 
 	, end_full 		varchar(255)
 	, rate 			double		-- value of second given 1 of first
 	, ex_id 		varchar(40)	-- hash based on start and end currency
-	, primary key(datetime, exstr) 
 );
 
-create table bank_rates (	-- extraneous probly
+create table bankRates (	-- extraneous probly
 	start 			varchar(40)  	-- starting currency abv
 	, start_full 		varchar(255)  	-- full name of currency
 	, end 			varchar(40) 
@@ -45,7 +60,7 @@ create table bank_rates (	-- extraneous probly
 );
 
 
-create table profitable_trends(
+create table profitableTrends(
 	start	 		varchar(40) 	-- starting currency abv
 	, start_full 		varchar(255) 	-- full name of currency
 	, end	 		varchar(40) 
@@ -59,7 +74,7 @@ create table profitable_trends(
 );
 
 
-create table efficient_trends(
+create table efficientTrends(
 	start	 		varchar(40) 	-- starting currency abv
 	, start_full 		varchar(255) 	-- full name of currency
 	, end	 		varchar(40) 
@@ -72,5 +87,6 @@ create table efficient_trends(
 	, path_id 		varchar(40)	primary key	-- hashed based on expath variable
 );
 
-alter table forex_dash add constraint fdash_unique unique (datetime,exstr);
-alter table forex add constraint forex_unique unique (datetime,exstr);
+alter table forexDashMinute add constraint fminute_unique unique (timestamp,ticker);
+alter table forexDashDaily add constraint fdaily_unique unique (timestamp,ticker);
+alter table forex add constraint forex_unique unique (ticker);

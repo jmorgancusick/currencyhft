@@ -4,40 +4,40 @@
 import MySQLdb as sql
 import json
 
-globalCredsFile = "../../credentials.txt"
+CREDSFILE = "../../credentials.txt"
 
 formatFile = open("tableColumns.json",'r')
-formats = json.loads(formatFile.read())
+FORMATS = json.loads(formatFile.read())
 formatFile.close()
 
 
 #open database connection
-def connect(credsFile = None):
+def Connect(credsFile = None):
     if credsFile == None:
-	credsFile = globalCredsFile
+	credsFile = CREDSFILE
     file = open(credsFile, 'r')
     creds = file.read().strip()
     file.close()
     creds = creds.split("\n")
     try:
-	db = sql.connect(host=creds[0],user=creds[1],passwd=creds[2],db='schemaTest')
+	db = sql.connect(host=creds[0],user=creds[1],passwd=creds[2],db='currencyhft')
 	cur = db.cursor()
 	return db, cur
     except Exception as e:
 	print "ERROR: database connection error\n"+str(e)
 
 #close database connection
-def close(db):
+def Close(db):
     db.close()
 
 #insert new rows into database
 #data is a dictionary
-def insert(cur, table, data):
+def Insert(cur, table, data):
     tableCols = ""
     values = ""
     update = ""
-    cols = formats[table]["cols"]
-    keys = formats[table]["keys"]
+    cols = FORMATS[table]["cols"]
+    keys = FORMATS[table]["keys"]
     for c in cols:
 	tableCols += c+","
 	if c not in keys:
@@ -63,14 +63,13 @@ def insert(cur, table, data):
 	print "ERROR: unable to add or update row to table" + str(e) 
 
 if __name__ == '__main__':
-    db,cur = connect()
-    data = {"datetime" : "05194503202017"	
-    , "exstr" : "USDEUR"	
+    db,cur = Connect()
+    data = {"ticker" : "USDEUR"	
     , "start" : "USD"	
     , "start_full" : "US Dollar"    
     , "end" : "EUR"
     , "end_full" : "Euros"	
     , "rate" : 2.2768768
     , "ex_id" : "1321321"}
-    insert(cur,'forex',data)
-    close(db)
+    Insert(cur,'forex',data)
+    Close(db)

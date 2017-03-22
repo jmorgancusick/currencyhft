@@ -1,6 +1,6 @@
-{"forex_dash" : { "cols" : [
-		"datetime" 		
-		, "exstr" 		
+{"forexDashMinute" : { "cols" : [
+		"timestamp" 		
+		, "ticker" 		
 		, "start"	 			
 		, "start_full" 		 	
 		, "end" 			
@@ -12,12 +12,28 @@
 		, "close"			
 		, "ex_id"]
 	, "keys" : [
-		"datetime"
-		, "exstr"]}
+		"timestamp"
+		, "ticker"]}
+
+, "forexDashDaily" : { "cols" : [
+		"timestamp" 		
+		, "ticker" 		
+		, "start"	 			
+		, "start_full" 		 	
+		, "end" 			
+		, "end_full" 		
+		, "high"
+		, "volume"
+		, "open"
+		, "low"
+		, "close"			
+		, "ex_id"]
+	, "keys" : [
+		"timestamp"
+		, "ticker"]}
 
 , "forex" : { "cols" : [
-		"datetime" 		
-		, "exstr" 		
+		"ticker" 		
 		, "start"	 			
 		, "start_full" 		 	
 		, "end" 			
@@ -25,10 +41,9 @@
 		, "rate" 			
 		, "ex_id"]
 	, "keys" : [
-		"datetime"
-		, "exstr"]}
+		"ticker"]}
 	 
-, "bank_rates" : { "cols" : [	
+, "bankRates" : { "cols" : [	
 		"start" 			 	
 		, "start_full" 		  	
 		, "end" 			
@@ -40,7 +55,7 @@
 	, "keys" : [
 		"ex_id"]}	
 
-, "profitable_trends" :{ "cols" : [
+, "profitableTrends" :{ "cols" : [
 	"start"	 			
 		, "start_full" 		 	
 		, "end"	 		
@@ -53,7 +68,7 @@
 	, "keys" : [
 		"path_id"]}
 
-, "efficient_trends" :{ "cols" : [
+, "efficientTrends" :{ "cols" : [
 		"start"	 			
 		, "start_full" 		 	
 		, "end"	 		
