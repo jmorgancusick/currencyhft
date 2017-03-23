@@ -1,5 +1,5 @@
 node/node_modules
-frontend/node_modules
+node/frontend/node_modules
 *~
 *.log
 node/src/build
