@@ -44,8 +44,11 @@ void Exchange(const FunctionCallbackInfo<Value>& args) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
     return;
   }
+
+  long date = 20170323033730;
+  unordered_map<std::string, double> *rows = db->selectExchangeWithID(id,date,1);
   
-  unordered_map<std::string, double> *rows = db->selectExchangeWithID(id);
+  //unordered_map<std::string, double> *rows = db->selectExchangeWithID(id);
 
   int i = 0;
 

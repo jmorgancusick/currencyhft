@@ -10,6 +10,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <math.h>
 
 #include "mysql_connection.h"
 
@@ -70,6 +71,42 @@ class API{
     }
     return 0;
   }
+
+  //only works for string, double pairs
+  unordered_map<string, double> * SelectExchangeDailyHistory(string id, long date, int years){
+    unordered_map<string, double> *rows = new unordered_map<string, double>();
+
+    cout<<"id: "<<id<<endl;
+    try{
+
+      pstmt.reset(con->prepareStatement("select * 
+                                        from forexDashDaily 
+                                        where id=?, and timestamp>?, and timestamp<=?"));
+      pstmt->setString(1,id);
+      pstmt->setString(2,date - years*pow(10,10));
+      pstmt->setString(3,date)
+      
+      res.reset(pstmt->executeQuery());
+
+      for(;;){
+        while (res->next()) {
+          (*rows)[res->getString("id")] = res->getDouble("close");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;
+      }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
 
   //only works for string, double pairs
   unordered_map<string, double> * selectExchangeWithID(string id){
