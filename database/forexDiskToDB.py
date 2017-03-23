@@ -13,23 +13,31 @@ import json
 import glob
 from pprint import pprint
 
+import dbapi
+
 def main():
-	print "Hello World!"
+  print "Hello World!"
 
-	data = {}
-	
-	for folder in glob.glob('data/*'):
-		print "foldername: ", folder
-		for filename in glob.glob(folder+'/*.txt'):
-			print "\tfilename: ", filename
-			ticker = folder.split('/')[1]
-			print "ticker: ", ticker
+  data = {}
 
-			with open(filename, 'r') as f:
-				data = json.load(f)
-				pprint(data)
-				return			
+  db = dbapi.API()
+  db.connect()
+  
+  for folder in glob.glob('data/*'):
+    print "foldername: ", folder
+    for filename in glob.glob(folder+'/*.txt'):
+      print "\tfilename: ", filename
+      ticker = folder.split('/')[1]
+      print "ticker: ", ticker
+
+      with open(filename, 'r') as f:
+        data = json.load(f)
+        #pprint(data)
+        db.close()
+        return      
+
+
 
 
 if __name__ == '__main__':
-	main()
+  main()
