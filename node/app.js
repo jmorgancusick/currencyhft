@@ -24,7 +24,7 @@ app.listen(3000, function () {
 
 app.get('/exchange/:id', function(req, res) {
 
-    // log table name
+    // log id
     console.log(req.params.id);
 
     ret = addon.exchange(req.params.id);
@@ -38,6 +38,29 @@ app.get('/table/:tableName', function(req, res) {
     console.log(req.params.tableName);
 
     ret = addon.table(req.params.tableName);
+    console.log(ret);
+
+    res.send(ret);
+});
+
+app.get('/tickerData/:empty', function(req, res) {
+
+    // function takes 0 args (automatic load)
+    console.log(req.params.empty);
+
+    ret = addon.TickerData(req.params.empty);
+    // should this not take any params? just call function like this:
+    // ret = addon.TickerData();
+    console.log(ret);
+    
+    res.send(ret);
+});
+
+app.get('/chartData/:chartId', function(req, res) {
+    // log chartId
+    console.log(req.params.chartId);
+
+    ret = addon.ChartData(req.params.chartId);
     console.log(ret);
 
     res.send(ret);
