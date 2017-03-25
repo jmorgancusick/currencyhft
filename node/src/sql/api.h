@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <stdio.h>
 
 #include <vector>
 #include <unordered_map>
@@ -69,6 +70,18 @@ class API{
     }
     return 0;
   }
+
+
+  struct chart_info {
+    long timestamp;
+    string ticker;
+    double high;
+    double volume;
+    double open;
+    double low;
+    double close;
+  };
+
 
   //only works for string, double pairs
   unordered_map<string, double> * selectExchangeWithID(string id){
@@ -137,6 +150,79 @@ class API{
     }
     return rows;
   }
+
+
+unordered_map<string, double> * selectAllTickerData(){
+    unordered_map<string, double> *rows = new unordered_map<string, double>();
+
+    try{
+      
+      pstmt.reset(con->prepareStatement("select * from forex"));
+      
+      //res now has return data
+      res.reset(pstmt->executeQuery());
+
+      for(;;)
+  {
+    while (res->next()) {
+      (*rows)[res->getString("ticker")] = res->getDouble("change_day");
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;  //No more results
+  }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+
+vector<chart_info> * selectHistoricalTickerData(string ticker, string interval){
+    vector<chart_info> *rows = new vector<chart_info>();
+
+    try{
+      //mysql query
+      pstmt.reset(con->prepareStatement("select * from forexDashMinute"));
+      
+      //res now has return data
+      res.reset(pstmt->executeQuery());
+
+      for(;;)
+  {
+    while (res->next()) {
+      chart_info rowData;
+      rowData.timestamp = res->getInt("timestamp");
+      rowData.ticker = res->getString("ticker");
+      rowData.high = res->getDouble("high");
+      rowData.volume = res->getDouble("volume");
+      rowData.open = res->getDouble("open");
+      rowData.low = res->getDouble("low");
+      rowData.close = res->getDouble("close");
+      (*rows).push_back(rowData);
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;  //No more results
+  }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+
+
 
  private:
   string host;
