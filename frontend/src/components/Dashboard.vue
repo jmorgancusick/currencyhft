@@ -3,8 +3,9 @@
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
-      <li>Chart</li>
-      <li>Tickers</li>
+      <el-button>Table</el-button>
+      <el-button>Chart</el-button>
+      <el-button>Tickers</el-button>
     </ul>
 
     {{msg}}
@@ -19,6 +20,15 @@ export default {
     return {
       msg: 'Dashboard'
     }
+  },
+  created () {
+    // get will make a call to api not api.json
+    /*axios.get("/api.json").then( (response) => {
+      console.log(response)
+      this.msg = response.data;
+    }).catch( (error) => {
+      console.log("ERROR:", error)
+    })*/
   }
 }
 </script>

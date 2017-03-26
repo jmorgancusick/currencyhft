@@ -1,15 +1,26 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <router-view></router-view>
+    <router-view @testEvent="listener($event)" :testProps="inputMsg"></router-view>
+    <router-link :to="{name: 'home'}">Home</router-link>
     <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
-    <router-link :to="{name: 'hello'}">Home</router-link>
+    <input v-model="inputMsg" type="text">
   </div>
 </template>
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  data () {
+    return {
+      inputMsg: ""
+    }
+  },
+  methods: {
+    listener(e) {
+      console.log(e)
+    }
+  }
 }
 </script>
 

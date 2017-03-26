@@ -7,6 +7,10 @@ import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en';
 import 'element-ui/lib/theme-default/index.css';
 
+import axios from 'axios';
+
+window.axios = axios;
+
 Vue.use(ElementUI, { locale });
 
 Vue.config.productionTip = false
