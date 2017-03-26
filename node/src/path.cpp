@@ -24,7 +24,6 @@ Path::Path(const Graph& graph, const string& start, const string& end) {
   }
 }
 
-
 double Path::ConvertStartAmount(const double& amount) {
   API *db = new API();
   int retVal = db->connect();
