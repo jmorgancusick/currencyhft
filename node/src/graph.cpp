@@ -43,8 +43,6 @@ bool Graph::SetEdgeWeight(const string& startCurr, const string& endCurr, const 
 
   graph[startCurr][endCurr] = rate;
 
-  cout << "Set rate " << startCurr << " -> " << endCurr << ": " << rate << endl;
-
   return true;
 }
 

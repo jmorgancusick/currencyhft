@@ -25,7 +25,7 @@ Path::Path(const Graph& graph, const string& start, const string& end) {
 }
 
 
-double Path::ConvertStartAmount(const double& start) {
+double Path::ConvertStartAmount(const double& amount) {
   API *db = new API();
   int retVal = db->connect();
 
@@ -33,11 +33,16 @@ double Path::ConvertStartAmount(const double& start) {
   ++itrTo;
   auto itrFrom = path.begin();
 
+  double result = amount;
+
   while (itrTo != path.end()) {
-    cout << *itrFrom << " to " << *itrTo << endl;
+    double rate = db->GetForexRate(*itrFrom+*itrTo+"=X");
+    result *= rate;
+    cout << *itrFrom << "->" << *itrTo << ": " << result << ", rate: " << rate << endl;
     ++itrTo;
     ++itrFrom;
   }
 
-  return start;
+  delete db;
+  return result;
 }

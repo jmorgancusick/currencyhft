@@ -25,7 +25,7 @@ class Path {
 
     //===========Helpers================
     //TODO: convert an amount from starting currency to ending currency using optimal path
-    double ConvertStartAmount(const double& start);
+    double ConvertStartAmount(const double& amount);
 
   private:
     //optimal path, stored as vector of nodes from start to end in order
