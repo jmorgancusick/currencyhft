@@ -3,7 +3,7 @@
   <div id="app">
     <el-menu theme="dark" :default-active="activeIndex" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1">
-        <router-link :to="{name: 'home'}" style="a">Home</router-link>
+        <router-link :to="{name: 'home'}">Home</router-link>
       </el-menu-item>
       <el-menu-item index="2">
         <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
@@ -50,12 +50,15 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #82BF9D;
 }
 #img {
   display: block;
   margin: auto;
   width: 25%; 
+}
+a:link{
+  text-decoration: none;
 }
 </style>
 
