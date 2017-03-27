@@ -1,5 +1,5 @@
 '''
-forexDataScrape.py
+forexDiskToDB.py
 
 Usage:
 forexDiskToDB.py
