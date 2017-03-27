@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <div id="img">
+      <img src="./assets/temp-logo.svg">
+    </div>
     <router-view @testEvent="listener($event)" :testProps="inputMsg"></router-view>
     <router-link :to="{name: 'home'}">Home</router-link>
     <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
@@ -32,5 +34,11 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+#img {
+  display: block;
+  margin: auto;
+  margin-bottom: -20px;
+  width: 25%; 
 }
 </style>

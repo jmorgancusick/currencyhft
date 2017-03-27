@@ -22,7 +22,7 @@ export default {
     }
   },
   created () {
-    // get will make a call to api not api.json
+    // get will make a call to api 
     axios.get("localhost:3000/tickerData/").then( (response) => {
       console.log(response)
       this.msg = response.data;
