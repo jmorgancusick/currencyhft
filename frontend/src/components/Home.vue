@@ -1,9 +1,19 @@
 <template>
-  <div>
+  <div class="home">
+    <div class="block">
+    <!--<span class="demonstration">Switch when indicator is clicked</span>-->
+      <el-carousel trigger="click">
+        <el-carousel-item v-for="item in 3">
+          <img src="../assets/temp-banner.svg">
+        </el-carousel-item>
+      </el-carousel>
+    </div>
+    
     <div id="img">
       <img src="../assets/temp-logo.svg">
     </div>
-    <div class="home">
+
+    <div>
       <h1>{{ msg }}</h1>
       <h1>{{ testProps }}</h1>
       <el-button @click="test()">Click Here</el-button>
@@ -16,6 +26,7 @@ export default {
   name: 'home',
   data () {
     return {
+      item: '',
       msg: 'Currency Home',
       data1: 100
     }
@@ -29,6 +40,7 @@ export default {
 }
 </script>
 
+
 <!--
 data 
 computed
@@ -38,6 +50,11 @@ methods
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-carousel__item {
+  display: block;
+  color: #475669;
+  opacity: 1;
+}
 #img {
   display: block;
   margin: auto;
