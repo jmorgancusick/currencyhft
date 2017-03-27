@@ -6,7 +6,9 @@
     <router-view @testEvent="listener($event)" :testProps="inputMsg"></router-view>
     <router-link :to="{name: 'home'}">Home</router-link>
     <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
-    <input v-model="inputMsg" type="text">
+    <div>
+      <input v-model="inputMsg" type="text">
+    </div>
   </div>
 </template>
 
