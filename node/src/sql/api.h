@@ -319,4 +319,3 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
 
 
 #endif
-Contact GitHub API Training Shop Blog About
