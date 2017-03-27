@@ -1,0 +1,86 @@
+{"forexDashMinute" : { "cols" : [
+		"timestamp" 		
+		, "ticker" 		
+		, "start"	 			
+		, "start_full" 		 	
+		, "end" 			
+		, "end_full" 		
+		, "high"
+		, "volume"
+		, "open"
+		, "low"
+		, "close"			
+		, "ex_id"]
+	, "keys" : [
+		"timestamp"
+		, "ticker"]}
+
+, "forexDashDaily" : { "cols" : [
+		"timestamp" 		
+		, "ticker" 		
+		, "start"	 			
+		, "start_full" 		 	
+		, "end" 			
+		, "end_full" 		
+		, "high"
+		, "volume"
+		, "open"
+		, "low"
+		, "close"			
+		, "ex_id"]
+	, "keys" : [
+		"timestamp"
+		, "ticker"]}
+
+, "forex" : { "cols" : [
+		"ticker" 		
+		, "start"	 			
+		, "start_full" 		 	
+		, "end" 			
+		, "end_full" 		
+		, "rate" 			
+		, "ex_id"
+		, "current_rate"
+  	, "last_rate"
+  	, "change_day"]
+	, "keys" : [
+		"ticker"]}
+	 
+, "bankRates" : { "cols" : [	
+		"start" 			 	
+		, "start_full" 		  	
+		, "end" 			
+		, "end_full" 		
+		, "bank" 	 		
+		, "bank_full" 		
+		, "rate"	 		
+		, "ex_id"]	
+	, "keys" : [
+		"ex_id"]}	
+
+, "profitableTrends" :{ "cols" : [
+	"start"	 			
+		, "start_full" 		 	
+		, "end"	 		
+		, "end_full" 		
+		, "profit"  		
+		, "length" 		
+		, "expath"   			
+		, "frequency"		
+		, "path_id"]
+	, "keys" : [
+		"path_id"]}
+
+, "efficientTrends" :{ "cols" : [
+		"start"	 			
+		, "start_full" 		 	
+		, "end"	 		
+		, "end_full" 		
+		, "end_value"		
+		, "length" 		
+		, "expath"   			
+		, "frequency" 	
+		, "path_id"]
+	, "keys" : [
+		"path_id"]}
+}
