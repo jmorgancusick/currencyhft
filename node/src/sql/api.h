@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <stdio.h>
 
 #include <vector>
 #include <unordered_map>
@@ -43,7 +44,6 @@ class API{
 	getline(myfile,user);
 	getline(myfile,pass);
 	getline(myfile,db);
-	cout<<host<<" , "<<user<<" , "<<pass<<" , "<<db<<endl;
 
 	
 	myfile.close();
@@ -71,6 +71,18 @@ class API{
     }
     return 0;
   }
+
+
+  struct chart_info {
+    long timestamp;
+    string ticker;
+    double high;
+    double volume;
+    double open;
+    double low;
+    double close;
+  };
+
 
   //only works for string, double pairs
   unordered_map<string, double> * SelectExchangeDailyHistory(string id, long date, int years){
@@ -175,6 +187,115 @@ class API{
     }
     return rows;
   }
+
+
+unordered_map<string, double> * selectAllTickerData(){
+    unordered_map<string, double> *rows = new unordered_map<string, double>();
+
+    try{
+      
+      pstmt.reset(con->prepareStatement("select * from forex"));
+      
+      //res now has return data
+      res.reset(pstmt->executeQuery());
+
+      for(;;)
+  {
+    while (res->next()) {
+      (*rows)[res->getString("ticker")] = res->getDouble("change_day");
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;  //No more results
+  }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+vector<chart_info> * selectHistoricalTickerData(string ticker, string interval){
+    vector<chart_info> *rows = new vector<chart_info>();
+
+    try{
+      //mysql query
+      pstmt.reset(con->prepareStatement("select * from forexDashMinute"));
+      
+      //res now has return data
+      res.reset(pstmt->executeQuery());
+
+      for(;;)
+  {
+    while (res->next()) {
+      chart_info rowData;
+      rowData.timestamp = res->getInt("timestamp");
+      rowData.ticker = res->getString("ticker");
+      rowData.high = res->getDouble("high");
+      rowData.volume = res->getDouble("volume");
+      rowData.open = res->getDouble("open");
+      rowData.low = res->getDouble("low");
+      rowData.close = res->getDouble("close");
+      (*rows).push_back(rowData);
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;  //No more results
+  }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+  //retrieves all currencies to store in graph
+  vector<string> GetAllCurrencies() {
+    vector<string> currencies;
+    try{
+      //placeholder until db is filled
+      pstmt.reset(con->prepareStatement("select distinct start from forex order by start"));
+      res.reset(pstmt->executeQuery());
+
+      while (res->next()) {
+        currencies.push_back(res->getString("start"));
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+      return {};
+    }
+    return currencies;
+  }
+
+  //retrieves forex rate of a particular ticker
+  double GetForexRate(string ticker) {
+    //initialize as NaN
+    double rate = numeric_limits<double>::quiet_NaN();
+    try{
+      //placeholder until db is filled
+      pstmt.reset(con->prepareStatement("select rate from forex where ticker = ?"));
+      pstmt->setString(1,ticker);
+
+      res.reset(pstmt->executeQuery());
+      res->next();
+
+      rate = res->getDouble("rate");
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rate;
+}
+
 
  private:
   string host;
