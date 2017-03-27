@@ -46,19 +46,30 @@ app.get('/table/:tableName', function(req, res) {
 app.get('/tickerData/', function(req, res) {
     // function takes 0 args (automatic load)
 
-    ret = addon.TickerData();
+    ret = addon.tickerData();
     // should this not take any params? just call function like this:
     // ret = addon.TickerData();
     console.log(ret);
     
+    // for frontend dev
+    ret = { "0" : [{"ticker":"USDEUR=X", "percentChange": "0.12"},
+        {"ticker":"USDCAD=X", "percentChange": "0.77"},
+        {"ticker":"JPYEUR=X", "percentChange": "0.89"},
+        {"ticker":"AUDEUR=X", "percentChange": "-0.55"},
+        {"ticker":"NZDJPY=X", "percentChange": "0.64"},
+        {"ticker":"CHFEUR=X", "percentChange": "-1.90"},
+        {"ticker":"GBPNZD=X", "percentChange": "0.43"}]
+    }
+
     res.send(ret);
+
 });
 
 app.get('/chartData/:chartId', function(req, res) {
     // log chartId
     console.log(req.params.chartId);
 
-    ret = addon.ChartData(req.params.chartId);
+    ret = addon.chartData(req.params.chartId);
     console.log(ret);
 
     res.send(ret);

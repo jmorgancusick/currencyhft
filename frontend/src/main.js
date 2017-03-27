@@ -6,6 +6,8 @@ import router from './router'
 import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en';
 import 'element-ui/lib/theme-default/index.css';
+import '../theme/menu.css';
+import '../theme/menu-item.css';
 
 import axios from 'axios';
 

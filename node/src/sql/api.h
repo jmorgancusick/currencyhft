@@ -182,7 +182,6 @@ unordered_map<string, double> * selectAllTickerData(){
     return rows;
   }
 
-
 vector<chart_info> * selectHistoricalTickerData(string ticker, string interval){
     vector<chart_info> *rows = new vector<chart_info>();
 
@@ -221,7 +220,44 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval){
     return rows;
   }
 
+  //retrieves all currencies to store in graph
+  vector<string> GetAllCurrencies() {
+    vector<string> currencies;
+    try{
+      //placeholder until db is filled
+      pstmt.reset(con->prepareStatement("select distinct start from forex order by start"));
+      res.reset(pstmt->executeQuery());
 
+      while (res->next()) {
+        currencies.push_back(res->getString("start"));
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+      return {};
+    }
+    return currencies;
+  }
+
+  //retrieves forex rate of a particular ticker
+  double GetForexRate(string ticker) {
+    //initialize as NaN
+    double rate = numeric_limits<double>::quiet_NaN();
+    try{
+      //placeholder until db is filled
+      pstmt.reset(con->prepareStatement("select rate from forex where ticker = ?"));
+      pstmt->setString(1,ticker);
+
+      res.reset(pstmt->executeQuery());
+      res->next();
+
+      rate = res->getDouble("rate");
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rate;
+}
 
 
  private:

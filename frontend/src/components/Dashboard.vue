@@ -1,14 +1,11 @@
 <template>
   <div class="dashboard">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
     <ul>
       <el-button>Table</el-button>
       <el-button>Chart</el-button>
       <el-button>Tickers</el-button>
     </ul>
-
-    {{msg}}
 
   </div>
 </template>
@@ -22,8 +19,8 @@ export default {
     }
   },
   created () {
-    // get will make a call to api not api.json
-    axios.get("/api.json").then( (response) => {
+    // get will make a call to api 
+    axios.get("localhost:3000/tickerData/").then( (response) => {
       console.log(response)
       this.msg = response.data;
     }).catch( (error) => {
