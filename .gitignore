@@ -3,3 +3,4 @@ node/frontend/node_modules
 *~
 *.log
 node/src/build
+*.DS_Store
