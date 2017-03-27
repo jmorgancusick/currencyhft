@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
     <ul>
       <el-button>Table</el-button>
       <el-button>Chart</el-button>
