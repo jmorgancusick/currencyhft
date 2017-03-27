@@ -198,11 +198,10 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
         cout << "# ERR: Improper input for variable interval in selectHistoricalTickerData" << endl;
         return NULL;
       }
-      pstmt.reset(con->prepareStatement("select * from ? where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
-      pstmt->setString(1,table);
-      pstmt->setString(2,ticker);
-      pstmt->setInt(3,endDate);
-      pstmt->setInt(4,startDate);
+      pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
+      pstmt->setString(1,ticker);
+      pstmt->setInt(2,endDate);
+      pstmt->setInt(3,startDate);
 
       //res now has return data
       res.reset(pstmt->executeQuery());

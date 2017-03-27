@@ -208,7 +208,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
   }
 
   v8::String::Utf8Value param2(args[1]->ToString());
-  std::string interval = std::string(*param2);
+  std::string timeframe = std::string(*param2);
   
   //TODO: move this to init
   API *db = new API();
@@ -218,8 +218,11 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
     return;
   }
-  
-  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,1450000000,1490064000);    //Database query
+
+  string interval = "day";
+  long startDate = 1450000000;
+  long endDate = 1490064000;
+  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
   //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
 //TODO change data structure to array of struct
 
