@@ -33,6 +33,7 @@
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^3.1.4",
     "css-loader": "^0.26.1",
+    "element-theme-default": "^1.2.5",
     "eslint": "^3.14.1",
     "eslint-friendly-formatter": "^2.0.7",
     "eslint-loader": "^1.6.1",

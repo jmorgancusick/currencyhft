@@ -8,8 +8,6 @@
       <el-button>Tickers</el-button>
     </ul>
 
-    {{msg}}
-
   </div>
 </template>
 

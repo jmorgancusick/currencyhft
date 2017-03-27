@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Dashboard from '@/components/Dashboard'
 import Arbitrage from '@/components/Arbitrage'
-
+import Calculator from '@/components/Calculator'
 
 Vue.use(Router)
 
@@ -15,14 +15,19 @@ export default new Router({
       component: Home
     },
     {
-      path:'/dashboard',
+      path: '/dashboard',
       name: 'dashboard',
       component: Dashboard
     }, 
-    {
-      path:'/arbitrage',
+    { 
+      path: '/arbitrage',
       name: 'arbitrage',
       component: Arbitrage
+    }, 
+    {
+      path: '/calculator',
+      name: 'calculator',
+      component: Calculator
     }
   ]
 })
