@@ -45,10 +45,8 @@ void Exchange(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  long date = 20170323033730;
-  unordered_map<std::string, double> *rows = db->selectExchangeWithID(id,date,1);
   
-  //unordered_map<std::string, double> *rows = db->selectExchangeWithID(id);
+  unordered_map<std::string, double> *rows = db->selectExchangeWithID(id);
 
   int i = 0;
 
@@ -221,7 +219,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
   
-  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval);    //Database query
+  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,1450000000,1490064000);    //Database query
   //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
 //TODO change data structure to array of struct
 
