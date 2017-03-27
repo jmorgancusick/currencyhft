@@ -5,6 +5,10 @@
       <el-button>Table</el-button>
       <el-button>Chart</el-button>
       <el-button>Tickers</el-button>
+
+      {{tickers}}
+
+      {{chartData}}
     </ul>
 
   </div>
@@ -15,14 +19,24 @@ export default {
   name: 'dashboard',
   data () {
     return {
-      msg: 'Dashboard'
+      msg: 'Dashboard',
+      tickers: '',
+      chartData: ''
     }
   },
   created () {
-    // get will make a call to api 
+    // call for tickerData
     axios.get("localhost:3000/tickerData/").then( (response) => {
       console.log(response)
-      this.msg = response.data;
+      this.tickers = response.data;
+    }).catch( (error) => {
+      console.log("ERROR:", error)
+    })
+
+    // call for chartData
+    axios.get("localhost:3000/chartData/USDEUR=X/YTD").then( (response) => {
+      console.log(response)
+      this.chartData = response.data;
     }).catch( (error) => {
       console.log("ERROR:", error)
     })
