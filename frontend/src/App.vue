@@ -1,5 +1,12 @@
 <template>
   <div id="app">
+    <el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+      <el-menu-item index="1">Dashboard</el-menu-item>
+      <el-menu-item index="2">Arbitrage</el-menu-item>
+      <el-menu-item index="3">Calculator</el-menu-item>
+    </el-menu>
+    <div class="line"></div>
+
     <div id="img">
       <img src="./assets/temp-logo.svg">
     </div>
@@ -13,20 +20,21 @@
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data () {
-    return {
-      inputMsg: ""
-    }
-  },
-  methods: {
-    listener(e) {
-      console.log(e)
+  export default {
+    name: 'app',
+    data() {
+      return {
+        activeIndex: '1'
+      };
+    },
+    methods: {
+      handleSelect(key, keyPath) {
+        console.log(key, keyPath);
+      }
     }
   }
-}
 </script>
+
 
 <style>
 #app {
@@ -44,3 +52,4 @@ export default {
   width: 25%; 
 }
 </style>
+
