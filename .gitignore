@@ -3,3 +3,4 @@ node/node_modules
 *.log
 node/src/build
 *.pyc
+*.DS_Store
