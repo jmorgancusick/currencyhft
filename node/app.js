@@ -65,11 +65,12 @@ app.get('/tickerData/', function(req, res) {
 
 });
 
-app.get('/chartData/:chartId', function(req, res) {
+app.get('/chartData/:ticker/:timeframe', function(req, res) {
     // log chartId
-    console.log(req.params.chartId);
+    console.log(req.params.ticker);
+    console.log(req.params.timeframe);
 
-    ret = addon.chartData(req.params.chartId);
+    ret = addon.chartData(req.params.ticker,req.params.timeframe);
     console.log(ret);
 
     res.send(ret);
