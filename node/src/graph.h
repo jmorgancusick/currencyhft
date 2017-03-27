@@ -25,7 +25,6 @@ class Graph {
   public:
     //===========Constructors===========
     Graph(const vector<string>& currencies);
-    //TODO: destructor
 
     //===========Setters================
     void InitializeCurrencies(const vector<string>& currencies);

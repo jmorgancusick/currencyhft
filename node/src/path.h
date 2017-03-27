@@ -17,7 +17,6 @@ class Path {
   public:
     //===========Constructors===========
     Path(const Graph& graph, const string& start, const string& end);
-    //TODO: destructor
 
     //===========Setters================
     double CalcTotalRate();

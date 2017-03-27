@@ -48,10 +48,7 @@ bool Graph::SetEdgeWeight(const string& startCurr, const string& endCurr, const 
 //gets the edge weight from startCurr to endCurr
 double Graph::GetEdgeWeight(const string& startCurr, const string& endCurr) const {
   //check if start and end nodes are actually in graph, say edge weight is infinity if either is not
-  if (!CheckCurrency(startCurr)) {
-    return numeric_limits<double>::infinity();
-  }
-  if (!CheckCurrency(endCurr)) {
+  if (!CheckCurrency(startCurr) || !CheckCurrency(endCurr)) {
     return numeric_limits<double>::infinity();
   }
 

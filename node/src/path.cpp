@@ -18,9 +18,9 @@ Path::Path(const Graph& graph, const string& start, const string& end) {
     return;
   }
 
-  cout << "Found optimal path from " << start << " to " << end << endl;
-
   CalcTotalRate();
+
+  cout << "Found optimal path from " << start << " to " << end << endl;
 }
 
 //sets the total rate of converting from start to end
