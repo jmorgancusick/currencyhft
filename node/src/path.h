@@ -20,16 +20,20 @@ class Path {
     //TODO: destructor
 
     //===========Setters================
-
+    double CalcTotalRate();
     //===========Getters================
+    vector<string>* GetPath() {return &path;}
+    double GetTotalRate() const {return totalRate;}
 
     //===========Helpers================
     //TODO: convert an amount from starting currency to ending currency using optimal path
-    double ConvertStartAmount(const double& amount);
+    double ConvertStartAmount(const double& amount) const {return amount*totalRate;}
+    double ConvertEndAmount(const double& amount) const {return amount/totalRate;}
 
   private:
     //optimal path, stored as vector of nodes from start to end in order
     vector<string> path;
+    double totalRate;
 };
 
 #endif

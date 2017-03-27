@@ -12,7 +12,6 @@ Graph::Graph(const vector<string>& currencies) {
 
 //initialize Graph nodes and weights based on input currencies
 void Graph::InitializeCurrencies(const vector<string>& currencies) {
-  //TODO: check that all currencies are properly formatted (once standard is decided), no duplicates
   N = currencies.size();
   graph.reserve(N);
 
@@ -189,7 +188,6 @@ vector<string> Graph::GetOptimalPath(const DistanceEstimates& dists, const strin
   vector<string> path;
   string currNode = end;
   //loop backwards until the starting node is reached
-  //note: if there is actually a cycle, this is an infinite loop, might be worth checking first
   while (currNode != "HEAD") {
     path.push_back(currNode);
     currNode = GetPrevNode(dists, currNode);
@@ -197,8 +195,13 @@ vector<string> Graph::GetOptimalPath(const DistanceEstimates& dists, const strin
     if (currNode == "") {
       return {};
     }
-
+    //if path grows longer than number of nodes, must be in cycle
+    if (path.size() > N) {
+      cout << "Error: encountered cycle in optimal path" << endl;
+      return {};
+    }
   }
+
   reverse(path.begin(), path.end());
   return path;
 }
@@ -206,7 +209,7 @@ vector<string> Graph::GetOptimalPath(const DistanceEstimates& dists, const strin
 //returns the distance estimate to a node
 double Graph::GetDistEstimate(const DistanceEstimates& dists, const string& node) const {
   //if the requested node isn't known, say that is has infinite distance
-  if (dists.find(node) == dists.end()) {
+  if (!CheckCurrency(node)) {
     return numeric_limits<double>::infinity();
   }
   return (*(dists.find(node))).second.first;
@@ -215,7 +218,7 @@ double Graph::GetDistEstimate(const DistanceEstimates& dists, const string& node
 //returns the previous node in the current estimated path to a node
 string Graph::GetPrevNode(const DistanceEstimates& dists, const string& node) const {
   //if the requested node isn't known, say that the prev node is null
-  if (dists.find(node) == dists.end()) {
+  if (!CheckCurrency(node)) {
     return NULL;
   }
   return (*(dists.find(node))).second.second;

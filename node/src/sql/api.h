@@ -139,48 +139,35 @@ class API{
     return rows;
   }
 
+  //retrieves all currencies to store in graph
   vector<string> GetAllCurrencies() {
     vector<string> currencies;
     try{
-      cout << "Getting ready" << endl;
+      //placeholder until db is filled
       pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forexDashDaily"));
-      
-      cout << "Prepared statement" << endl;
-
       res.reset(pstmt->executeQuery());
 
-      cout << "Performed query" << endl;
-
-      for(;;)
-  {
-    while (res->next()) {
-      currencies.push_back(res->getString("curr"));
-      cout << "Added " << res->getString("curr") << endl;
-    }
-    if (pstmt->getMoreResults())
-      {
-        res.reset(pstmt->getResultSet());
-        continue;
+      while (res->next()) {
+        currencies.push_back(res->getString("curr"));
       }
-    break;
-  }
-    } catch(sql::SQLException &e){
+    }
+    catch(sql::SQLException &e) {
       printError(e);
       return {};
     }
     return currencies;
   }
 
+  //retrieves forex rate of a particular ticker
   double GetForexRate(string ticker) {
+    //initialize as NaN
     double rate = numeric_limits<double>::quiet_NaN();
     try{
-      //mysql query
+      //placeholder until db is filled
       pstmt.reset(con->prepareStatement("select distinct close as rate from forexDashDaily where ticker = ? limit 1"));
       pstmt->setString(1,ticker);
-      
-      //res now has return data
-      res.reset(pstmt->executeQuery());
 
+      res.reset(pstmt->executeQuery());
       res->next();
 
       rate = res->getDouble("rate");

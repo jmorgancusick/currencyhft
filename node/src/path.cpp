@@ -18,13 +18,13 @@ Path::Path(const Graph& graph, const string& start, const string& end) {
     return;
   }
 
-  cout << "Found optimal path from " << start << " to " << end << ":" << endl;
-  for (auto it = path.begin(); it != path.end(); ++it) {
-    cout << "\t" << *it << endl;
-  }
+  cout << "Found optimal path from " << start << " to " << end << endl;
+
+  CalcTotalRate();
 }
 
-double Path::ConvertStartAmount(const double& amount) {
+//sets the total rate of converting from start to end
+double Path::CalcTotalRate() {
   API *db = new API();
   int retVal = db->connect();
 
@@ -32,16 +32,20 @@ double Path::ConvertStartAmount(const double& amount) {
   ++itrTo;
   auto itrFrom = path.begin();
 
-  double result = amount;
+  double result = 1.0;
 
+  //multiply all forwards rates
   while (itrTo != path.end()) {
     double rate = db->GetForexRate(*itrFrom+*itrTo+"=X");
     result *= rate;
-    cout << *itrFrom << "->" << *itrTo << ": " << result << ", rate: " << rate << endl;
     ++itrTo;
     ++itrFrom;
   }
 
   delete db;
+
+  totalRate = result;
+  cout << "Total Rate: " << totalRate << endl;
   return result;
 }
+
