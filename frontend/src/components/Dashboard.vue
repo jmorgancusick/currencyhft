@@ -26,7 +26,7 @@ export default {
   },
   created () {
     // call for tickerData
-    axios.get("localhost:3000/tickerData/").then( (response) => {
+    axios.get("http://localhost:3000/tickerData/").then( (response) => {
       console.log(response)
       this.tickers = response.data;
     }).catch( (error) => {
@@ -34,7 +34,7 @@ export default {
     })
 
     // call for chartData
-    axios.get("localhost:3000/chartData/USDEUR=X/YTD").then( (response) => {
+    axios.get("http://localhost:3000/chartData/USDEUR=X/YTD").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {
