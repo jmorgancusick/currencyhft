@@ -19,7 +19,8 @@ class Path {
     Path(const Graph& graph, const string& start, const string& end);
 
     //===========Setters================
-    double CalcTotalRate();
+    
+
     //===========Getters================
     vector<string>* GetPath() {return &path;}
     double GetTotalRate() const {return totalRate;}
@@ -30,6 +31,8 @@ class Path {
     double ConvertEndAmount(const double& amount) const {return amount/totalRate;}
 
   private:
+    double CalcTotalRate();
+    
     //optimal path, stored as vector of nodes from start to end in order
     vector<string> path;
     double totalRate;
