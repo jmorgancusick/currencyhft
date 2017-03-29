@@ -5,11 +5,11 @@
       <el-button>Table</el-button>
       <el-button>Chart</el-button>
       <el-button>Tickers</el-button>
-
-      {{tickers}}
-
-      {{chartData}}
     </ul>
+
+    <p> {{tickers}} </p>
+
+    <p> {{chartData}} </p>
 
   </div>
 </template>
