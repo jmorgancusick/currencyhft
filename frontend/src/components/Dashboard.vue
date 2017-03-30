@@ -26,23 +26,6 @@ export default {
   },
   created () {
     // call for tickerData
-    axios.get("/static/data.json/").then( (response) => {
-      console.log(response)
-      this.tickers = response.data;
-    }).catch( (error) => {
-      console.log("ERROR:", error)
-    })
-
-    // call for chartData
-    axios.get("http://localhost:3000/chartData/USDEUR=X/YTD").then( (response) => {
-      console.log(response)
-      this.chartData = response.data;
-    }).catch( (error) => {
-      console.log("ERROR:", error)
-    })
-
-    /*
-    // call for tickerData
     axios.get("http://localhost:3000/tickerData/").then( (response) => {
       console.log(response)
       this.tickers = response.data;
@@ -56,7 +39,7 @@ export default {
       this.chartData = response.data;
     }).catch( (error) => {
       console.log("ERROR:", error)
-    })*/
+    })
   }
 }
 </script>

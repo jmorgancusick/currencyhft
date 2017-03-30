@@ -46,13 +46,9 @@ app.get('/table/:tableName', function(req, res) {
 app.get('/tickerData/', function(req, res) {
     // function takes 0 args (automatic load)
 
-    ret = addon.tickerData();
-    // should this not take any params? just call function like this:
     ret = addon.TickerData();
     console.log(ret);
     
-    // for frontend dev
-
     res.send(ret);
 
 });
