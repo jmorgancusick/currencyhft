@@ -7,14 +7,14 @@
       <el-button>Tickers</el-button>
     </ul>
     <ticker v-for="ticker in tickers" :ticker="ticker" />
-     
-    {{chartData}}
 
     <div>
+      <svg width="960" height="500">
       <vn-line :model="trends"
               :x-format="formatDate"
-              y-format=",f">
+              y-format="formatPercent">
       </vn-line> 
+      </svg>
     </div>
 
   </div>
@@ -76,6 +76,9 @@ export default {
   methods: {
     formatDate (d){
       return d3.time.format('%x')(new Date(d))
+    }, 
+    formatPercent (){
+      return d3.format(".1f")(10);
     }
   },
   created () {
@@ -98,7 +101,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
