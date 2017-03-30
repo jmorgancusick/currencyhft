@@ -21,25 +21,25 @@ def getData(ticker):
 def updateTicker(ticker, data, old):
  	cols = db.formats["forex"]["cols"]
 
- 	print data
+ 	print old
 	update = {}
  	for i in range(0,len(cols)):
  		col = cols[i]
  		if col == "current_rate":
  			update[col] = data["quote"]["close"][0]
 		elif col == "last_rate":
-			if old[ticker][i] == None:
+			if old[ticker][i-1] == None:
 				update[col] = 0.
 			else:
-				update[col] = old[ticker][i]
+				update[col] = old[ticker][i-1]
 		elif col == "change_day":
-			if old[ticker][i] == None or old[ticker][i] == 0:
+			if update["last_rate"] == 0:
 				update[col] = 0.
 			else:
-				update[col] = (data["quote"]["close"][0]/old[ticker][i] - 1)*100
+				update[col] = (data["quote"]["close"][0]/update["last_rate"] - 1)*100
 		else:
 			update[col] = old[ticker][i]
-	print "hi"
+	
 	print update
 
 	db.insert("forex", update)
