@@ -52,14 +52,14 @@ app.get('/tickerData/', function(req, res) {
     console.log(ret);
     
     // for frontend dev
-    ret = { "0" : [{"ticker":"USDEUR=X", "percentChange": "0.12"},
-        {"ticker":"USDCAD=X", "percentChange": "0.77"},
-        {"ticker":"JPYEUR=X", "percentChange": "0.89"},
-        {"ticker":"AUDEUR=X", "percentChange": "-0.55"},
-        {"ticker":"NZDJPY=X", "percentChange": "0.64"},
-        {"ticker":"CHFEUR=X", "percentChange": "-1.90"},
-        {"ticker":"GBPNZD=X", "percentChange": "0.43"}]
-    }
+    // ret = { "0" : [{"ticker":"USDEUR=X", "percentChange": "0.12"},
+    //     {"ticker":"USDCAD=X", "percentChange": "0.77"},
+    //     {"ticker":"JPYEUR=X", "percentChange": "0.89"},
+    //     {"ticker":"AUDEUR=X", "percentChange": "-0.55"},
+    //     {"ticker":"NZDJPY=X", "percentChange": "0.64"},
+    //     {"ticker":"CHFEUR=X", "percentChange": "-1.90"},
+    //     {"ticker":"GBPNZD=X", "percentChange": "0.43"}]
+    // }
 
     res.send(ret);
 
