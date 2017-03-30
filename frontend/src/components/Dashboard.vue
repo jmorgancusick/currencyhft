@@ -6,15 +6,25 @@
       <el-button>Chart</el-button>
       <el-button>Tickers</el-button>
     </ul>
+    <ticker v-for="ticker in tickers" :ticker="ticker" />
+     
+    {{chartData}}
 
-    <p> {{tickers}} </p>
-
-    <p> {{chartData}} </p>
+    <div>
+      <vn-line :model="trends"
+              :x-format="formatDate"
+              y-format=",f">
+      </vn-line> 
+    </div>
 
   </div>
 </template>
 
 <script>
+import Ticker from './Ticker.vue';
+import _ from 'lodash';
+import d3 from 'd3';
+
 export default {
   name: 'dashboard',
   data () {
@@ -22,6 +32,50 @@ export default {
       msg: 'Dashboard',
       tickers: null ,
       chartData: null
+    }
+  },
+  components: {
+      Ticker
+  },
+  computed: {
+    trends () {
+      return [
+        {
+          key: 'high',
+          area: true,
+          values: _.map(this.chartData, (t) => {
+            return {
+              x: t.date,
+              y: t.high
+            }
+          })
+        },
+        {
+          key: 'low',
+          bar: true,
+          values: _.map(this.chartData, (t) => {
+            return {
+              x: t.date,
+              y: t.low
+            }
+          })
+        },
+        {
+          key: 'close',
+          area: true,
+          values: _.map(this.chartData, (t) => {
+            return {
+              x: t.date,
+              y: t.close
+            }
+          })
+        }
+      ]
+    }
+  },
+  methods: {
+    formatDate (d){
+      return d3.time.format('%x')(new Date(d))
     }
   },
   created () {
@@ -64,3 +118,4 @@ a {
   color: #42b983;
 }
 </style>
+

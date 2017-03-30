@@ -262,7 +262,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
 
     //Can call a pack function here to be cleaner once more data
     // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "timestamp"),
+    obj->Set(String::NewFromUtf8(isolate, "date"),
        Number::New(isolate, itr->timestamp));
     obj->Set(String::NewFromUtf8(isolate, "ticker"),
        String::NewFromUtf8(isolate, itr->ticker.data()));
