@@ -1,8 +1,8 @@
 <template>
   <div class="ticker">
     <div id="content">
-      <p>{{ ticker.ticker }}</p>
-      <p>{{ ticker.percentChange }}</p>
+      <p>{{ id }}</p>
+      <p>{{ percentChange }}</p>
     </div>
   </div>
 </template>
@@ -12,10 +12,17 @@ export default {
   name: 'ticker',
   data () {
     return {
+      id: null,
+      percentChange: null
     }
   },
   created () {
     console.log(this.ticker);
+    this.id = this.ticker.ticker;
+    this.percentChange = this.ticker.percentChange;
+
+    /*console.log(this.id);
+    console.log(this.percentChange);*/
   },
   props: ['ticker']
 }

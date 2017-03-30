@@ -17,8 +17,10 @@
     </el-menu>
     <div class="line"></div>
 
+    <router-view></router-view>
+    <!--
     <router-view @testEvent="listener($event)" :testProps="inputMsg"></router-view>
-   <!-- <div>
+    <div>
       <input v-model="inputMsg" type="text">
     </div> -->
   </div>

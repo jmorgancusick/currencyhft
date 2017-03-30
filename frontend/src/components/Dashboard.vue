@@ -12,7 +12,7 @@
       <svg width="960" height="500">
       <vn-line :model="trends"
               :x-format="formatDate"
-              y-format="formatPercent">
+              y-format="">
       </vn-line> 
       </svg>
     </div>
@@ -78,7 +78,7 @@ export default {
       return d3.time.format('%x')(new Date(d))
     }, 
     formatPercent (){
-      return d3.format(".1f")(10);
+      return d3.range(0,1).format(".1f");
     }
   },
   created () {
