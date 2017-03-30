@@ -6,16 +6,24 @@
       <el-button>Chart</el-button>
       <el-button>Tickers</el-button>
     </ul>
-    <ticker v-for="ticker in tickers" :ticker="ticker" />
 
-    <div>
-      <svg width="960" height="500">
-      <vn-line :model="trends"
-              :x-format="formatDate"
-              y-format="">
-      </vn-line> 
-      </svg>
-    </div>
+    <el-row>
+      <el-col >
+        <div style="align:left;">
+          <svg width="1000" height="500">
+          <vn-line :model="trends"
+                  :x-format="formatDate"
+                  y-format="">
+          </vn-line> 
+          </svg>
+        </div>
+      </el-col>
+    </el-row>
+    <h1> </h1>
+    <el-row>
+      <h3>Tickers</h3>
+      <ticker v-for="ticker in tickers" :ticker="ticker" />
+    </el-row>
 
   </div>
 </template>
@@ -76,9 +84,6 @@ export default {
   methods: {
     formatDate (d){
       return d3.time.format('%x')(new Date(d))
-    }, 
-    formatPercent (){
-      return d3.range(0,1).format(".1f");
     }
   },
   created () {
@@ -102,6 +107,9 @@ export default {
 </script>
 
 <style scoped>
+.el-col {
+  border-radius: 4px;
+}
 h1, h2 {
   font-weight: normal;
 }

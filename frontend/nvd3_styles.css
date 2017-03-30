@@ -12838,7 +12838,7 @@ svg.nvd3-svg {
 	-ms-user-select:none;
 	user-select:none;
 	display:block;
-	width:100%;
+	
 	height:100%
 }
 .nvtooltip.with-3d-shadow,.with-3d-shadow .nvtooltip {

@@ -1,8 +1,11 @@
 <template>
   <div class="ticker">
-    <div id="content">
-      <p>{{ id }}</p>
-      <p>{{ percentChange }}</p>
+    <div id="textbox">
+      <el-col :span="3">
+        <p style="text-align:left;">{{ id }}
+        <span style="float:right;">{{ percentChange }}</span>
+        </p>
+      </el-col>
     </div>
   </div>
 </template>
@@ -30,6 +33,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-col {
+  padding: 25px;
+}
 h1, h2 {
   font-weight: normal;
 }
