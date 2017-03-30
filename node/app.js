@@ -15,12 +15,6 @@ var app = express();
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));  //all html in public
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
 
 console.log("__dirname: "+__dirname);
 
@@ -54,18 +48,10 @@ app.get('/tickerData/', function(req, res) {
 
     ret = addon.tickerData();
     // should this not take any params? just call function like this:
-    // ret = addon.TickerData();
+    ret = addon.TickerData();
     console.log(ret);
     
     // for frontend dev
-    ret = { "0" : [{"ticker":"USDEUR=X", "percentChange": "0.12"},
-        {"ticker":"USDCAD=X", "percentChange": "0.77"},
-        {"ticker":"JPYEUR=X", "percentChange": "0.89"},
-        {"ticker":"AUDEUR=X", "percentChange": "-0.55"},
-        {"ticker":"NZDJPY=X", "percentChange": "0.64"},
-        {"ticker":"CHFEUR=X", "percentChange": "-1.90"},
-        {"ticker":"GBPNZD=X", "percentChange": "0.43"}]
-    }
 
     res.send(ret);
 

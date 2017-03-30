@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "element-ui": "^1.2.5",
+    "nvd3": "^1.8.5",
     "vue": "^2.2.2",
+    "vue-nvd3": "^1.0.0",
     "vue-router": "^2.2.0"
   },
   "devDependencies": {
