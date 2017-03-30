@@ -15,6 +15,12 @@ var app = express();
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));  //all html in public
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 
 console.log("__dirname: "+__dirname);
 
@@ -46,7 +52,7 @@ app.get('/table/:tableName', function(req, res) {
 app.get('/tickerData/', function(req, res) {
     // function takes 0 args (automatic load)
 
-    ret = addon.TickerData();
+    ret = addon.tickerData();
     console.log(ret);
     
     res.send(ret);

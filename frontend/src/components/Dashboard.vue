@@ -21,7 +21,7 @@ export default {
     return {
       msg: 'Dashboard',
       tickers: null ,
-      chartData: 
+      chartData: null
     }
   },
   created () {
