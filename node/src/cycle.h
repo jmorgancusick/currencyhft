@@ -17,11 +17,11 @@ class Cycle {
 
   public:
     //===========Constructors===========
-    Cycle(const unordered_map<string, string>* path);
+    Cycle(const unordered_map<string, string>& path);
 
     //===========Getters================
-    vector<string>* GetCycle() {return &cycle};
-    unsigned int const GetSize() const {return cycle.size()};
+    vector<string>* GetCycle() {return &cycle;}
+    unsigned int const GetSize() const {return cycle.size();}
     double GetTotalRate() const {return rate;}
 
     //===========Helpers================
@@ -30,10 +30,10 @@ class Cycle {
 
   private:
     //===========Setters================
-    double CalcRate() const;
+    double CalcRate();
 
     vector<string> cycle;
-    int rate;
-}
+    double rate;
+};
 
 #endif

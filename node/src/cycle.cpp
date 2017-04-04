@@ -4,25 +4,25 @@
 using namespace std;
 
 //construct cycles based on a mapping of nodes
-Cycle::Cycle(const unordered_map<string, string>* path) {
-  unsigned int size = &path.size();
+Cycle::Cycle(const unordered_map<string, string>& path) {
+  unsigned int size = path.size();
   vector<string> keys;
   keys.reserve(size);
   cycle.reserve(size);
 
-  for (auto it : &path) {
+  for (auto it : path) {
     keys.push_back(it.first);
   }
 
   //find the first node in alphanumerical order
-  sort(keys.begin(), key.end());
+  sort(keys.begin(), keys.end());
   string current = keys[0];
-  path.push_back(current);
+  cycle.push_back(current);
 
   //add each other node in order, until start is reached again
   for (unsigned int i = 1; i < size; ++i) {
-    current = &path[current];
-    path.push_back(current);
+    current = (*(path.find(current))).second;
+    cycle.push_back(current);
   }
 }
 
@@ -39,11 +39,11 @@ bool Cycle::CheckEquivalent(const unordered_map<string, string>& other) const {
   vector<string> keys;
   keys.reserve(size);
 
-  for (auto it : &path) {
+  for (auto it : other) {
     keys.push_back(it.first);
   }
 
-  sort(keys.begin(), key.end());
+  sort(keys.begin(), keys.end());
   string current = keys[0];
 
   //check if each node is the same
@@ -52,7 +52,7 @@ bool Cycle::CheckEquivalent(const unordered_map<string, string>& other) const {
   }
 
   for (unsigned int i = 1; i < size; ++i) {
-    current = &other[current];
+    current = (*(other.find(current))).second;
     if (current != cycle[i]) {
       return false;
     }
@@ -62,7 +62,7 @@ bool Cycle::CheckEquivalent(const unordered_map<string, string>& other) const {
 }
 
 //calculates the total rate of one loop of the cycle, from start node back to itself
-double Cycle::CalcRate() const {
+double Cycle::CalcRate() {
   API *db = new API();
   int retVal = db->connect();
 
@@ -72,7 +72,7 @@ double Cycle::CalcRate() const {
 
   double totalRate = 1;
 
-  while (itrTo != path.end()) {
+  while (itrTo != cycle.end()) {
     totalRate *= db->GetForexRate(*itrFrom+*itrTo+"=X");
   }
 
@@ -81,6 +81,6 @@ double Cycle::CalcRate() const {
   return totalRate;
 }
 
-void UpdateDatabase() const {
+void Cycle::UpdateDatabase() const {
 
 }
