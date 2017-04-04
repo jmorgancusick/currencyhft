@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <set>
+#include <unordered_set>
 #include <iomanip>
 #include <math.h>
 
@@ -50,6 +50,9 @@ int main(int argc, char* argv[]) {
     string end = "";
     string amountString;
     double amount = 0.0;
+    string limitExchangesString;
+    int limitExchanges;
+    unordered_set<string> ignoreCurrencies;
 
     cout << "Enter start currency: ";
     cin >> start;
@@ -82,8 +85,33 @@ int main(int argc, char* argv[]) {
       continue;
     }
 
+    cout << "Enter max path length, 0 for unlimited: ";
+    cin >> limitExchangesString;
+
+    try {
+      limitExchanges = stoi(limitExchangesString, NULL);
+    }
+    catch (invalid_argument &e) {
+      cout << "Error: Invalid amount" << endl;
+      continue;
+    }
+
+    cout << "Enter something other than a currency to stop input" << endl;
+
+    while (true) {
+      string ignore;
+      cout << "Enter currencies to ignore: ";
+      cin >> ignore;
+      if (find(currencies.begin(), currencies.end(), ignore) != currencies.end()) {
+        ignoreCurrencies.insert(ignore);
+      }
+      else {
+        break;
+      }
+    }
+
     cout << endl << "Finding path from " << start << " to " << end << endl;
-    Path path = Path(g, start, end);
+    Path path = Path(g, start, end, ignoreCurrencies, limitExchanges);
     vector<string> *p = path.GetPath();
     for (auto it = (*p).begin(); it != (*p).end(); ++it) {
       cout << "\t" << *it << endl;
@@ -93,10 +121,14 @@ int main(int argc, char* argv[]) {
     double convert = path.ConvertStartAmount(amount);
     cout << amountString << " " << start << " = " << convert << " " << end << endl;
 
-
     cout << "Converting " << amountString << " " << end << " to " << start << endl;
     double convert2 = path.ConvertEndAmount(amount);
     cout << amountString << " " << end << " = " << convert2 << " " << start << endl;
+
+    double rate = db->GetForexRate(start+end+"=X");
+    double regularAmount = amount * rate;
+    double difference = convert - regularAmount;
+    cout << "Advantage over direct conversion: " << difference << endl;
   }
 
     delete db;

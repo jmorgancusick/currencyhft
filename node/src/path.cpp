@@ -7,9 +7,9 @@
 using namespace std;
 
 //construct a path based on a given graph, starting currency, and ending currency
-Path::Path(const Graph& graph, const string& start, const string& end) {
+Path::Path(const Graph& graph, const string& start, const string& end, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit) {
   //find and store the optimal path
-  DistanceEstimates dists = graph.FindOptimalPaths(start);
+  DistanceEstimates dists = graph.FindOptimalPaths(start, ignoreCurrencies, exchangeLimit);
   path = graph.GetOptimalPath(dists, end);
 
   //check that a path was actually found

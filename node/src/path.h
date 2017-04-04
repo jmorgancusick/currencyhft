@@ -16,7 +16,7 @@ using namespace std;
 class Path {
   public:
     //===========Constructors===========
-    Path(const Graph& graph, const string& start, const string& end);
+    Path(const Graph& graph, const string& start, const string& end, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit);
 
     //===========Setters================
     

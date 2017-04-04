@@ -42,12 +42,9 @@ class API{
 	getline(myfile,user);
 	getline(myfile,pass);
 	getline(myfile,db);
-	cout<<host<<" , "<<user<<" , "<<pass<<" , "<<db<<endl;
-
 	
 	myfile.close();
 
-	cout << "Read credentials" << endl;
 
 	try{
 	  
@@ -56,7 +53,6 @@ class API{
 	  con.reset(driver->connect(host, user, pass));
 	  con->setSchema(db);
 
-	  cout << "Connected to DB" << endl;
 	  
 	} catch(sql::SQLException &e){
 	  printError(e);
