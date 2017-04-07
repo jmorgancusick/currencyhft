@@ -2,12 +2,12 @@ import forexDataScrape as fds
 import dbapi
 import datetime
 import itertools
+import schedule
 
 
 def getData(ticker):
 
 	endTime = fds.startOfDay(datetime.datetime.utcnow())
-	#endTime = endTime.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 	startTime = fds.startOfDay(endTime - datetime.timedelta(days=1))
 	interval = "1m"
 
@@ -18,11 +18,10 @@ def getData(ticker):
 
 
 #data = {ticker : data, ticker2: data2}
-def updateTicker(ticker, data, old):
+def updateTicker(ticker, data, old, db):
  	cols = db.formats["forex"]["cols"]
 
- 	print old
-	update = {}
+ 	update = {}
  	for i in range(0,len(cols)):
  		col = cols[i]
  		if col == "current_rate":
@@ -40,8 +39,6 @@ def updateTicker(ticker, data, old):
 		else:
 			update[col] = old[ticker][i]
 	
-	print update
-
 	db.insert("forex", update)
 
 
@@ -61,7 +58,7 @@ def updateForex():
 
 	for ticker in currencyTickers:
 		data = getData(ticker)
-		updateTicker(ticker,data,old)
+		updateTicker(ticker,data,old,db)
 
 
 #data must be two dimensions
@@ -69,13 +66,11 @@ def mapify(data):
 	m = {}
 	for row in data:
 		m[row[0]] = row
-	print m
 	return m
 
-#def pullPrevData
 
 if __name__ == '__main__':
- 	#getData("USDEUR=X")
- 	db = dbapi.API()
- 	db.connect()
- 	updateForex()
+ 	schedule.every().day.at("00:01").do(updateForex)
+ 	while 1:
+ 		schedule.run_pending()
+ 		#time.sleep(1)
