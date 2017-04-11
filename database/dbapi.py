@@ -88,9 +88,7 @@ class API:
     else:
       insertion += " ON DUPLICATE KEY UPDATE {0}".format(update)
 
-
     #print insertion
-
 
     try:
       self.cur.execute(insertion)
@@ -111,7 +109,6 @@ class API:
     try:
       print insertion
       self.cur.execute(insertion)
-      print "hi"
       rows = self.cur.fetchall()
       return list(rows)
     except Exception as e:

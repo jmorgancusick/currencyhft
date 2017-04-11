@@ -11,10 +11,10 @@ def getData(ticker):
 	startTime = fds.startOfDay(endTime - datetime.timedelta(days=1))
 	interval = "1m"
 
-	fds.execScrape(ticker, startTime, endTime, interval)
-	data = fds.execScrape(ticker, startTime, endTime, "1d")
+	dataMin = fds.execScrape(ticker, startTime, endTime, interval)
+	dataDay = fds.execScrape(ticker, startTime, endTime, "1d")
 
-	return data
+	return dataMin,dataDay
 
 
 #data = {ticker : data, ticker2: data2}
@@ -39,7 +39,34 @@ def updateTicker(ticker, data, old, db):
 		else:
 			update[col] = old[ticker][i]
 	
-	db.insert("forex", update)
+	retVal = db.insert("forex", update)
+	if retVal == False:
+		print "ERROR: bulk insert failed for file: ", filename
+
+
+
+def updateHistory(ticker, data, table, db):
+	bulkUpdate = []
+
+	for i in range(0,len(data["timestamp"])):
+		update = {}
+		
+		update["ticker"] = ticker
+		update["start"] = ticker[0:3]
+		update["end"] = ticker[3:6]
+		update["timestamp"] = data["timestamp"][i]
+		update["volume"] = data["quote"]["volume"][i]
+		update["close"] = data["quote"]["close"][i]
+		update["high"] = data["quote"]["high"][i]
+		update["open"] = data["quote"]["open"][i]
+		update["low"] = data["quote"]["low"][i]
+
+		bulkUpdate.append(update)
+
+	retVal = db.bulkInsert(table, bulkUpdate)
+	if retVal == False:
+		print "ERROR: bulk insert failed for file: ", filename
+
 
 
 def updateForex():
@@ -57,8 +84,10 @@ def updateForex():
 	old = mapify(old)
 
 	for ticker in currencyTickers:
-		data = getData(ticker)
-		updateTicker(ticker,data,old,db)
+		dataMin,dataDay = getData(ticker)
+		updateTicker(ticker, dataDay, old, db)
+		updateHistory(ticker, dataDay, "forexDashDaily", db)
+		updateHistory(ticker, dataMin, "forexDashMinute", db)
 
 
 #data must be two dimensions
