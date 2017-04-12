@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
       //don't store reflex edges
       if (*it != *it2) {
         //all edges are initialized to infinity
+        cout << *it << *it2 << endl;
         double rate = -log(db->GetForexRate(*it+*it2+"=X"));
         g.SetEdgeWeight(*it, *it2, rate);
       }

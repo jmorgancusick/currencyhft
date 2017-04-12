@@ -140,7 +140,7 @@ class API{
     vector<string> currencies;
     try{
       //placeholder until db is filled
-      pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forexDashDaily"));
+      pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forex"));
       res.reset(pstmt->executeQuery());
 
       while (res->next()) {
@@ -160,13 +160,13 @@ class API{
     double rate = numeric_limits<double>::quiet_NaN();
     try{
       //placeholder until db is filled
-      pstmt.reset(con->prepareStatement("select distinct close as rate from forexDashDaily where ticker = ? limit 1"));
+      pstmt.reset(con->prepareStatement("select current_rate from forex where ticker = ?"));
       pstmt->setString(1,ticker);
 
       res.reset(pstmt->executeQuery());
       res->next();
 
-      rate = res->getDouble("rate");
+      rate = res->getDouble("current_rate");
     }
     catch(sql::SQLException &e) {
       printError(e);
