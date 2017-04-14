@@ -15,6 +15,12 @@ var app = express();
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));  //all html in public
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 
 console.log("__dirname: "+__dirname);
 
@@ -24,7 +30,7 @@ app.listen(3000, function () {
 
 app.get('/exchange/:id', function(req, res) {
 
-    // log table name
+    // log id
     console.log(req.params.id);
 
     ret = addon.exchange(req.params.id);
@@ -38,6 +44,27 @@ app.get('/table/:tableName', function(req, res) {
     console.log(req.params.tableName);
 
     ret = addon.table(req.params.tableName);
+    console.log(ret);
+
+    res.send(ret);
+});
+
+app.get('/tickerData/', function(req, res) {
+    // function takes 0 args (automatic load)
+
+    ret = addon.tickerData();
+    console.log(ret);
+    
+    res.send(ret);
+
+});
+
+app.get('/chartData/:ticker/:timeframe', function(req, res) {
+    // log chartId
+    console.log(req.params.ticker);
+    console.log(req.params.timeframe);
+
+    ret = addon.chartData(req.params.ticker,req.params.timeframe);
     console.log(ret);
 
     res.send(ret);
