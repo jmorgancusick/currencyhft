@@ -2,6 +2,8 @@
 
 #include <node.h>
 #include "sql/api.h"
+#include "graph.h"
+#include "path.h"
 #include "string"
 #include <unordered_set>
 
@@ -294,8 +296,8 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
 
   cout<<"Number of args: "<<args.Length()<<endl;
 
-  //Make sure 6 arguments.  Cast to string
-  if (args.Length() != 6) {
+  //Make sure 4 arguments.  Cast to string
+  if (args.Length() != 4) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
     return;
   }
@@ -316,39 +318,23 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
   v8::String::Utf8Value param2(args[1]->ToString());
   std::string endCurr = std::string(*param2);
 
-  if (!args[2]->IsDouble()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param3(args[2]->ToString());
-  std::string startValue = std::string(*param3);
-
-  if (!args[3]->IsDouble()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param4(args[3]->ToString());
-  std::string endValue = std::string(*param4);
-
-  if (!args[4]->IsArray()) {
+  if (!args[2]->IsArray()) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
     return;
   }
 
   std::vector<std:string> currenciesToExclude = new std::vector<std::string>();
-  for(int i=0; i<args[4].length(); i++) {
-    currenciesToExclude.push_back(args[4][i]->ToString());
+  for(int i=0; i<args[2].length(); i++) {
+    currenciesToExclude.push_back(args[2][i]->ToString());
   }
 
-  if (!args[5]->IsInteger()) {
+  if (!args[3]->IsInteger()) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
     return;
   }
 
-  v8::String::Utf8Value param6(args[5]->ToString());
-  std::string maxNumberExchanges = std::string(*param6);
+  v8::String::Utf8Value param4(args[3]->ToString());
+  std::string maxNumberExchanges = std::string(*param4);
   
   //TODO: move this to init
   API *db = new API();
@@ -359,50 +345,43 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  string interval = "day";
-  long startDate = 1450000000;
-  long endDate = 1490064000;
-  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
-  //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
-//TODO change data structure to array of struct
+  vector<string> currencies = db->GetAllCurrencies();
 
+  Graph g = Graph(currencies);
 
-  int i = 0;
-
-  Local<Array> result = Array::New(isolate);
-  
-
-  for(vector<API::chart_info>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
-    cout << itr->timestamp << "\t" << itr->ticker << "\t" << itr->high << "\t" << itr->volume << "\t"
-          << itr->open << "\t" << itr->low << "\t" << itr->close << endl;
-
-    // Creates a new Object on the V8 heap
-    Local<Object> obj = Object::New(isolate);
-
-    //Can call a pack function here to be cleaner once more data
-    // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "date"),
-       Number::New(isolate, itr->timestamp));
-    obj->Set(String::NewFromUtf8(isolate, "ticker"),
-       String::NewFromUtf8(isolate, itr->ticker.data()));
-    obj->Set(String::NewFromUtf8(isolate, "high"),
-       Number::New(isolate, itr->high));
-    obj->Set(String::NewFromUtf8(isolate, "volume"),
-       Number::New(isolate, itr->volume));
-    obj->Set(String::NewFromUtf8(isolate, "open"),
-       Number::New(isolate, itr->open));
-    obj->Set(String::NewFromUtf8(isolate, "low"),
-       Number::New(isolate, itr->low));
-    obj->Set(String::NewFromUtf8(isolate, "close"),
-       Number::New(isolate, itr->close));
-    
-
-    result->Set(i, obj); 
+  for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+    //iterate through "to nodes"
+    for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+      //don't store reflex edges
+      if (*it != *it2) {
+        //all edges are initialized to infinity
+        cout << *it << *it2 << endl;
+        double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+        g.SetEdgeWeight(*it, *it2, rate);
+      }
+    }
   }
 
-  args.GetReturnValue().Set(result);
-  //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
+  unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
+
+  Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+  vector<string> *p = path.GetPath();
+  double totalRate = path.GetTotalRate();
+
+  Local<Array> result = Array::New(isolate);
+
+  for (unsigned int i = 0; i < path.size(); i++) {
+    Local<Object> obj = Object::New(isolate);
+    obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, path[i].data()));
+    result->Set(i, obj);
+  }
+
+  Local<Object> obj = Object::New(isolate);
+  obj->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
+  result->Set(i, obj);
   
+  args.GetReturnValue().Set(result);
+
   delete db;
 }
 
@@ -413,6 +392,7 @@ void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "table", Table);
   NODE_SET_METHOD(exports, "tickerData", TickerData);
   NODE_SET_METHOD(exports, "chartData", ChartData);
+  NODE_SET_METHOD(exports, "arbitrageData", ArbitrageData);
 }
 
 NODE_MODULE(addon, init)
