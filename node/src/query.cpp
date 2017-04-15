@@ -308,7 +308,7 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
   }
 
   v8::String::Utf8Value param1(args[0]->ToString());
-  std::string startCurr = std::string(*param1);
+  string startCurr = string(*param1);
   
   if (!args[1]->IsString()) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
@@ -316,14 +316,14 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
   }
 
   v8::String::Utf8Value param2(args[1]->ToString());
-  std::string endCurr = std::string(*param2);
+  string endCurr = string(*param2);
 
   if (!args[2]->IsArray()) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
     return;
   }
 
-  std::vector<std:string> currenciesToExclude = new std::vector<std::string>();
+  vector<std:string> currenciesToExclude = new vector<std::string>();
   for(int i=0; i<args[2].length(); i++) {
     currenciesToExclude.push_back(args[2][i]->ToString());
   }
@@ -334,7 +334,7 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
   }
 
   v8::String::Utf8Value param4(args[3]->ToString());
-  std::string maxNumberExchanges = std::string(*param4);
+  string maxNumberExchanges = string(*param4);
   
   //TODO: move this to init
   API *db = new API();
