@@ -386,6 +386,53 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
 }
 
 
+void CalculatorData(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+
+  cout<<"Number of args: "<<args.Length()<<endl;
+
+  //Make sure 0 arguments.
+  if (args.Length() != 0) {
+    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+    return;
+  }
+  
+  //TODO: move this to init
+  API *db = new API();
+  int retVal = db->connect();
+  if(retVal != 0){
+    cout<<"db.connect() failed with exit code "<<retVal<<endl;
+    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
+    return;
+  }
+
+  vector<string> currencies = db->GetAllCurrencies();
+
+  int i=0;
+  Local<Array> result = Array::New(isolate);
+
+  for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+    //iterate through "to nodes"
+    for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+      //don't store reflex edges
+      if (*it != *it2) {
+        //all edges are initialized to infinity
+        cout << *it << *it2 << endl;
+        double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+
+        Local<Object> obj = Object::New(isolate);
+        obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
+        result->Set(i, obj);
+        i++;
+      }
+    }
+  }
+  
+  args.GetReturnValue().Set(result);
+
+  delete db;
+}
+
 
 void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "exchange", Exchange);
@@ -393,6 +440,7 @@ void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "tickerData", TickerData);
   NODE_SET_METHOD(exports, "chartData", ChartData);
   NODE_SET_METHOD(exports, "arbitrageData", ArbitrageData);
+  NODE_SET_METHOD(exports, "calculatorData", CalculatorData);
 }
 
 NODE_MODULE(addon, init)
