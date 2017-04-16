@@ -248,7 +248,6 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     }
     return currencies;
   }
-}
 
   //retrieves forex rate of a particular ticker
   double GetForexRate(string ticker) {
@@ -268,7 +267,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       printError(e);
     }
     return rate;
-}
+  }
 
  private:
   string host;

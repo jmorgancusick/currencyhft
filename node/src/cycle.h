@@ -9,7 +9,7 @@
 using namespace std;
 
 /*
-  Cycle stores a path of nodes that from a negative cycle
+  Cycle stores a path of nodes that form a negative cycle
   The starting node of the cycle is selected to be the first node in alphanumerical order
   Each node after the first follows the previous node, with the last node looping back to the start
 */
@@ -18,6 +18,7 @@ class Cycle {
   public:
     //===========Constructors===========
     Cycle(const unordered_map<string, string>& path);
+    Cycle(const vector<string>& path);
 
     //===========Getters================
     vector<string>* GetCycle() {return &cycle;}
@@ -25,7 +26,8 @@ class Cycle {
     double GetTotalRate() const {return rate;}
 
     //===========Helpers================
-    bool CheckEquivalent(const unordered_map<string, string>& other) const;
+    bool CheckEquivalent(const unordered_map<string, string>& other);
+    bool CheckEquivalent(Cycle& other);
     void UpdateDatabase() const;
 
   private:

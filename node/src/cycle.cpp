@@ -15,8 +15,13 @@ Cycle::Cycle(const unordered_map<string, string>& path) {
   }
 
   //find the first node in alphanumerical order
-  sort(keys.begin(), keys.end());
   string current = keys[0];
+  for (unsigned int i = 1; i < size; ++i) {
+    if (keys[i] < current) {
+      current = keys[i];
+    }
+  }
+
   cycle.push_back(current);
 
   //add each other node in order, until start is reached again
@@ -26,9 +31,32 @@ Cycle::Cycle(const unordered_map<string, string>& path) {
   }
 }
 
+//construct cycles based on a vector of nodes
+Cycle::Cycle(const vector<string>& path) {
+  unsigned int size = path.size();
+  cycle.reserve(size);
+
+  //find the first node in alphanumerical order
+  int start = 0;
+  for (unsigned int i = 1; i < size; ++i) {
+    if (path[i] < path[start]) {
+      start = i;
+    }
+  }
+
+  //add nodes in order of path from the start
+  for (unsigned int i = start; i < size; ++i) {
+    cycle.push_back(path[i]);
+  }
+
+  for (unsigned int i = 0; i < start; ++i) {
+    cycle.push_back(path[i]);
+  }
+}
+
 //check if a mapping of nodes is equivalent to this cycle
 //assumes that other is a valid cycle
-bool Cycle::CheckEquivalent(const unordered_map<string, string>& other) const {
+bool Cycle::CheckEquivalent(const unordered_map<string, string>& other) {
   //first check if sizes are the same
   if (other.size() != GetSize()) {
     return false;
@@ -54,6 +82,26 @@ bool Cycle::CheckEquivalent(const unordered_map<string, string>& other) const {
   for (unsigned int i = 1; i < size; ++i) {
     current = (*(other.find(current))).second;
     if (current != cycle[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//check if another is equivalent to this cycle
+bool Cycle::CheckEquivalent(Cycle& other) {
+  //first check if sizes are the same
+  if (other.GetSize() != GetSize()) {
+    return false;
+  }
+
+  vector<string>* otherCycle = other.GetCycle();
+
+  unsigned int size = GetSize();
+
+  for (unsigned int i = 0; i < size; ++i) {
+    if (cycle[i] != (*otherCycle)[i]) {
       return false;
     }
   }

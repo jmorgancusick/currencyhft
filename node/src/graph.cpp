@@ -79,7 +79,7 @@ bool Graph::CheckCurrency(const string& curr) const {
 }
 
 //find distance estimats from start to other nodes, ignoring negative cycles
-DistanceEstimates Graph::FindOptimalPaths(const string& start, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit) const {
+DistanceEstimates Graph::FindOptimalPaths(const string& start, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit) {
   cout << "Finding optimal paths from " << start <<  endl;
 
   DistanceEstimates dists;
@@ -100,13 +100,13 @@ DistanceEstimates Graph::FindOptimalPaths(const string& start, const unordered_s
   dists[start].second = "HEAD";
 
   //perform the (modified) Bellman-Ford algorithm to find shortest paths
-  BellmanFord(dists, ignoreCurrencies, exchangeLimit);
+  BellmanFord(dists, ignoreCurrencies, exchangeLimit, false);
   return dists;
 }
 
 //runs a modified Bellman-Ford algorithm to find shortest paths without entering cycles
 //assumes that the start node has distance estimate 0 and prev node HEAD
-void Graph::BellmanFord(DistanceEstimates& dists, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit) const {
+void Graph::BellmanFord(DistanceEstimates& dists, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit, const bool storeCycles) {
   cout << "Beginning Bellman-Ford algorithm" << endl;
   int count = 1;
 
@@ -145,7 +145,7 @@ void Graph::BellmanFord(DistanceEstimates& dists, const unordered_set<string>& i
             //is less than the current distance estimate of the "to node", then use that as the new path
             if (distStart + edgeWeight < distEnd) {
               //check if path update enters a cycle or exceeds length limit, and abort the update if it does
-              int length = CheckPath(dists, current, next);
+              int length = CheckPath(dists, current, next, storeCycles);
               if (length == -1 || (exchangeLimit > 0 && length > exchangeLimit)) {
                 continue;
               }
@@ -174,13 +174,37 @@ void Graph::BellmanFord(DistanceEstimates& dists, const unordered_set<string>& i
 
 //checks if adding link from start to end introduces a cycle in the current list of distance elements
 //also finds length of the path
-int Graph::CheckPath(const DistanceEstimates& dists, const string& start, const string& end) const {
+int Graph::CheckPath(const DistanceEstimates& dists, const string& start, const string& end, const bool storeCycles) {
   int length = 0;
   string currNode = start;
+  vector<string> path;
   //loop backwards until the starting node is reached
   while (currNode != "HEAD") {
+    if (storeCycles) {
+      path.push_back(currNode);
+    }
     //if the previous node of a node is the ending node, then this is a cycle
     if (GetPrevNode(dists, currNode) == end) {
+      if (storeCycles) {
+        reverse(path.begin(), path.end());
+
+        Cycle cycle = Cycle(path);
+        for (unsigned int i = 0; i < cycles.size(); ++i) {
+          if (cycle.CheckEquivalent(cycles[i])) {
+            return -1;
+          }
+        }
+
+        cycles.push_back(cycle);
+
+        cout << "Cycle Found:" << endl;
+
+        for (int i = 0; i < path.size(); i++) {
+          cout << path[i] << endl;
+        }
+        cout << endl;
+      }
+
       return -1;
     }
     currNode = GetPrevNode(dists, currNode);
@@ -231,4 +255,31 @@ string Graph::GetPrevNode(const DistanceEstimates& dists, const string& node) co
     return NULL;
   }
   return (*(dists.find(node))).second.second;
+}
+
+void Graph::FindCycles() {
+  DistanceEstimates dists;
+  dists.reserve(N);
+
+  vector<string> currencies = GetCurrencies();
+
+  for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+    //first element of pair is the distance estimate to the node, initalized to infinity
+    //second element is the previous node to reach this one, initialized to empty string
+    dists[*it] = make_pair(numeric_limits<double>::infinity(), "");
+  }
+
+  string start = "USD";
+
+  //starting node has 0 distance to itself, and its previous node is set to special value HEAD
+  dists[start].first = 0;
+  dists[start].second = "HEAD";
+
+  //perform the (modified) Bellman-Ford algorithm to find shortest paths
+  unordered_set<string> ignoreCurrencies;
+  BellmanFord(dists, ignoreCurrencies, 0, true);
+}
+
+vector<Cycle> Graph::GetCycles() {
+  return cycles;
 }

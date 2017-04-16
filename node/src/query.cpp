@@ -364,7 +364,7 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
 
   unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
 
-  Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+  Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges, false);
   vector<string> *p = path.GetPath();
   double totalRate = path.GetTotalRate();
 
@@ -418,7 +418,7 @@ void CalculatorData(const FunctionCallbackInfo<Value>& args) {
       if (*it != *it2) {
         //all edges are initialized to infinity
         cout << *it << *it2 << endl;
-        double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+        double rate = db->GetForexRate(*it+*it2+"=X");
 
         Local<Object> obj = Object::New(isolate);
         obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
