@@ -1,9 +1,8 @@
 <template>
   <div class="arbitrage">
-    <h1>{{ msg }}</h1>
     <h1>{{ testProps }}</h1>
-    <el-button @click="print()">Click Here</el-button>
     <h2> {{nicemsg}} </h2>
+    <el-button @click="print()">Calculate</el-button>
   </div>
 </template>
 
@@ -12,8 +11,7 @@ export default {
   name: 'arbitrage',
   data () {
     return {
-      msg: 'Arbitrage Coming Soon...',
-      nicemsg: ''
+      nicemsg: 'Arbitrage Coming Soon...'
     }
   },
   methods: {

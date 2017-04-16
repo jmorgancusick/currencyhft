@@ -2,6 +2,7 @@
   <div class="calculator">
     <h1>{{ msg }}</h1>
     <h2> {{nicemsg}} </h2>
+    <el-button @click="print()">Calculate</el-button>
   </div>
 </template>
 
