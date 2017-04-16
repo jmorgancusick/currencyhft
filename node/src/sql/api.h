@@ -234,7 +234,6 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   vector<string> GetAllCurrencies() {
     vector<string> currencies;
     try{
-      //placeholder until db is filled
       pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forex"));
       res.reset(pstmt->executeQuery());
 
@@ -250,11 +249,10 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   }
 
   //retrieves forex rate of a particular ticker
-  double GetForexRate(string ticker) {
+  double GetForexRate(const string& ticker) {
     //initialize as NaN
     double rate = numeric_limits<double>::quiet_NaN();
     try{
-      //placeholder until db is filled
       pstmt.reset(con->prepareStatement("select current_rate from forex where ticker = ?"));
       pstmt->setString(1,ticker);
 
@@ -267,6 +265,22 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       printError(e);
     }
     return rate;
+  }
+
+  //updates the profitable paths
+  void UpdateProfitablePath(const string& expath, const int& length, const double& rate) {
+    try{
+      pstmt.reset(con->prepareStatement("insert into profitableTrends (expath, length, profit, frequency) values (?, ?, ?, 1) on duplicate key update frequency=frequency+1"));
+      pstmt->setString(1,expath);
+      pstmt->setString(2,to_string(length));
+      pstmt->setString(3,to_string(rate));
+
+      res.reset(pstmt->executeQuery());
+
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
   }
 
  private:

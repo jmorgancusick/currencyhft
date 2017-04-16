@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "sql/api.h"
 #include <limits>
 #include <algorithm>
 
@@ -257,6 +258,7 @@ string Graph::GetPrevNode(const DistanceEstimates& dists, const string& node) co
   return (*(dists.find(node))).second.second;
 }
 
+//finds and stores the negative cycles in the graph
 void Graph::FindCycles() {
   DistanceEstimates dists;
   dists.reserve(N);
@@ -280,6 +282,21 @@ void Graph::FindCycles() {
   BellmanFord(dists, ignoreCurrencies, 0, true);
 }
 
+//returns the cycles that have been found
 vector<Cycle> Graph::GetCycles() {
   return cycles;
+}
+
+//update the DB with found cycles
+void Graph::UpdateCyclesDB() {
+  for (unsigned int i = 0; i < cycles.size(); ++i) {
+    vector<string>* cycle = cycles[i].GetCycle();
+    string expath = (*cycle)[0];
+    for (unsigned int j = 1; j < cycle->size(); ++j) {
+      expath += "|" + (*cycle)[j];
+    }
+    API *db = new API();
+    int retVal = db->connect();
+    db->UpdateProfitablePath(expath, cycles[i].GetSize(), cycles[i].GetTotalRate());
+  }
 }

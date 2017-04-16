@@ -51,6 +51,7 @@ class Graph {
     double GetDistEstimate(const DistanceEstimates& dists, const string& node) const;
     string GetPrevNode(const DistanceEstimates& dists, const string& node) const;
     void FindCycles();
+    void UpdateCyclesDB();
 
     AdjacencyMatrix graph;
     //number of nodes in graph
