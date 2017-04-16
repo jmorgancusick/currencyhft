@@ -156,7 +156,7 @@ void TickerData(const FunctionCallbackInfo<Value>& args) {
 
 
   unordered_set<std::string> majorTickers ({
-    "USDCAD=X", "EURJPY=X"
+    "USDCAD=X", "EURJPY=X",
     "EURUSD=X", "EURCHF=X",
     "USDCHF=X", "EURGBP=X",
     "GBPUSD=X", "AUDCAD=X",
