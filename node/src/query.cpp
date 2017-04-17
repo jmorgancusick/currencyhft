@@ -241,9 +241,10 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
   }
 
   string interval = "day";
-  long startDate = 1450000000;
-  long endDate = 1490064000;
-  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
+  string startDate = "05/12/2013 08:36:30";
+  string endDate = "06/12/2013 09:23:20";
+
+  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval, startDate, endDate);    //Database query
   //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
 //TODO change data structure to array of struct
 
