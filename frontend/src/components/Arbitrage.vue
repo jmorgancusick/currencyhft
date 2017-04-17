@@ -25,9 +25,10 @@
 
     <!-- Input field for amount -->
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-    <h2>Conversion : {{ inputVal }}</h2>
 
     <el-button @click="print()">Calculate</el-button>
+    <h2>Return from most profitable conversion: {{ inputVal }}</h2>
+    <h2>Path:</h2>
   </div>
 </template>
 
