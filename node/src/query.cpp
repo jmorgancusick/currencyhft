@@ -3,6 +3,7 @@
 #include <node.h>
 #include "sql/api.h"
 #include "string"
+#include <unordered_set>
 
 namespace demo {
 
@@ -152,6 +153,20 @@ void TickerData(const FunctionCallbackInfo<Value>& args) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
     return;
   }
+
+
+  unordered_set<std::string> majorTickers ({
+    "USDCAD=X", "EURJPY=X",
+    "EURUSD=X", "EURCHF=X",
+    "USDCHF=X", "EURGBP=X",
+    "GBPUSD=X", "AUDCAD=X",
+    "NZDUSD=X", "GBPCHF=X",
+    "AUDUSD=X", "GBPJPY=X",
+    "USDJPY=X", "CHFJPY=X",
+    "EURCAD=X", "AUDJPY=X",
+    "EURAUD=X", "AUDNZD=X"
+  });
+
   
   unordered_map<std::string, double> *rows = db->selectAllTickerData();   //Get data
 
@@ -160,20 +175,26 @@ void TickerData(const FunctionCallbackInfo<Value>& args) {
   Local<Array> result = Array::New(isolate);    //JSON results Array
   
   //Loop through C++ hashmap
-  for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
+  for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++){
     cout<< itr->first << "\t" << itr->second << endl;
 
-    // Creates a new JSON Object on the V8 heap
-    Local<Object> obj = Object::New(isolate);
+    // Add to return array if it is a major ticker
+    if (majorTickers.find(itr->first) != majorTickers.end()){
 
-    //Can call a pack function here to be cleaner once more data
-    // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "ticker"),
-       String::NewFromUtf8(isolate, itr->first.data()));
-    obj->Set(String::NewFromUtf8(isolate, "percentChange"),
-       Number::New(isolate, itr->second));
+      // Creates a new JSON Object on the V8 heap
+      Local<Object> obj = Object::New(isolate);
 
-    result->Set(i, obj); 
+      //Can call a pack function here to be cleaner once more data
+      // Transfers the data from result, to obj (see below)
+      obj->Set(String::NewFromUtf8(isolate, "ticker"),
+         String::NewFromUtf8(isolate, itr->first.data()));
+      obj->Set(String::NewFromUtf8(isolate, "percentChange"),
+         Number::New(isolate, itr->second));
+
+      result->Set(i, obj); 
+
+      i++;
+    }
   }
 
   args.GetReturnValue().Set(result);
@@ -241,7 +262,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
 
     //Can call a pack function here to be cleaner once more data
     // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "timestamp"),
+    obj->Set(String::NewFromUtf8(isolate, "date"),
        Number::New(isolate, itr->timestamp));
     obj->Set(String::NewFromUtf8(isolate, "ticker"),
        String::NewFromUtf8(isolate, itr->ticker.data()));

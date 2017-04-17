@@ -238,11 +238,11 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     vector<string> currencies;
     try{
       //placeholder until db is filled
-      pstmt.reset(con->prepareStatement("select distinct start from forex order by start"));
+      pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forex"));
       res.reset(pstmt->executeQuery());
 
       while (res->next()) {
-        currencies.push_back(res->getString("start"));
+        currencies.push_back(res->getString("curr"));
       }
     }
     catch(sql::SQLException &e) {
@@ -250,7 +250,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       return {};
     }
     return currencies;
-  }
+}
 
   //retrieves forex rate of a particular ticker
   double GetForexRate(string ticker) {
@@ -258,13 +258,13 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     double rate = numeric_limits<double>::quiet_NaN();
     try{
       //placeholder until db is filled
-      pstmt.reset(con->prepareStatement("select rate from forex where ticker = ?"));
+      pstmt.reset(con->prepareStatement("select current_rate from forex where ticker = ?"));
       pstmt->setString(1,ticker);
 
       res.reset(pstmt->executeQuery());
       res->next();
 
-      rate = res->getDouble("rate");
+      rate = res->getDouble("current_rate");
     }
     catch(sql::SQLException &e) {
       printError(e);
