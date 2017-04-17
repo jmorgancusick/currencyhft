@@ -20,6 +20,9 @@ class Cycle {
     Cycle(const unordered_map<string, string>& path);
     Cycle(const vector<string>& path);
 
+    //===========Setters================
+    double CalcRate();
+
     //===========Getters================
     vector<string>* GetCycle() {return &cycle;}
     unsigned int const GetSize() const {return cycle.size();}
@@ -31,9 +34,6 @@ class Cycle {
     void UpdateDatabase() const;
 
   private:
-    //===========Setters================
-    double CalcRate();
-
     vector<string> cycle;
     double rate;
 };

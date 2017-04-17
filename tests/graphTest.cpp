@@ -1,5 +1,6 @@
 #include "../node/src/graph.h"
 #include "../node/src/path.h"
+#include "../node/src/cycle.h"
 #include "../node/src/sql/api.h"
 #include <string>
 #include <vector>
@@ -13,6 +14,8 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
+
+  cout << fixed << setprecision(10);
 
   API *db = new API();
   int retVal = db->connect();
@@ -42,6 +45,22 @@ int main(int argc, char* argv[]) {
   for (unsigned int i = 0; i < currs.size(); ++i) {
     cout << "\t" << currs[i] << endl;
   }
+
+  g.FindCycles();
+  vector<Cycle> cycles = g.GetCycles();
+
+  cout << "Found " << cycles.size() << " cycles" << endl;
+
+  for (unsigned int i = 0; i < cycles.size(); ++i) {
+    double rate = cycles[i].CalcRate();
+    cout << "Cycle " << i+1 << ", rate " << cycles[i].GetTotalRate() << endl;
+    vector<string>* cycle = cycles[i].GetCycle();
+    for (unsigned int j = 0; j < cycle->size(); ++j) {
+      cout << "\t" << (*cycle)[j] << endl;
+    }
+  }
+
+  g.UpdateCyclesDB();
 
   cout << "Beginning exchange simulations. Type 'exit' as a currency to end." << endl;
 

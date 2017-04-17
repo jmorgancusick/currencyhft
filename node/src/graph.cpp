@@ -187,6 +187,7 @@ int Graph::CheckPath(const DistanceEstimates& dists, const string& start, const 
     //if the previous node of a node is the ending node, then this is a cycle
     if (GetPrevNode(dists, currNode) == end) {
       if (storeCycles) {
+        path.push_back(end);
         reverse(path.begin(), path.end());
 
         Cycle cycle = Cycle(path);
@@ -197,13 +198,6 @@ int Graph::CheckPath(const DistanceEstimates& dists, const string& start, const 
         }
 
         cycles.push_back(cycle);
-
-        cout << "Cycle Found:" << endl;
-
-        for (int i = 0; i < path.size(); i++) {
-          cout << path[i] << endl;
-        }
-        cout << endl;
       }
 
       return -1;
@@ -290,13 +284,6 @@ vector<Cycle> Graph::GetCycles() {
 //update the DB with found cycles
 void Graph::UpdateCyclesDB() {
   for (unsigned int i = 0; i < cycles.size(); ++i) {
-    vector<string>* cycle = cycles[i].GetCycle();
-    string expath = (*cycle)[0];
-    for (unsigned int j = 1; j < cycle->size(); ++j) {
-      expath += "|" + (*cycle)[j];
-    }
-    API *db = new API();
-    int retVal = db->connect();
-    db->UpdateProfitablePath(expath, cycles[i].GetSize(), cycles[i].GetTotalRate());
+    cycles[i].UpdateDatabase();
   }
 }

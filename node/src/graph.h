@@ -44,14 +44,14 @@ class Graph {
     //optimal path functions
     DistanceEstimates FindOptimalPaths(const string& start, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit);
     vector<string> GetOptimalPath(const DistanceEstimates& dists, const string& end) const;
+    void FindCycles();
+    void UpdateCyclesDB();
 
   private:
     void BellmanFord(DistanceEstimates& dists, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit, const bool storeCycles);
     int CheckPath(const DistanceEstimates& dists, const string& start, const string& end, const bool storeCycles);
     double GetDistEstimate(const DistanceEstimates& dists, const string& node) const;
     string GetPrevNode(const DistanceEstimates& dists, const string& node) const;
-    void FindCycles();
-    void UpdateCyclesDB();
 
     AdjacencyMatrix graph;
     //number of nodes in graph

@@ -122,13 +122,23 @@ double Cycle::CalcRate() {
 
   while (itrTo != cycle.end()) {
     totalRate *= db->GetForexRate(*itrFrom+*itrTo+"=X");
+    ++itrTo;
+    ++itrFrom;
   }
 
-  totalRate *= db->GetForexRate(*itrTo+*cycle.begin()+"=X");
+  totalRate *= db->GetForexRate(*itrFrom+*cycle.begin()+"=X");
   rate = totalRate;
+  delete db;
   return totalRate;
 }
 
 void Cycle::UpdateDatabase() const {
-
+  string expath = cycle[0];
+  for (unsigned int j = 1; j < cycle.size(); ++j) {
+    expath += "|" + cycle[j];
+  }
+  API *db = new API();
+  int retVal = db->connect();
+  db->UpdateProfitablePath(expath, cycle.size(), GetTotalRate());
+  delete db;
 }
