@@ -290,7 +290,12 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
 }
 
 
-
+//takes in 4 arguments: string starting currency, string ending currency,
+//array of strings of currencies to exclude, and int maximum number of exchanges in the path
+//if no currencies should be excluded, give an empty array
+//if there is no limit to the number of exchanges, give a value of 0
+//returns 2 parameters: array for strings of the currencies that form the optimal path, and
+//double total rate over the path
 void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
@@ -333,8 +338,7 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  v8::String::Utf8Value param4(args[3]->ToString());
-  string maxNumberExchanges = string(*param4);
+  double maxNumberExchanges = args[3]->NumberValue();
   
   //TODO: move this to init
   API *db = new API();
