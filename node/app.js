@@ -69,3 +69,21 @@ app.get('/chartData/:ticker/:timeframe', function(req, res) {
 
     res.send(ret);
 });
+
+app.get('/arbitrageData/', function(req, res) {
+    console.log(req.params.);
+
+    ret = addon.arbitrageData();
+    console.log(ret);
+
+    res.send(ret);
+});
+
+app.get('/calculatorData/', function(req, res) {
+    console.log(req.params.);
+
+    ret = addon.calculatorData();
+    console.log(ret);
+
+    res.send(ret);
+});
