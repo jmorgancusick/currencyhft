@@ -36,7 +36,7 @@ void Exchange(const FunctionCallbackInfo<Value>& args) {
   }
 
   v8::String::Utf8Value param1(args[0]->ToString());
-  std::string id = std::string(*param1);
+  string id = string(*param1);
   
   cout<<"Hello World!"<<endl;
 
@@ -49,13 +49,13 @@ void Exchange(const FunctionCallbackInfo<Value>& args) {
   }
 
   
-  unordered_map<std::string, double> *rows = db->selectExchangeWithID(id);
+  unordered_map<string, double> *rows = db->selectExchangeWithID(id);
 
   int i = 0;
 
   Local<Array> result = Array::New(isolate);
   
-  for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
+  for(unordered_map<string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
     cout<< itr->first << "\t" << itr->second << endl;
 
     // Creates a new Object on the V8 heap
@@ -95,7 +95,7 @@ void Table(const FunctionCallbackInfo<Value>& args) {
   }
 
   v8::String::Utf8Value param1(args[0]->ToString());
-  std::string tableName = std::string(*param1);
+  string tableName = string(*param1);
   
   
   //TODO: move this to init
@@ -107,13 +107,13 @@ void Table(const FunctionCallbackInfo<Value>& args) {
     return;
   }
   
-  unordered_map<std::string, double> *rows = db->selectAllFromTable(tableName);
+  unordered_map<string, double> *rows = db->selectAllFromTable(tableName);
 
   int i = 0;
 
   Local<Array> result = Array::New(isolate);
   
-  for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
+  for(unordered_map<string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
     cout<< itr->first << "\t" << itr->second << endl;
 
     // Creates a new Object on the V8 heap
@@ -284,7 +284,6 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
   }
 
   args.GetReturnValue().Set(result);
-  //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
   
   delete db;
 }
@@ -395,11 +394,27 @@ void CalculatorData(const FunctionCallbackInfo<Value>& args) {
 
   cout<<"Number of args: "<<args.Length()<<endl;
 
-  //Make sure 0 arguments.
-  if (args.Length() != 0) {
+  //Make sure 2 arguments.
+  if (args.Length() != 2) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
     return;
   }
+
+  if (!args[0]->IsString()) {
+    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+    return;
+  }
+
+  v8::String::Utf8Value param1(args[0]->ToString());
+  string startCurr = string(*param1);
+  
+  if (!args[1]->IsString()) {
+    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+    return;
+  }
+
+  v8::String::Utf8Value param2(args[1]->ToString());
+  string endCurr = string(*param2);
   
   //TODO: move this to init
   API *db = new API();
@@ -410,11 +425,17 @@ void CalculatorData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  vector<string> currencies = db->GetAllCurrencies();
+  //ector<string> currencies = db->GetAllCurrencies();
 
   int i=0;
   Local<Array> result = Array::New(isolate);
 
+  double rate = db->GetForexRate(startCurr + endCurr + "=X");
+  Local<Object> obj = Object::New(isolate);
+  obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
+  result->Set(i, obj);
+
+/*
   for (auto it = currencies.begin(); it != currencies.end(); ++it) {
     //iterate through "to nodes"
     for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
@@ -431,7 +452,7 @@ void CalculatorData(const FunctionCallbackInfo<Value>& args) {
       }
     }
   }
-  
+*/
   args.GetReturnValue().Set(result);
 
   delete db;
