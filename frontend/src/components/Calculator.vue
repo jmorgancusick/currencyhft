@@ -6,7 +6,7 @@
     <!-- Start -->
     <el-select v-model="start" placeholder="Start currency">
       <el-option
-        v-for="item in startOptions"
+        v-for="item in startCurrencies"
         :label="item.label"
         :value="item.value"
         :disabled="item.disabled">
@@ -15,7 +15,7 @@
     <!-- End -->
     <el-select v-model="end" placeholder="End currency">
       <el-option
-        v-for="item in endOptions"
+        v-for="item in endCurrencies"
         :label="item.label"
         :value="item.value"
         :disabled="item.disabled">
@@ -27,7 +27,7 @@
 
     <h2>Conversion: {{ inputVal }}</h2>
 
-    <h3> {{nicemsg}} </h3>
+    <h3>{{nicemsg}}</h3>
   </div>
 </template>
 
@@ -38,7 +38,7 @@ export default {
     return {
       msg: 'Currency Calculator',
       nicemsg: '**future calculator implementation will remove full page view',
-      startOptions: [{
+      startCurrencies: [{
         value: 'Start currency',
         label: 'Start currency',
         disabled: true
@@ -67,7 +67,7 @@ export default {
         value: 'USD',
         label: 'USD'
       }],
-      endOptions: [{
+      endCurrencies: [{
         value: 'End currency',
         label: 'End currency',
         disabled: true

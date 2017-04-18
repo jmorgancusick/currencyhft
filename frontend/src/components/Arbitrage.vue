@@ -7,7 +7,7 @@
     <!-- Start currency -->
     <el-select v-model="start" placeholder="Start currency">
       <el-option
-        v-for="item in startOptions"
+        v-for="item in startCurrencies"
         :label="item.label"
         :value="item.value"
         :disabled="item.disabled">
@@ -16,7 +16,17 @@
     <!-- End currency -->
     <el-select v-model="end" placeholder="End currency">
       <el-option
-        v-for="item in endOptions"
+        v-for="item in endCurrencies"
+        :label="item.label"
+        :value="item.value"
+        :disabled="item.disabled">
+      </el-option>
+    </el-select>
+
+    <!-- Multiple selections to exclude currencies -->
+    <el-select v-model="exclude" multiple placeholder="Exclude currencies">
+      <el-option
+        v-for="item in excludeCurrencies"
         :label="item.label"
         :value="item.value"
         :disabled="item.disabled">
@@ -27,8 +37,9 @@
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
 
     <el-button @click="print()">Calculate</el-button>
-    <h2>Return from most profitable conversion: {{ inputVal }}</h2>
+    <h2>Optimal conversion: {{ inputVal }}</h2>
     <h2>Path:</h2>
+    <h3></h3>
   </div>
 </template>
 
@@ -38,7 +49,7 @@ export default {
   data () {
     return {
       msg: 'Arbitrage', 
-      startOptions: [{
+      startCurrencies: [{
           value: 'Start currency',
           label: 'Start currency',
           disabled: true
@@ -67,7 +78,7 @@ export default {
           value: 'USD',
           label: 'USD'
         }],
-      endOptions: [{
+      endCurrencies: [{
           value: 'End currency',
           label: 'End currency',
           disabled: true
@@ -96,8 +107,38 @@ export default {
           value: 'USD',
           label: 'USD'
         }],
+      excludeCurrencies: [{
+        value: 'Exclude currencies',
+        label: 'Exclude currencies',
+        disabled: true
+        },{
+          value: 'AUD',
+          label: 'AUD'
+        }, {
+          value: 'CAD',
+          label: 'CAD'
+        }, {
+          value: 'CHF',
+          label: 'CHF'
+        }, {
+          value: 'EUR',
+          label: 'EUR'
+        }, {
+          value: 'GBP',
+          label: 'GBP'
+        }, {
+          value: 'JPY',
+          label: 'JPY'
+        }, {
+          value: 'NZD',
+          label: 'NZD'
+        }, {
+          value: 'USD',
+          label: 'USD'
+        }],
       start: '',
       end: '', 
+      exclude: [],
       inputVal: null,
       optRate: .4567,
       optVal: null
