@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <stdio.h>
 
 #include <vector>
 #include <unordered_map>
@@ -38,30 +39,30 @@ class API{
     //open credentials file
     ifstream myfile("../../credentials.txt");
     if (myfile.is_open()){
-	getline(myfile,host);
-	getline(myfile,user);
-	getline(myfile,pass);
-	getline(myfile,db);
+      getline(myfile,host);
+      getline(myfile,user);
+      getline(myfile,pass);
+      getline(myfile,db);
 
-	
-	myfile.close();
+      
+      myfile.close();
 
-	cout << "Read credentials" << endl;
+      cout << "Read credentials" << endl;
 
-	try{
-	  
-	  driver = get_driver_instance();
+      try{
+        
+        driver = get_driver_instance();
 
-	  con.reset(driver->connect(host, user, pass));
-	  con->setSchema(db);
+        con.reset(driver->connect(host, user, pass));
+        con->setSchema(db);
 
-	  cout << "Connected to DB" << endl;
-	  
-	} catch(sql::SQLException &e){
-	  printError(e);
-	  con.reset();
-	  return 1;
-	}
+        cout << "Connected to DB" << endl;
+        
+      } catch(sql::SQLException &e){
+        printError(e);
+        con.reset();
+        return 1;
+      }
     }
     else{
       cout << "Unable to open file" << endl;
@@ -69,6 +70,18 @@ class API{
     }
     return 0;
   }
+
+
+  struct chart_info {
+    long timestamp;
+    string ticker;
+    double high;
+    double volume;
+    double open;
+    double low;
+    double close;
+  };
+
 
   //only works for string, double pairs
   unordered_map<string, double> * selectExchangeWithID(string id){
@@ -83,17 +96,17 @@ class API{
       res.reset(pstmt->executeQuery());
 
       for(;;)
-	{
-	  while (res->next()) {
-	    (*rows)[res->getString("id")] = res->getDouble("close");
-	  }
-	  if (pstmt->getMoreResults())
-	    {
-	      res.reset(pstmt->getResultSet());
-	      continue;
-	    }
-	  break;
-	}
+  {
+    while (res->next()) {
+      (*rows)[res->getString("id")] = res->getDouble("close");
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;
+  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -109,8 +122,8 @@ class API{
     try{
 
       if(!hasTable(table)){
-	cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
-	return NULL; 
+  cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
+  return NULL; 
       }
 
       
@@ -119,17 +132,17 @@ class API{
       res.reset(pstmt->executeQuery());
 
       for(;;)
-	{
-	  while (res->next()) {
-	    (*rows)[res->getString("id")] = res->getDouble("close");
-	  }
-	  if (pstmt->getMoreResults())
-	    {
-	      res.reset(pstmt->getResultSet());
-	      continue;
-	    }
-	  break;
-	}
+  {
+    while (res->next()) {
+      (*rows)[res->getString("id")] = res->getDouble("close");
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;
+  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -137,6 +150,128 @@ class API{
     }
     return rows;
   }
+
+
+unordered_map<string, double> * selectAllTickerData(){
+    unordered_map<string, double> *rows = new unordered_map<string, double>();
+
+    try{
+      
+      pstmt.reset(con->prepareStatement("select * from forex"));
+      
+      //res now has return data
+      res.reset(pstmt->executeQuery());
+
+      for(;;)
+  {
+    while (res->next()) {
+      (*rows)[res->getString("ticker")] = res->getDouble("change_day");
+    }
+    if (pstmt->getMoreResults())
+      {
+        res.reset(pstmt->getResultSet());
+        continue;
+      }
+    break;  //No more results
+  }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, long startDate, long endDate){
+    vector<chart_info> *rows = new vector<chart_info>();
+
+    try{
+      //mysql query
+      string table;
+      if(interval == "minute"){
+        table = "forexDashMinute";
+      }
+      else if(interval == "day"){
+        table = "forexDashDaily";
+      }
+      else {
+        cout << "# ERR: Improper input for variable interval in selectHistoricalTickerData" << endl;
+        return NULL;
+      }
+      pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
+      pstmt->setString(1,ticker);
+      pstmt->setInt(2,endDate);
+      pstmt->setInt(3,startDate);
+
+      //res now has return data
+      res.reset(pstmt->executeQuery());
+
+      for(;;){
+        while (res->next()) {
+          chart_info rowData;
+          rowData.timestamp = res->getInt("timestamp");
+          rowData.ticker = res->getString("ticker");
+          rowData.high = res->getDouble("high");
+          rowData.volume = res->getDouble("volume");
+          rowData.open = res->getDouble("open");
+          rowData.low = res->getDouble("low");
+          rowData.close = res->getDouble("close");
+          (*rows).push_back(rowData);
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;  //No more results
+      }
+    } catch(sql::SQLException &e){
+      printError(e);
+      delete rows;
+      return NULL;
+    }
+    return rows;
+  }
+
+  //retrieves all currencies to store in graph
+  vector<string> GetAllCurrencies() {
+    vector<string> currencies;
+    try{
+      //placeholder until db is filled
+      pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forex"));
+      res.reset(pstmt->executeQuery());
+
+      while (res->next()) {
+        currencies.push_back(res->getString("curr"));
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+      return {};
+    }
+    return currencies;
+}
+
+  //retrieves forex rate of a particular ticker
+  double GetForexRate(string ticker) {
+    //initialize as NaN
+    double rate = numeric_limits<double>::quiet_NaN();
+    try{
+      //placeholder until db is filled
+      pstmt.reset(con->prepareStatement("select current_rate from forex where ticker = ?"));
+      pstmt->setString(1,ticker);
+
+      res.reset(pstmt->executeQuery());
+      res->next();
+
+      rate = res->getDouble("current_rate");
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rate;
+}
+
 
  private:
   string host;
@@ -159,7 +294,6 @@ class API{
   void printError(sql::SQLException &e){
     /*
       MySQL Connector/C++ throws three different exceptions:
-
       - sql::MethodNotImplementedException (derived from sql::SQLException)
       - sql::InvalidArgumentException (derived from sql::SQLException)
       - sql::SQLException (derived from std::runtime_error)
@@ -175,7 +309,7 @@ class API{
   bool hasTable(string tableName){
     for(int i = 0; i < numTables; i++){
       if(tableName.compare(tablesWhiteList[i]) == 0){
-	return true;
+  return true;
       }
     }
     return false;
