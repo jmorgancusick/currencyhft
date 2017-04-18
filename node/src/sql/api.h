@@ -39,27 +39,27 @@ class API{
     //open credentials file
     ifstream myfile("../../credentials.txt");
     if (myfile.is_open()){
-	getline(myfile,host);
-	getline(myfile,user);
-	getline(myfile,pass);
-	getline(myfile,db);
-	
-	myfile.close();
+    	getline(myfile,host);
+    	getline(myfile,user);
+    	getline(myfile,pass);
+    	getline(myfile,db);
+    	
+    	myfile.close();
 
 
-	try{
-	  
-	  driver = get_driver_instance();
+    	try{
+    	  
+    	  driver = get_driver_instance();
 
-	  con.reset(driver->connect(host, user, pass));
-	  con->setSchema(db);
+    	  con.reset(driver->connect(host, user, pass));
+    	  con->setSchema(db);
 
-	  
-	} catch(sql::SQLException &e){
-	  printError(e);
-	  con.reset();
-	  return 1;
-	}
+    	  
+    	} catch(sql::SQLException &e){
+    	  printError(e);
+    	  con.reset();
+    	  return 1;
+    	}
     }
     else{
       cout << "Unable to open file" << endl;
@@ -93,17 +93,17 @@ class API{
       res.reset(pstmt->executeQuery());
 
       for(;;)
-  {
-    while (res->next()) {
-      (*rows)[res->getString("id")] = res->getDouble("close");
-    }
-    if (pstmt->getMoreResults())
       {
-        res.reset(pstmt->getResultSet());
-        continue;
+        while (res->next()) {
+          (*rows)[res->getString("id")] = res->getDouble("close");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;
       }
-    break;
-  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -119,8 +119,8 @@ class API{
     try{
 
       if(!hasTable(table)){
-  cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
-  return NULL; 
+        cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
+        return NULL; 
       }
 
       
@@ -129,17 +129,17 @@ class API{
       res.reset(pstmt->executeQuery());
 
       for(;;)
-  {
-    while (res->next()) {
-      (*rows)[res->getString("id")] = res->getDouble("close");
-    }
-    if (pstmt->getMoreResults())
       {
-        res.reset(pstmt->getResultSet());
-        continue;
+        while (res->next()) {
+          (*rows)[res->getString("id")] = res->getDouble("close");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;
       }
-    break;
-  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -160,17 +160,17 @@ unordered_map<string, double> * selectAllTickerData(){
       res.reset(pstmt->executeQuery());
 
       for(;;)
-  {
-    while (res->next()) {
-      (*rows)[res->getString("ticker")] = res->getDouble("change_day");
-    }
-    if (pstmt->getMoreResults())
       {
-        res.reset(pstmt->getResultSet());
-        continue;
+        while (res->next()) {
+          (*rows)[res->getString("ticker")] = res->getDouble("change_day");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;  //No more results
       }
-    break;  //No more results
-  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -319,7 +319,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   bool hasTable(string tableName){
     for(int i = 0; i < numTables; i++){
       if(tableName.compare(tablesWhiteList[i]) == 0){
-  return true;
+        return true;
       }
     }
     return false;
