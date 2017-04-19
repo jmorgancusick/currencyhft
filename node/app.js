@@ -59,12 +59,14 @@ app.get('/tickerData/', function(req, res) {
 
 });
 
-app.get('/chartData/:ticker/:timeframe', function(req, res) {
+app.get('/chartData/:ticker/:timeframe/:startDate/:endDate', function(req, res) {
     // log chartId
     console.log(req.params.ticker);
     console.log(req.params.timeframe);
+    console.log(req.params.startDate);
+    console.log(req.params.endDate);
 
-    ret = addon.chartData(req.params.ticker,req.params.timeframe);
+    ret = addon.chartData(req.params.ticker,req.params.timeframe,req.params.startDate,req.params.endDate);
     console.log(ret);
 
     res.send(ret);

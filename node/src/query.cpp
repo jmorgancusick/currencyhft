@@ -158,7 +158,7 @@ void TickerData(const FunctionCallbackInfo<Value>& args) {
 
 
   unordered_set<std::string> majorTickers ({
-    "USDCAD=X", "EURJPY=X"
+    "USDCAD=X", "EURJPY=X",
     "EURUSD=X", "EURCHF=X",
     "USDCHF=X", "EURGBP=X",
     "GBPUSD=X", "AUDCAD=X",
@@ -212,7 +212,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
   cout<<"Number of args: "<<args.Length()<<endl;
 
   //Make sure 2 arguments.  Cast to string
-  if (args.Length() != 2) {
+  if (args.Length() != 4) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
     return;
   }
@@ -233,6 +233,12 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
   v8::String::Utf8Value param2(args[1]->ToString());
   std::string timeframe = std::string(*param2);
   
+  v8::String::Utf8Value param3(args[2]->ToString());
+  std::string startDate = std::string(*param3);
+
+  v8::String::Utf8Value param4(args[3]->ToString());
+  std::string endDate = std::string(*param4);
+
   //TODO: move this to init
   API *db = new API();
   int retVal = db->connect();
@@ -242,12 +248,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  string interval = "day";
-  long startDate = 1450000000;
-  long endDate = 1490064000;
-  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
-  //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
-//TODO change data structure to array of struct
+  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, timeframe, startDate, endDate);    //Database query
 
 
   int i = 0;
@@ -265,7 +266,7 @@ void ChartData(const FunctionCallbackInfo<Value>& args) {
     //Can call a pack function here to be cleaner once more data
     // Transfers the data from result, to obj (see below)
     obj->Set(String::NewFromUtf8(isolate, "date"),
-       Number::New(isolate, itr->timestamp));
+       String::NewFromUtf8(isolate, itr->timestamp.data()));
     obj->Set(String::NewFromUtf8(isolate, "ticker"),
        String::NewFromUtf8(isolate, itr->ticker.data()));
     obj->Set(String::NewFromUtf8(isolate, "high"),
