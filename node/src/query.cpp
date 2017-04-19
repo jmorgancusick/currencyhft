@@ -6,6 +6,7 @@
 #include "path.h"
 #include "string"
 #include <unordered_set>
+#include <typeinfo>
 
 namespace demo{
 
@@ -288,65 +289,47 @@ public:
     v8::String::Utf8Value param2(args[1]->ToString());
     string endCurr = string(*param2);
 
-    if (!args[2]->IsArray()) {
+    if (!args[2]->IsString()) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
       return;
     }
 
+    v8::String::Utf8Value param3(args[2]->ToString());
+    std::string param3Str = std::string(*param3);
 
-    std::cout << "Constructing arguments" << std::endl;
+    int maxNumberExchanges = std::stoi(param3Str.data());
 
-    v8::Array param3 = *(Array::Cast(*args[2]));
+
+    if (!args[3]->IsArray()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    Local<Array> param4 = Local<Array>::Cast(args[3]);
 
     std::cout << "Array cast" << std::endl;
 
     vector<std::string> currenciesToExclude;
-    std::cout << "test -1" << std::endl;
 
-    std::cout<< "Param 3 Length" << param3.Length() << std::endl;
-    for(int i=0; i < param3.Length(); i++) {
-      std::cout<< "test0" <<std::endl;
-      v8::String::Utf8Value temp(param3.CloneElementAt(i)->ToString());
-      std::cout<< "test1" <<std::endl;
-      string temp2 = string(*temp);
-      std::cout<< "test2" <<std::endl;
-      currenciesToExclude.push_back(temp2);
-    }
+    std::cout<< "Param 4 Length: " << param4->Length() << std::endl;
+    for(int i=0; i < param4->Length(); i++) {
+      Local<Value> ele = param4->Get(i);
 
-    std::cout << "currencies to exclude" << std::endl;
-
-    if (!args[3]->IsNumber()) {
-      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-      return;
-    }
-
-    double maxNumberExchanges = args[3]->NumberValue();
-    
-
-    std::cout << "Getting currencies" << std::endl;
-
-    vector<string> currencies = db->GetAllCurrencies();
-
-    Graph g = Graph(currencies);
-
-    std::cout << "Made graph" << std::endl;
-
-    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
-      //iterate through "to nodes"
-      for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
-        //don't store reflex edges
-        if (*it != *it2) {
-          //all edges are initialized to infinity
-          cout << *it << *it2 << endl;
-          double rate = -log(db->GetForexRate(*it+*it2+"=X"));
-          g.SetEdgeWeight(*it, *it2, rate);
-        }
+      if(!ele->IsString()){
+        isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments in array"));
+        return;
       }
+
+      v8::String::Utf8Value arrEle(ele->ToString());
+      std::string tmpStr = std::string(*arrEle);
+
+      currenciesToExclude.push_back(tmpStr);
     }
+
 
     unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
 
-    Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+    Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
     vector<string> *p = path.GetPath();
     double totalRate = path.GetTotalRate();
 
@@ -440,12 +423,12 @@ public:
 
     // Clear memory
     delete db;
-    //delete g;
+    delete g;
   }
 
   // statis member variables
   static API *db;
-  //static Graph g;
+  static Graph *g;
 
   static void init(Local<Object> exports) {
     // Establish Node.js addon functions
@@ -466,6 +449,25 @@ public:
     }
 
     // Create graph
+    vector<string> currencies = db->GetAllCurrencies();
+
+    REST_API::g = new Graph(currencies);
+
+    std::cout << "Made graph" << std::endl;
+
+    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+      //iterate through "to nodes"
+      for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+        //don't store reflex edges
+        if (*it != *it2) {
+          //all edges are initialized to infinity
+          cout << *it << *it2 << endl;
+          double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+          g->SetEdgeWeight(*it, *it2, rate);
+        }
+      }
+    }
+
 
   }
 
@@ -481,6 +483,7 @@ public:
 
 // Define the static member variables
 API *REST_API::db = NULL;
+Graph *REST_API::g = NULL;
 
 // Expose Node Module
 NODE_MODULE(addon, REST_API::init)

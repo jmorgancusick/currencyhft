@@ -76,9 +76,13 @@ app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges', function(req, 
     console.log("startCurr: ",req.params.startCurr);
     console.log("endCurr: ",req.params.endCurr);
     console.log("exclude: ",req.query.exclude);
-    console.log("maxNumExch: ",req.maxNumberExchanges);
+    console.log("maxNumExch: ",req.params.maxNumberExchanges);
 
-    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.query.exclude, req.maxNumberExchanges);
+    if (req.query.exclude === undefined){
+        req.query.exclude = [];
+    }
+
+    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.maxNumberExchanges, req.query.exclude);
     console.log(ret);
 
     res.send(ret);
