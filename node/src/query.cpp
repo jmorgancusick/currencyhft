@@ -374,13 +374,21 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
 
   Local<Array> result = Array::New(isolate);
 
-  for (unsigned int i = 0; i < path.size(); i++) {
+  /*for (unsigned int i = 0; i < path.size(); i++) {
     Local<Object> obj = Object::New(isolate);
     obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, p[i].data()));
     result->Set(i, obj);
-  }
+  }*/
 
   int i = 0;
+  for (vector<string>::iterator it = p->begin(); it != p->end(); ++it) {
+    Local<Object> obj = Object::New(isolate);
+    obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, it->data()));
+    result->Set(i, obj);
+    ++i;
+  }
+
+  i = 0;
   Local<Object> obj = Object::New(isolate);
   obj->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
   result->Set(i, obj);
