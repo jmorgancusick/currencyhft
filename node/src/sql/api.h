@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <iomanip>
 #include <stdio.h>
 
 #include <vector>
@@ -39,30 +40,27 @@ class API{
     //open credentials file
     ifstream myfile("../../credentials.txt");
     if (myfile.is_open()){
-      getline(myfile,host);
-      getline(myfile,user);
-      getline(myfile,pass);
-      getline(myfile,db);
+    	getline(myfile,host);
+    	getline(myfile,user);
+    	getline(myfile,pass);
+    	getline(myfile,db);
+    	
+    	myfile.close();
 
-      
-      myfile.close();
 
-      cout << "Read credentials" << endl;
+    	try{
+    	  
+    	  driver = get_driver_instance();
 
-      try{
-        
-        driver = get_driver_instance();
+    	  con.reset(driver->connect(host, user, pass));
+    	  con->setSchema(db);
 
-        con.reset(driver->connect(host, user, pass));
-        con->setSchema(db);
-
-        cout << "Connected to DB" << endl;
-        
-      } catch(sql::SQLException &e){
-        printError(e);
-        con.reset();
-        return 1;
-      }
+    	  
+    	} catch(sql::SQLException &e){
+    	  printError(e);
+    	  con.reset();
+    	  return 1;
+    	}
     }
     else{
       cout << "Unable to open file" << endl;
@@ -73,7 +71,7 @@ class API{
 
 
   struct chart_info {
-    long timestamp;
+    string timestamp;
     string ticker;
     double high;
     double volume;
@@ -96,17 +94,17 @@ class API{
       res.reset(pstmt->executeQuery());
 
       for(;;)
-  {
-    while (res->next()) {
-      (*rows)[res->getString("id")] = res->getDouble("close");
-    }
-    if (pstmt->getMoreResults())
       {
-        res.reset(pstmt->getResultSet());
-        continue;
+        while (res->next()) {
+          (*rows)[res->getString("id")] = res->getDouble("close");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;
       }
-    break;
-  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -122,8 +120,8 @@ class API{
     try{
 
       if(!hasTable(table)){
-  cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
-  return NULL; 
+        cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
+        return NULL; 
       }
 
       
@@ -132,17 +130,17 @@ class API{
       res.reset(pstmt->executeQuery());
 
       for(;;)
-  {
-    while (res->next()) {
-      (*rows)[res->getString("id")] = res->getDouble("close");
-    }
-    if (pstmt->getMoreResults())
       {
-        res.reset(pstmt->getResultSet());
-        continue;
+        while (res->next()) {
+          (*rows)[res->getString("id")] = res->getDouble("close");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;
       }
-    break;
-  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -163,17 +161,17 @@ unordered_map<string, double> * selectAllTickerData(){
       res.reset(pstmt->executeQuery());
 
       for(;;)
-  {
-    while (res->next()) {
-      (*rows)[res->getString("ticker")] = res->getDouble("change_day");
-    }
-    if (pstmt->getMoreResults())
       {
-        res.reset(pstmt->getResultSet());
-        continue;
+        while (res->next()) {
+          (*rows)[res->getString("ticker")] = res->getDouble("change_day");
+        }
+        if (pstmt->getMoreResults())
+          {
+            res.reset(pstmt->getResultSet());
+            continue;
+          }
+        break;  //No more results
       }
-    break;  //No more results
-  }
     } catch(sql::SQLException &e){
       printError(e);
       delete rows;
@@ -182,7 +180,7 @@ unordered_map<string, double> * selectAllTickerData(){
     return rows;
   }
 
-vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, long startDate, long endDate){
+vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, string startDate, string endDate){
     vector<chart_info> *rows = new vector<chart_info>();
 
     try{
@@ -198,10 +196,14 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
         cout << "# ERR: Improper input for variable interval in selectHistoricalTickerData" << endl;
         return NULL;
       }
+
+      struct tm startTime = timeConversion(startDate);
+      struct tm endTime = timeConversion(endDate);
+
       pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
       pstmt->setString(1,ticker);
-      pstmt->setInt(2,endDate);
-      pstmt->setInt(3,startDate);
+      pstmt->setInt(2,mktime(&endTime));
+      pstmt->setInt(3,mktime(&startTime));
 
       //res now has return data
       res.reset(pstmt->executeQuery());
@@ -209,7 +211,11 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       for(;;){
         while (res->next()) {
           chart_info rowData;
-          rowData.timestamp = res->getInt("timestamp");
+          time_t t = res->getInt("timestamp");
+          struct tm *date = gmtime(&t);
+          char d[20];
+          strftime(d, sizeof(d), "%m-%d-%Y+%H:%M:%S", date);
+          rowData.timestamp = d;
           rowData.ticker = res->getString("ticker");
           rowData.high = res->getDouble("high");
           rowData.volume = res->getDouble("volume");
@@ -237,7 +243,6 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   vector<string> GetAllCurrencies() {
     vector<string> currencies;
     try{
-      //placeholder until db is filled
       pstmt.reset(con->prepareStatement("select distinct substring(ticker, 1, 3) as curr from forex"));
       res.reset(pstmt->executeQuery());
 
@@ -250,14 +255,13 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       return {};
     }
     return currencies;
-}
+  }
 
   //retrieves forex rate of a particular ticker
-  double GetForexRate(string ticker) {
+  double GetForexRate(const string& ticker) {
     //initialize as NaN
     double rate = numeric_limits<double>::quiet_NaN();
     try{
-      //placeholder until db is filled
       pstmt.reset(con->prepareStatement("select current_rate from forex where ticker = ?"));
       pstmt->setString(1,ticker);
 
@@ -270,8 +274,23 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       printError(e);
     }
     return rate;
-}
+  }
 
+  //updates the profitable paths
+  void UpdateProfitablePath(const string& expath, const int& length, const double& rate) {
+    try{
+      pstmt.reset(con->prepareStatement("insert into profitableTrends (expath, length, profit, frequency) values (?, ?, ?, 1) on duplicate key update frequency=frequency+1"));
+      pstmt->setString(1,expath);
+      pstmt->setString(2,to_string(length));
+      pstmt->setString(3,to_string(rate));
+
+      res.reset(pstmt->executeQuery());
+
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+  }
 
  private:
   string host;
@@ -309,10 +328,20 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   bool hasTable(string tableName){
     for(int i = 0; i < numTables; i++){
       if(tableName.compare(tablesWhiteList[i]) == 0){
-  return true;
+        return true;
       }
     }
     return false;
+  }
+
+  tm timeConversion(string time){
+    istringstream ss(time);
+    struct tm timestamp = {};
+    ss >> get_time(&timestamp, "%m-%d-%Y+%H:%M:%S");
+    if (ss.fail()){
+      cout << "# ERR: could not convert time" << endl;
+    }
+    return timestamp;
   }
   
 };
