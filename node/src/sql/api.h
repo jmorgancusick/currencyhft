@@ -74,7 +74,7 @@ class API{
 
 
   struct chart_info {
-    long timestamp;
+    string timestamp;
     string ticker;
     double high;
     double volume;
@@ -214,7 +214,11 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       for(;;){
         while (res->next()) {
           chart_info rowData;
-          rowData.timestamp = res->getInt("timestamp");
+          time_t t = res->getInt("timestamp");
+          struct tm *date = gmtime(&t);
+          char d[20];
+          strftime(d, sizeof(d), "%m-%d-%Y+%H:%M:%S", date);
+          rowData.timestamp = d;
           rowData.ticker = res->getString("ticker");
           rowData.high = res->getDouble("high");
           rowData.volume = res->getDouble("volume");
@@ -323,7 +327,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   tm timeConversion(string time){
     istringstream ss(time);
     struct tm timestamp = {};
-    ss >> get_time(&timestamp, "%m/%d/%Y %H:%M:%S");
+    ss >> get_time(&timestamp, "%m-%d-%Y+%H:%M:%S");
     if (ss.fail()){
       cout << "# ERR: could not convert time" << endl;
     }
