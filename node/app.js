@@ -71,7 +71,7 @@ app.get('/chartData/:ticker/:timeframe', function(req, res) {
 });
 
 app.get('/arbitrageData/:startCurr/:endCurr/:excludeCurrs/:maxNumberExchanges', function(req, res) {
-    console.log(req.params.);
+    //console.log(req.params);
 
     ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.excludeCurrs, req.maxNumberExchanges);
     console.log(ret);
@@ -80,7 +80,7 @@ app.get('/arbitrageData/:startCurr/:endCurr/:excludeCurrs/:maxNumberExchanges', 
 });
 
 app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
-    console.log(req.params.);
+    //console.log(req.params.);
 
     ret = addon.calculatorData(req.params.startCurr, req.params.endCurr);
     console.log(ret);
