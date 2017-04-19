@@ -160,7 +160,7 @@ export default {
 
       console.log(this.apiData);
     }
-  } 
+  }, 
   computed: {
     optVal() {
       return this.optRate * this.inputVal;
