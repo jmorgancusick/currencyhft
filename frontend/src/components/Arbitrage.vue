@@ -33,10 +33,11 @@
       </el-option>
     </el-select>
 
-    <!-- Input field for amount -->
+    <!-- Input field for amount and calculate button-->
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-
     <el-button @click="shouldShow = true">Calculate</el-button>
+
+    <!-- Only show optimal conversion and path when user clicks calculate -->
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
     <h2 v-if="shouldShow === true">Path:</h2>
     <h3></h3>
@@ -140,10 +141,26 @@ export default {
       end: '', 
       exclude: [],
       inputVal: null,
-      optRate: .4567, 
+      optRate: .4567,
+      apiData: null, 
       shouldShow: false
     }
-  },  
+  }, 
+  methods: {
+    fetchPath() {
+      shouldShow = true;
+
+      // call for arbitrageData
+      axios.get("http://localhost:3000/tickerData/").then( (response) => {
+        console.log(response);
+        this.apiData = response.data;
+      }).catch( (error) => {
+        console.log("ERROR:", error);
+      })
+
+      console.log(this.apiData);
+    }
+  } 
   computed: {
     optVal() {
       return this.optRate * this.inputVal;

@@ -99,6 +99,7 @@ export default {
       start: '',
       end: '', 
       inputVal: '',
+      apiData: null,
       rate: 0.4567
     }
   },
@@ -110,6 +111,16 @@ export default {
     handleSelect() {
       if (this.start !== '' && this.end !== '') {
         console.log('ready!');
+
+        // call for calculatorData
+        axios.get("http://localhost:3000/tickerData/").then( (response) => {
+          console.log(response);
+          this.apiData = response.data;
+        }).catch( (error) => {
+          console.log("ERROR:", error);
+        })
+
+        console.log(this.apiData);
       }
     }
   },
