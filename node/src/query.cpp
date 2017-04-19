@@ -7,7 +7,7 @@
 #include "string"
 #include <unordered_set>
 
-namespace demo {
+namespace demo{
 
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
@@ -18,468 +18,471 @@ using v8::Value;
 using v8::Number;
 using v8::Array;
 
+
 using namespace std;
 
-void Exchange(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
+class REST_API{
+public: 
 
-  cout<<"Number of args: "<<args.Length()<<endl;
-  
-  if (args.Length() != 1) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
-    return;
-  }
+  static void Exchange(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
 
-  if (!args[0]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
+    cout<<"Number of args: "<<args.Length()<<endl;
+    
+    if (args.Length() != 1) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
 
-  v8::String::Utf8Value param1(args[0]->ToString());
-  string id = string(*param1);
-  
-  cout<<"Hello World!"<<endl;
+    if (!args[0]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
 
-  API *db = new API();
-  int retVal = db->connect();
-  if(retVal != 0){
-    cout<<"db.connect() failed with exit code "<<retVal<<endl;
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
-    return;
-  }
+    v8::String::Utf8Value param1(args[0]->ToString());
+    string id = string(*param1);
+    
+    cout<<"Hello World!"<<endl;
 
-  
-  unordered_map<string, double> *rows = db->selectExchangeWithID(id);
+    
+    unordered_map<string, double> *rows = db->selectExchangeWithID(id);
 
-  int i = 0;
+    int i = 0;
 
-  Local<Array> result = Array::New(isolate);
-  
-  for(unordered_map<string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
-    cout<< itr->first << "\t" << itr->second << endl;
+    Local<Array> result = Array::New(isolate);
+    
+    for(unordered_map<string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
+      cout<< itr->first << "\t" << itr->second << endl;
 
-    // Creates a new Object on the V8 heap
-    Local<Object> obj = Object::New(isolate);
-
-    //Can call a pack function here to be cleaner once more data
-    // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "id"),
-	     String::NewFromUtf8(isolate, itr->first.data()));
-    obj->Set(String::NewFromUtf8(isolate, "close"),
-	     Number::New(isolate, itr->second));
-
-    result->Set(i, obj); 
-  }
-
-  args.GetReturnValue().Set(result);
-  //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
-  
-  delete db;
-}
-
-  
-void Table(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  cout<<"Number of args: "<<args.Length()<<endl;
-
-  
-  if (args.Length() != 1) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
-    return;
-  }
-
-  if (!args[0]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param1(args[0]->ToString());
-  string tableName = string(*param1);
-  
-  
-  //TODO: move this to initis
-  API *db = new API();
-  int retVal = db->connect();
-  if(retVal != 0){
-    cout<<"db.connect() failed with exit code "<<retVal<<endl;
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
-    return;
-  }
-  
-  unordered_map<string, double> *rows = db->selectAllFromTable(tableName);
-
-  int i = 0;
-
-  Local<Array> result = Array::New(isolate);
-  
-  for(unordered_map<string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
-    cout<< itr->first << "\t" << itr->second << endl;
-
-    // Creates a new Object on the V8 heap
-    Local<Object> obj = Object::New(isolate);
-
-    //Can call a pack function here to be cleaner once more data
-    // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "id"),
-	     String::NewFromUtf8(isolate, itr->first.data()));
-    obj->Set(String::NewFromUtf8(isolate, "close"),
-	     Number::New(isolate, itr->second));
-
-    result->Set(i, obj); 
-  }
-
-  args.GetReturnValue().Set(result);
-  //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
-  
-  delete db;
-}
-
-void TickerData(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  cout<<"Number of args: "<<args.Length()<<endl;
-
-  
-  if (args.Length() != 0) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
-    return;
-  }
-  
-  
-  //TODO: move this to init
-  API *db = new API();
-  int retVal = db->connect();
-  if(retVal != 0){
-    cout<<"db.connect() failed with exit code "<<retVal<<endl;
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
-    return;
-  }
-
-
-  unordered_set<std::string> majorTickers ({
-    "USDCAD=X", "EURJPY=X"
-    "EURUSD=X", "EURCHF=X",
-    "USDCHF=X", "EURGBP=X",
-    "GBPUSD=X", "AUDCAD=X",
-    "NZDUSD=X", "GBPCHF=X",
-    "AUDUSD=X", "GBPJPY=X",
-    "USDJPY=X", "CHFJPY=X",
-    "EURCAD=X", "AUDJPY=X",
-    "EURAUD=X", "AUDNZD=X"
-  });
-
-  
-  unordered_map<std::string, double> *rows = db->selectAllTickerData();   //Get data
-
-  int i = 0;
-
-  Local<Array> result = Array::New(isolate);    //JSON results Array
-  
-  //Loop through C++ hashmap
-  for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++){
-    cout<< itr->first << "\t" << itr->second << endl;
-
-    // Add to return array if it is a major ticker
-    if (majorTickers.find(itr->first) != majorTickers.end()){
-
-      // Creates a new JSON Object on the V8 heap
+      // Creates a new Object on the V8 heap
       Local<Object> obj = Object::New(isolate);
 
       //Can call a pack function here to be cleaner once more data
       // Transfers the data from result, to obj (see below)
-      obj->Set(String::NewFromUtf8(isolate, "ticker"),
-         String::NewFromUtf8(isolate, itr->first.data()));
-      obj->Set(String::NewFromUtf8(isolate, "percentChange"),
-         Number::New(isolate, itr->second));
+      obj->Set(String::NewFromUtf8(isolate, "id"),
+  	     String::NewFromUtf8(isolate, itr->first.data()));
+      obj->Set(String::NewFromUtf8(isolate, "close"),
+  	     Number::New(isolate, itr->second));
 
       result->Set(i, obj); 
-
-      i++;
     }
+
+    args.GetReturnValue().Set(result);
+    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
+    
   }
 
-  args.GetReturnValue().Set(result);
-  //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
-  
-  delete db;
-}
+    
+  static void Table(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
 
+    cout<<"Number of args: "<<args.Length()<<endl;
 
-void ChartData(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
+    
+    if (args.Length() != 1) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
 
-  cout<<"Number of args: "<<args.Length()<<endl;
+    if (!args[0]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
 
-  //Make sure 2 arguments.  Cast to string
-  if (args.Length() != 2) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
-    return;
+    v8::String::Utf8Value param1(args[0]->ToString());
+    string tableName = string(*param1);
+
+    
+    unordered_map<string, double> *rows = db->selectAllFromTable(tableName);
+
+    int i = 0;
+
+    Local<Array> result = Array::New(isolate);
+    
+    for(unordered_map<string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
+      cout<< itr->first << "\t" << itr->second << endl;
+
+      // Creates a new Object on the V8 heap
+      Local<Object> obj = Object::New(isolate);
+
+      //Can call a pack function here to be cleaner once more data
+      // Transfers the data from result, to obj (see below)
+      obj->Set(String::NewFromUtf8(isolate, "id"),
+  	     String::NewFromUtf8(isolate, itr->first.data()));
+      obj->Set(String::NewFromUtf8(isolate, "close"),
+  	     Number::New(isolate, itr->second));
+
+      result->Set(i, obj); 
+    }
+
+    args.GetReturnValue().Set(result);
+    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
+
   }
 
-  if (!args[0]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
+  static void TickerData(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
 
-  v8::String::Utf8Value param1(args[0]->ToString());
-  std::string ticker = std::string(*param1);
-  
-  if (!args[1]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
+    cout<<"Number of args: "<<args.Length()<<endl;
 
-  v8::String::Utf8Value param2(args[1]->ToString());
-  std::string timeframe = std::string(*param2);
-  
-  //TODO: move this to init
-  API *db = new API();
-  int retVal = db->connect();
-  if(retVal != 0){
-    cout<<"db.connect() failed with exit code "<<retVal<<endl;
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
-    return;
-  }
-
-  string interval = "day";
-  long startDate = 1450000000;
-  long endDate = 1490064000;
-  vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
-  //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
-//TODO change data structure to array of struct
-
-
-  int i = 0;
-
-  Local<Array> result = Array::New(isolate);
-  
-
-  for(vector<API::chart_info>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
-    cout << itr->timestamp << "\t" << itr->ticker << "\t" << itr->high << "\t" << itr->volume << "\t"
-          << itr->open << "\t" << itr->low << "\t" << itr->close << endl;
-
-    // Creates a new Object on the V8 heap
-    Local<Object> obj = Object::New(isolate);
-
-    //Can call a pack function here to be cleaner once more data
-    // Transfers the data from result, to obj (see below)
-    obj->Set(String::NewFromUtf8(isolate, "date"),
-       Number::New(isolate, itr->timestamp));
-    obj->Set(String::NewFromUtf8(isolate, "ticker"),
-       String::NewFromUtf8(isolate, itr->ticker.data()));
-    obj->Set(String::NewFromUtf8(isolate, "high"),
-       Number::New(isolate, itr->high));
-    obj->Set(String::NewFromUtf8(isolate, "volume"),
-       Number::New(isolate, itr->volume));
-    obj->Set(String::NewFromUtf8(isolate, "open"),
-       Number::New(isolate, itr->open));
-    obj->Set(String::NewFromUtf8(isolate, "low"),
-       Number::New(isolate, itr->low));
-    obj->Set(String::NewFromUtf8(isolate, "close"),
-       Number::New(isolate, itr->close));
+    
+    if (args.Length() != 0) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
     
 
-    result->Set(i, obj); 
-  }
+    unordered_set<std::string> majorTickers ({
+      "USDCAD=X", "EURJPY=X",
+      "EURUSD=X", "EURCHF=X",
+      "USDCHF=X", "EURGBP=X",
+      "GBPUSD=X", "AUDCAD=X",
+      "NZDUSD=X", "GBPCHF=X",
+      "AUDUSD=X", "GBPJPY=X",
+      "USDJPY=X", "CHFJPY=X",
+      "EURCAD=X", "AUDJPY=X",
+      "EURAUD=X", "AUDNZD=X"
+    });
 
-  args.GetReturnValue().Set(result);
-  
-  delete db;
-}
+    
+    unordered_map<std::string, double> *rows = db->selectAllTickerData();   //Get data
 
+    int i = 0;
 
-//takes in 4 arguments: string starting currency, string ending currency,
-//array of strings of currencies to exclude, and int maximum number of exchanges in the path
-//if no currencies should be excluded, give an empty array
-//if there is no limit to the number of exchanges, give a value of 0
-//returns 2 parameters: array for strings of the currencies that form the optimal path, and
-//double total rate over the path
-void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
+    Local<Array> result = Array::New(isolate);    //JSON results Array
+    
+    //Loop through C++ hashmap
+    for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++){
+      cout<< itr->first << "\t" << itr->second << endl;
 
-  cout<<"Number of args: "<<args.Length()<<endl;
+      // Add to return array if it is a major ticker
+      if (majorTickers.find(itr->first) != majorTickers.end()){
 
-  //Make sure 4 arguments.  Cast to string
-  if (args.Length() != 4) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
-    return;
-  }
-
-  if (!args[0]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param1(args[0]->ToString());
-  string startCurr = string(*param1);
-  
-  if (!args[1]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param2(args[1]->ToString());
-  string endCurr = string(*param2);
-
-  if (!args[2]->IsArray()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::Array param3 = *(Array::Cast(*args[2]));
-
-  vector<std::string> currenciesToExclude;
-  for(int i=0; i < param3.Length(); i++) {
-    v8::String::Utf8Value temp(param3.CloneElementAt(i)->ToString());
-    string temp2 = string(*temp);
-    currenciesToExclude.push_back(temp2);
-  }
-
-  if (!args[3]->IsNumber()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  double maxNumberExchanges = args[3]->NumberValue();
-  
-  //TODO: move this to init
-  API *db = new API();
-  int retVal = db->connect();
-  if(retVal != 0){
-    cout<<"db.connect() failed with exit code "<<retVal<<endl;
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
-    return;
-  }
-
-  vector<string> currencies = db->GetAllCurrencies();
-
-  Graph g = Graph(currencies);
-
-  for (auto it = currencies.begin(); it != currencies.end(); ++it) {
-    //iterate through "to nodes"
-    for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
-      //don't store reflex edges
-      if (*it != *it2) {
-        //all edges are initialized to infinity
-        cout << *it << *it2 << endl;
-        double rate = -log(db->GetForexRate(*it+*it2+"=X"));
-        g.SetEdgeWeight(*it, *it2, rate);
-      }
-    }
-  }
-
-  unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
-
-  Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
-  vector<string> *p = path.GetPath();
-  double totalRate = path.GetTotalRate();
-
-  Local<Array> result = Array::New(isolate);
-
-  /*for (unsigned int i = 0; i < path.size(); i++) {
-    Local<Object> obj = Object::New(isolate);
-    obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, p[i].data()));
-    result->Set(i, obj);
-  }*/
-
-  int i = 0;
-  for (vector<string>::iterator it = p->begin(); it != p->end(); ++it) {
-    Local<Object> obj = Object::New(isolate);
-    obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, it->data()));
-    result->Set(i, obj);
-    ++i;
-  }
-
-  i = 0;
-  Local<Object> obj = Object::New(isolate);
-  obj->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
-  result->Set(i, obj);
-  args.GetReturnValue().Set(result);
-
-  delete db;
-}
-
-
-void CalculatorData(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  cout<<"Number of args: "<<args.Length()<<endl;
-
-  //Make sure 2 arguments.
-  if (args.Length() != 2) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
-    return;
-  }
-
-  if (!args[0]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param1(args[0]->ToString());
-  string startCurr = string(*param1);
-  
-  if (!args[1]->IsString()) {
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-    return;
-  }
-
-  v8::String::Utf8Value param2(args[1]->ToString());
-  string endCurr = string(*param2);
-  
-  //TODO: move this to init
-  API *db = new API();
-  int retVal = db->connect();
-  if(retVal != 0){
-    cout<<"db.connect() failed with exit code "<<retVal<<endl;
-    isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Failed to connect to database"));
-    return;
-  }
-
-  //ector<string> currencies = db->GetAllCurrencies();
-
-  int i=0;
-  Local<Array> result = Array::New(isolate);
-
-  double rate = db->GetForexRate(startCurr + endCurr + "=X");
-  Local<Object> obj = Object::New(isolate);
-  obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
-  result->Set(i, obj);
-
-/*
-  for (auto it = currencies.begin(); it != currencies.end(); ++it) {
-    //iterate through "to nodes"
-    for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
-      //don't store reflex edges
-      if (*it != *it2) {
-        //all edges are initialized to infinity
-        cout << *it << *it2 << endl;
-        double rate = db->GetForexRate(*it+*it2+"=X");
-
+        // Creates a new JSON Object on the V8 heap
         Local<Object> obj = Object::New(isolate);
-        obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
-        result->Set(i, obj);
+
+        //Can call a pack function here to be cleaner once more data
+        // Transfers the data from result, to obj (see below)
+        obj->Set(String::NewFromUtf8(isolate, "ticker"),
+           String::NewFromUtf8(isolate, itr->first.data()));
+        obj->Set(String::NewFromUtf8(isolate, "percentChange"),
+           Number::New(isolate, itr->second));
+
+        result->Set(i, obj); 
+
         i++;
       }
     }
+
+    args.GetReturnValue().Set(result);
+    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
+    
   }
-*/
-  args.GetReturnValue().Set(result);
-
-  delete db;
-}
 
 
-void init(Local<Object> exports) {
-  NODE_SET_METHOD(exports, "exchange", Exchange);
-  NODE_SET_METHOD(exports, "table", Table);
-  NODE_SET_METHOD(exports, "tickerData", TickerData);
-  NODE_SET_METHOD(exports, "chartData", ChartData);
-  NODE_SET_METHOD(exports, "arbitrageData", ArbitrageData);
-  NODE_SET_METHOD(exports, "calculatorData", CalculatorData);
-}
+  static void ChartData(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
 
-NODE_MODULE(addon, init)
+    cout<<"Number of args: "<<args.Length()<<endl;
 
-}  // namespace demo
+    //Make sure 2 arguments.  Cast to string
+    if (args.Length() != 2) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
+
+    if (!args[0]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param1(args[0]->ToString());
+    std::string ticker = std::string(*param1);
+    
+    if (!args[1]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param2(args[1]->ToString());
+    std::string timeframe = std::string(*param2);
+    
+
+
+    string interval = "day";
+    long startDate = 1450000000;
+    long endDate = 1490064000;
+    vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
+    //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
+  //TODO change data structure to array of struct
+
+
+    int i = 0;
+
+    Local<Array> result = Array::New(isolate);
+    
+
+    for(vector<API::chart_info>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
+      cout << itr->timestamp << "\t" << itr->ticker << "\t" << itr->high << "\t" << itr->volume << "\t"
+            << itr->open << "\t" << itr->low << "\t" << itr->close << endl;
+
+      // Creates a new Object on the V8 heap
+      Local<Object> obj = Object::New(isolate);
+
+      //Can call a pack function here to be cleaner once more data
+      // Transfers the data from result, to obj (see below)
+      obj->Set(String::NewFromUtf8(isolate, "date"),
+         Number::New(isolate, itr->timestamp));
+      obj->Set(String::NewFromUtf8(isolate, "ticker"),
+         String::NewFromUtf8(isolate, itr->ticker.data()));
+      obj->Set(String::NewFromUtf8(isolate, "high"),
+         Number::New(isolate, itr->high));
+      obj->Set(String::NewFromUtf8(isolate, "volume"),
+         Number::New(isolate, itr->volume));
+      obj->Set(String::NewFromUtf8(isolate, "open"),
+         Number::New(isolate, itr->open));
+      obj->Set(String::NewFromUtf8(isolate, "low"),
+         Number::New(isolate, itr->low));
+      obj->Set(String::NewFromUtf8(isolate, "close"),
+         Number::New(isolate, itr->close));
+      
+
+      result->Set(i, obj); 
+    }
+
+    args.GetReturnValue().Set(result);
+    
+  }
+
+
+  //takes in 4 arguments: string starting currency, string ending currency,
+  //array of strings of currencies to exclude, and int maximum number of exchanges in the path
+  //if no currencies should be excluded, give an empty array
+  //if there is no limit to the number of exchanges, give a value of 0
+  //returns 2 parameters: array for strings of the currencies that form the optimal path, and
+  //double total rate over the path
+  static void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    cout<<"Number of args: "<<args.Length()<<endl;
+
+    //Make sure 4 arguments.  Cast to string
+    if (args.Length() != 4) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
+
+    if (!args[0]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param1(args[0]->ToString());
+    string startCurr = string(*param1);
+    
+    if (!args[1]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param2(args[1]->ToString());
+    string endCurr = string(*param2);
+
+    if (!args[2]->IsArray()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+
+    std::cout << "Constructing arguments" << std::endl;
+
+    v8::Array param3 = *(Array::Cast(*args[2]));
+
+    std::cout << "Array cast" << std::endl;
+
+    vector<std::string> currenciesToExclude;
+    std::cout << "test -1" << std::endl;
+
+    std::cout<< "Param 3 Length" << param3.Length() << std::endl;
+    for(int i=0; i < param3.Length(); i++) {
+      std::cout<< "test0" <<std::endl;
+      v8::String::Utf8Value temp(param3.CloneElementAt(i)->ToString());
+      std::cout<< "test1" <<std::endl;
+      string temp2 = string(*temp);
+      std::cout<< "test2" <<std::endl;
+      currenciesToExclude.push_back(temp2);
+    }
+
+    std::cout << "currencies to exclude" << std::endl;
+
+    if (!args[3]->IsNumber()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    double maxNumberExchanges = args[3]->NumberValue();
+    
+
+    std::cout << "Getting currencies" << std::endl;
+
+    vector<string> currencies = db->GetAllCurrencies();
+
+    Graph g = Graph(currencies);
+
+    std::cout << "Made graph" << std::endl;
+
+    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+      //iterate through "to nodes"
+      for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+        //don't store reflex edges
+        if (*it != *it2) {
+          //all edges are initialized to infinity
+          cout << *it << *it2 << endl;
+          double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+          g.SetEdgeWeight(*it, *it2, rate);
+        }
+      }
+    }
+
+    unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
+
+    Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+    vector<string> *p = path.GetPath();
+    double totalRate = path.GetTotalRate();
+
+    Local<Array> result = Array::New(isolate);
+
+    /*for (unsigned int i = 0; i < path.size(); i++) {
+      Local<Object> obj = Object::New(isolate);
+      obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, p[i].data()));
+      result->Set(i, obj);
+    }*/
+
+    int i = 0;
+    for (vector<string>::iterator it = p->begin(); it != p->end(); ++it) {
+      Local<Object> obj = Object::New(isolate);
+      obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, it->data()));
+      result->Set(i, obj);
+      ++i;
+    }
+
+    i = 0;
+    Local<Object> obj = Object::New(isolate);
+    obj->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
+    result->Set(i, obj);
+    args.GetReturnValue().Set(result);
+
+  }
+
+
+  static void CalculatorData(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    cout<<"Number of args: "<<args.Length()<<endl;
+
+    //Make sure 2 arguments.
+    if (args.Length() != 2) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
+
+    if (!args[0]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param1(args[0]->ToString());
+    string startCurr = string(*param1);
+    
+    if (!args[1]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param2(args[1]->ToString());
+    string endCurr = string(*param2);
+    
+
+    //ector<string> currencies = db->GetAllCurrencies();
+
+    int i=0;
+    Local<Array> result = Array::New(isolate);
+
+    double rate = db->GetForexRate(startCurr + endCurr + "=X");
+    Local<Object> obj = Object::New(isolate);
+    obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
+    result->Set(i, obj);
+
+  /*
+    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+      //iterate through "to nodes"
+      for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+        //don't store reflex edges
+        if (*it != *it2) {
+          //all edges are initialized to infinity
+          cout << *it << *it2 << endl;
+          double rate = db->GetForexRate(*it+*it2+"=X");
+
+          Local<Object> obj = Object::New(isolate);
+          obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
+          result->Set(i, obj);
+          i++;
+        }
+      }
+    }
+  */
+    args.GetReturnValue().Set(result);
+
+  }
+
+  static void shutdown(const FunctionCallbackInfo<Value>& args){
+    std::cout << "Shutting down REST_API and DB API" << std::endl;
+
+    // Clear memory
+    delete db;
+    //delete g;
+  }
+
+  // statis member variables
+  static API *db;
+  //static Graph g;
+
+  static void init(Local<Object> exports) {
+    // Establish Node.js addon functions
+    NODE_SET_METHOD(exports, "exchange", REST_API::Exchange);
+    NODE_SET_METHOD(exports, "table", REST_API::Table);
+    NODE_SET_METHOD(exports, "tickerData", REST_API::TickerData);
+    NODE_SET_METHOD(exports, "chartData", REST_API::ChartData);
+    NODE_SET_METHOD(exports, "arbitrageData", REST_API::ArbitrageData);
+    NODE_SET_METHOD(exports, "calculatorData", REST_API::CalculatorData);
+    NODE_SET_METHOD(exports, "shutdown", REST_API::shutdown);
+
+    // Connect to Database
+    REST_API::db = new API();
+    int retVal = REST_API::db->connect();
+    if(retVal != 0){
+      cout<<"db.connect() failed with exit code "<<retVal<<endl;
+      return;
+    }
+
+    // Create graph
+
+  }
+
+
+
+
+
+};
+
+
+
+
+
+// Define the static member variables
+API *REST_API::db = NULL;
+
+// Expose Node Module
+NODE_MODULE(addon, REST_API::init)
+
+} // end namespace demo
