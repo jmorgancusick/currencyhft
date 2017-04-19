@@ -327,10 +327,13 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
+  v8::Array param3 = *(Array::Cast(*args[2]));
 
   vector<std::string> currenciesToExclude;
-  for(int i=0; i < args[2].Length(); i++) {
-    currenciesToExclude.push_back(args[2][i]->ToString());
+  for(int i=0; i < param3.Length(); i++) {
+    v8::String::Utf8Value temp(param3.CloneElementAt(i)->ToString());
+    string temp2 = string(*temp);
+    currenciesToExclude.push_back(temp2);
   }
 
   if (!args[3]->IsNumber()) {
