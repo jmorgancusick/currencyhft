@@ -6,7 +6,7 @@ import json
 
 class API:
 
-  defaultCredsFile = "../../stockCredentials.txt"
+  defaultCredsFile = "../../credentials.txt"
   formats = None
   db = None
   cur = None
@@ -88,9 +88,7 @@ class API:
     else:
       insertion += " ON DUPLICATE KEY UPDATE {0}".format(update)
 
-
     #print insertion
-
 
     try:
       self.cur.execute(insertion)
@@ -103,6 +101,24 @@ class API:
       else:
         print "WARNING: unable to execute call: ",insertion
         print str(e) 
+
+
+  def getAllData(self, table):
+    insertion = "SELECT * from {0}".format(table)
+
+    try:
+      print insertion
+      self.cur.execute(insertion)
+      rows = self.cur.fetchall()
+      return list(rows)
+    except Exception as e:
+      print e
+      if table not in self.formats.keys():
+        print "ERROR: the inputted table name does not exist"
+      else:
+        print "ERROR: could not execute call"
+        print str(e)
+      return None
 
 
   def commit(self):
