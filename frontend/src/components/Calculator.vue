@@ -4,7 +4,7 @@
 
     <!-- Adds dropdown menus for Start and End currencies -->
     <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency">
+    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
       <el-option
         v-for="item in startCurrencies"
         :label="item.label"
@@ -13,7 +13,7 @@
       </el-option>
     </el-select>
     <!-- End -->
-    <el-select v-model="end" placeholder="End currency">
+    <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
       <el-option
         v-for="item in endCurrencies"
         :label="item.label"
@@ -25,7 +25,7 @@
     <!-- Input field for amount -->    
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
 
-    <h2>Conversion: {{ inputVal }}</h2>
+    <h2>Conversion: {{ convertedVal }}</h2>
 
     <h3>{{nicemsg}}</h3>
   </div>
@@ -98,15 +98,24 @@ export default {
       }],
       start: '',
       end: '', 
-      inputVal: null,
-      rate: 0.4567,
-      convertedVal: null
+      inputVal: '',
+      rate: 0.4567
     }
   },
   methods: {
     print() {
-      this.$emit("testEvent", {obj: this.data1} )
-      this.nicemsg = 'You are awesome!!'
+      this.$emit("testEvent", {obj: this.data1} );
+      this.nicemsg = 'You are awesome!!';
+    },
+    handleSelect() {
+      if (this.start !== '' && this.end !== '') {
+        console.log('ready!');
+      }
+    }
+  },
+  computed: {
+    convertedVal() {
+      return this.inputVal * this.rate;
     }
   }
 }

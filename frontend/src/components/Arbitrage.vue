@@ -1,5 +1,5 @@
 <template>
-  <div class="arbitrage">
+  <div class="arbitrage" ref="arbitrage">
     <!-- <h1>{{ testProps }}</h1> -->
     <h1> {{msg}} </h1>
 
@@ -36,9 +36,9 @@
     <!-- Input field for amount -->
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
 
-    <el-button @click="print()">Calculate</el-button>
-    <h2>Optimal conversion: {{ inputVal }}</h2>
-    <h2>Path:</h2>
+    <el-button @click="shouldShow = true">Calculate</el-button>
+    <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
+    <h2 v-if="shouldShow === true">Path:</h2>
     <h3></h3>
   </div>
 </template>
@@ -140,14 +140,13 @@ export default {
       end: '', 
       exclude: [],
       inputVal: null,
-      optRate: .4567,
-      optVal: null
+      optRate: .4567, 
+      shouldShow: false
     }
   },  
-  methods: {
-    print() {
-      this.$emit("testEvent", {obj: this.data1} )
-      this.nicemsg = 'You are awesome!!'
+  computed: {
+    optVal() {
+      return this.optRate * this.inputVal;
     }
   }, 
   props: ["testProps"]
