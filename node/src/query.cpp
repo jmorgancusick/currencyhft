@@ -327,8 +327,8 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  vector<std:string> currenciesToExclude = new vector<std::string>();
-  for(int i=0; i<args[2].length(); i++) {
+  vector<std::string> currenciesToExclude = new vector<std::string>();
+  for(int i=0; i < args[2].Length(); i++) {
     currenciesToExclude.push_back(args[2][i]->ToString());
   }
 
