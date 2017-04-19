@@ -22,6 +22,7 @@ class Path {
     
 
     //===========Getters================
+    int size() {return path.size();}
     vector<string>* GetPath() {return &path;}
     double GetTotalRate() const {return totalRate;}
 

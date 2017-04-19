@@ -98,7 +98,7 @@ void Table(const FunctionCallbackInfo<Value>& args) {
   string tableName = string(*param1);
   
   
-  //TODO: move this to init
+  //TODO: move this to initis
   API *db = new API();
   int retVal = db->connect();
   if(retVal != 0){
@@ -327,12 +327,13 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  vector<std::string> currenciesToExclude = new vector<std::string>();
+
+  vector<std::string> currenciesToExclude;
   for(int i=0; i < args[2].Length(); i++) {
     currenciesToExclude.push_back(args[2][i]->ToString());
   }
 
-  if (!args[3]->IsInteger()) {
+  if (!args[3]->IsNumber()) {
     isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
     return;
   }
@@ -367,7 +368,7 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
 
   unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
 
-  Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges, false);
+  Path path = Path(g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
   vector<string> *p = path.GetPath();
   double totalRate = path.GetTotalRate();
 
@@ -375,14 +376,14 @@ void ArbitrageData(const FunctionCallbackInfo<Value>& args) {
 
   for (unsigned int i = 0; i < path.size(); i++) {
     Local<Object> obj = Object::New(isolate);
-    obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, path[i].data()));
+    obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, p[i].data()));
     result->Set(i, obj);
   }
 
+  int i = 0;
   Local<Object> obj = Object::New(isolate);
   obj->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
   result->Set(i, obj);
-  
   args.GetReturnValue().Set(result);
 
   delete db;
