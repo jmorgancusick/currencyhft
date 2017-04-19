@@ -72,20 +72,39 @@ app.get('/chartData/:ticker/:timeframe/:startDate/:endDate', function(req, res) 
     res.send(ret);
 });
 
-app.get('/arbitrageData/:startCurr/:endCurr/:excludeCurrs/:maxNumberExchanges', function(req, res) {
-    //console.log(req.params);
+app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges', function(req, res) {
+    console.log("arbitrage data endpoint");
 
-    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.excludeCurrs, req.maxNumberExchanges);
+    console.log("startCurr: ",req.params.startCurr);
+    console.log("endCurr: ",req.params.endCurr);
+    console.log("exclude: ",req.query.exclude);
+    console.log("maxNumExch: ",req.maxNumberExchanges);
+
+    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.query.exclude, req.maxNumberExchanges);
     console.log(ret);
 
     res.send(ret);
 });
 
 app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
-    //console.log(req.params.);
+    console.log("calculator data endpoint");
 
     ret = addon.calculatorData(req.params.startCurr, req.params.endCurr);
     console.log(ret);
 
     res.send(ret);
+});
+
+
+process.on('exit', function() {
+  addon.shutdown();
+
+  console.log('Goodbye.');
+});
+
+process.on('SIGINT', function () {
+  console.log('Got SIGINT. Shutting down...');
+  console.log('Press Control-D to exit immediately.');
+
+  process.exit()
 });
