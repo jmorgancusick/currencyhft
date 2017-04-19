@@ -173,7 +173,8 @@ export default {
     })
 
     // call for chartData
-    axios.get("http://localhost:3000/chartData/USDEUR=X/YTD").then( (response) => {
+    // http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
+    axios.get("http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {

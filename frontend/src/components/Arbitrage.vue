@@ -40,7 +40,7 @@
     <!-- Only show optimal conversion and path when user clicks calculate -->
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
     <h2 v-if="shouldShow === true">Path:</h2>
-    <h3></h3>
+    <h3> {{apiData}} </h3>
   </div>
 </template>
 
@@ -139,6 +139,7 @@ export default {
         }],
       start: '',
       end: '', 
+      numEdges: 5,
       exclude: [],
       inputVal: null,
       optRate: .4567,
@@ -150,8 +151,17 @@ export default {
     fetchPath() {
       shouldShow = true;
 
+      var str = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
+
+      for (var i = 0; i < exclude.length; ++i){
+        if (i === 0){
+          str = "?" + str + "exclude=" + exclude[i];
+        } else {
+          str = "&" + str + "exclude=" + exclude[i];
+        }
+      }
       // call for arbitrageData
-      axios.get("http://localhost:3000/tickerData/").then( (response) => {
+      axios.get(str).then( (response) => {
         console.log(response);
         this.apiData = response.data;
       }).catch( (error) => {
