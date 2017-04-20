@@ -1,5 +1,5 @@
 '''
-forexDataScrape.py
+forexDiskToDB.py
 
 Usage:
 forexDiskToDB.py
@@ -34,7 +34,6 @@ def main():
     #create ticker in forex table
     obj = {}
     obj["ticker"] = ticker
-    db.insert("forex", obj, requireData=False)
     
     for filename in glob.glob(folder+'/*.txt'):
       

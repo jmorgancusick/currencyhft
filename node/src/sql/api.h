@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <iomanip>
 #include <stdio.h>
 
 #include <vector>
@@ -70,7 +71,7 @@ class API{
 
 
   struct chart_info {
-    long timestamp;
+    string timestamp;
     string ticker;
     double high;
     double volume;
@@ -179,7 +180,7 @@ unordered_map<string, double> * selectAllTickerData(){
     return rows;
   }
 
-vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, long startDate, long endDate){
+vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, string startDate, string endDate){
     vector<chart_info> *rows = new vector<chart_info>();
 
     try{
@@ -195,10 +196,14 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
         cout << "# ERR: Improper input for variable interval in selectHistoricalTickerData" << endl;
         return NULL;
       }
+
+      struct tm startTime = timeConversion(startDate);
+      struct tm endTime = timeConversion(endDate);
+
       pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
       pstmt->setString(1,ticker);
-      pstmt->setInt(2,endDate);
-      pstmt->setInt(3,startDate);
+      pstmt->setInt(2,mktime(&endTime));
+      pstmt->setInt(3,mktime(&startTime));
 
       //res now has return data
       res.reset(pstmt->executeQuery());
@@ -206,7 +211,11 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       for(;;){
         while (res->next()) {
           chart_info rowData;
-          rowData.timestamp = res->getInt("timestamp");
+          time_t t = res->getInt("timestamp");
+          struct tm *date = gmtime(&t);
+          char d[20];
+          strftime(d, sizeof(d), "%m-%d-%Y+%H:%M:%S", date);
+          rowData.timestamp = d;
           rowData.ticker = res->getString("ticker");
           rowData.high = res->getDouble("high");
           rowData.volume = res->getDouble("volume");
@@ -323,6 +332,16 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       }
     }
     return false;
+  }
+
+  tm timeConversion(string time){
+    istringstream ss(time);
+    struct tm timestamp = {};
+    ss >> get_time(&timestamp, "%m-%d-%Y+%H:%M:%S");
+    if (ss.fail()){
+      cout << "# ERR: could not convert time" << endl;
+    }
+    return timestamp;
   }
   
 };
