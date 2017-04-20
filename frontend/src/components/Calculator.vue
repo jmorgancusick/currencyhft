@@ -125,7 +125,7 @@ export default {
 
         console.log(this.apiData);
 
-        this.rate = this.apiData[0].rate;
+        this.rate = this.apiData.rate;
       }
     }
   },

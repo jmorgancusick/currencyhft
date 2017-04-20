@@ -141,7 +141,7 @@ export default {
       end: '', 
       numEdges: 5,
       exclude: [],
-      inputVal: null,
+      inputVal: 0,
       optRate: .4567,
       apiData: null, 
       shouldShow: false
