@@ -3,6 +3,8 @@ import dbapi
 import datetime
 import itertools
 import schedule
+from lxml import html
+import requests
 
 
 def getData(ticker):
@@ -90,6 +92,86 @@ def updateForex():
 		updateHistory(ticker, dataMin, "forexDashMinute", db)
 
 
+def getCitiRates(currencies):
+	page = requests.get('https://www.citibank.com.au/aus/investments/forex-rates/USD.htm')
+	tree = html.fromstring(page.content)
+	curName = tree.xpath('//tr/td/strong/text()')
+	value = tree.xpath('//tr/td[4]/text()')
+
+	values = {}
+	for i in range(0,len(value)):
+		currency = curName[2*i+1]
+		if currency in currencies:
+			values[curName[2*i+1]] = float(value[i])
+	values["USD"] = 1.00
+
+	return values
+
+
+def getHSBCRates(currencies):
+	page = requests.get('https://www.hsbc.ca/1/2/calculators/foreign-exchange-calculator')
+	tree = html.fromstring(page.content)
+	curName = tree.xpath('//tr/td[@class="hsbcTdStyle2"][2]/text()')
+	value = tree.xpath('//tr/td[@class="hsbcTdStyle2"][4]/text()')
+
+	values = {}
+	for i in range(0,len(value)):
+		currency = curName[i]
+		if currency in currencies:
+			values[curName[i]] = float(value[i])
+	values["CAD"] = 1.00
+
+	return values
+
+
+def extrapolate(base, data, pairs):
+	exchanges = {}
+	for p in pairs:
+		cur1 = p[0]
+		cur2 = p[1]
+		if cur1 == base:
+			exchanges[cur1+cur2] = data[cur2]
+		elif cur2 == base:
+			exchanges[cur1+cur2] = 1/data[cur1]
+		else:
+			exchanges[cur1+cur2] = data[cur2]/data[cur1]
+
+	return exchanges
+
+
+def bankUpdate(data, bank):
+	update = []
+	for d in data.keys():
+		obj = {}
+		obj["start"] = d[0:3]
+		obj["end"] = d[3:6]
+		obj["bank"] = bank
+		obj["rate"] = data[d]
+		update.append(obj)
+
+	return update
+
+def updateBanks():
+	currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD"]
+	currencyPairs = list(itertools.permutations(currencies, 2))
+	db = dbapi.API()
+	db.connect()
+
+	values = getCitiRates(currencies)
+	rates = extrapolate("USD", values, currencyPairs)
+	update = bankUpdate(rates, "CIT")
+	retVal = db.bulkInsert("bankRates", update)
+	if retVal == False:
+		print "ERROR: bulk insert failed for file: ", filename
+
+	values = getCitiRates(currencies)
+	rates = extrapolate("CAN", values, currencyPairs)
+	update = bankUpdate(rates, "HSB")
+	retVal = db.bulkInsert("bankRates", update)
+	if retVal == False:
+		print "ERROR: bulk insert failed for file: ", filename
+
+
 #data must be two dimensions
 def mapify(data):
 	m = {}
@@ -100,6 +182,7 @@ def mapify(data):
 
 if __name__ == '__main__':
  	schedule.every().day.at("00:01").do(updateForex)
+ 	schedule.every().day.at("01:00").do(updateBanks)
  	while 1:
  		schedule.run_pending()
  		#time.sleep(1)
