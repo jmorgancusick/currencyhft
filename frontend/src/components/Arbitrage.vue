@@ -39,7 +39,9 @@
 
     <!-- Only show optimal conversion and path when user clicks calculate -->
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
-    <h2 v-if="shouldShow === true">Path:</h2>
+    <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
+    <h3 v-if="shouldShow === true">Regular Rate: {{ regRate }} </h3>
+    <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate }} </h3>
     <h3> {{apiData}} </h3>
   </div>
 </template>
@@ -141,8 +143,11 @@ export default {
       end: '', 
       numEdges: 5,
       exclude: [],
+      regRate: null,
       inputVal: null,
       optRate: null,
+      optVal: null, 
+      optPath: [],
       apiData: null, 
       shouldShow: false
     }
@@ -151,35 +156,48 @@ export default {
     fetchPath() {
       this.shouldShow = true;
 
-      var exclude = this.exclude;
+      // fetching regualr rate
+      var regStr = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
 
-      var str = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
+      // fetching optimal rate and path ro achieve optimal rate
+      var exclude = this.exclude;
+      var arbStr = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
 
       for (var i = 0; i < exclude.length; ++i){
         if (i === 0){
-          str = str + "?" + "exclude=" + exclude[i];
+          arbStr = arbStr + "?" + "exclude=" + exclude[i];
         } else {
-          str = str + "&" + "exclude=" + exclude[i];
+          arbStr = arbStr + "&" + "exclude=" + exclude[i];
         }
       }
 
-      console.log(str);
-      // call for arbitrageData
-      axios.get(str).then( (response) => {
+      axios.get(arbStr).then( (response) => {
         console.log(response);
         this.apiData = response.data;
       }).catch( (error) => {
         console.log("ERROR:", error);
       })
 
+      axios.get(regStr).then( (response) => {
+        console.log(response);
+        this.regRate = response.data.rate;
+      }).catch( (error) => {
+        console.log("ERROR:", error);
+      })
+
       console.log(this.apiData);
-      
+
+      this.optRate = this.apiData.totalRate;
+
+      this.optPath = this.apiData.currencies;
+
+      this.optVal = this.optRate * this.inputVal;
     }
   }, 
-  computed: {
+  computed: {/*
     optVal() {
       return this.optRate * this.inputVal;
-    }
+    }*/
   }, 
   props: ["testProps"]
 }

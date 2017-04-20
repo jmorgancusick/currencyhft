@@ -25,7 +25,7 @@
     <!-- Input field for amount -->    
     <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input>
 
-    <h2> Conversion: {{ convertedVal }} {{end}}</h2>
+    <h2> Conversion: {{ convertedVal }} {{end}} </h2>
 
     <h3>{{nicemsg}}</h3>
   </div>
