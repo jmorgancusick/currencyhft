@@ -48,11 +48,8 @@
 	 
 , "bankRates" : { "cols" : [	
 		"start" 			 	
-		, "start_full" 		  	
 		, "end" 			
-		, "end_full" 		
 		, "bank" 	 		
-		, "bank_full" 		
 		, "rate"	 		
 		, "ex_id"]	
 	, "keys" : [
@@ -60,14 +57,11 @@
 
 , "profitableTrends" :{ "cols" : [
 	"start"	 			
-		, "start_full" 		 	
 		, "end"	 		
-		, "end_full" 		
 		, "profit"  		
 		, "length" 		
 		, "expath"   			
-		, "frequency"		
-		, "path_id"]
+		, "frequency"]		
 	, "keys" : [
 		"path_id"]}
 

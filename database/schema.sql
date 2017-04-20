@@ -55,27 +55,22 @@ create table forex (
 
 create table bankRates (  -- extraneous probly
   start       varchar(40)   -- starting currency abv
-  , start_full    varchar(255)    -- full name of currency
   , end       varchar(40) 
-  , end_full    varchar(255)
   , bank      varchar(40) -- bank name abv
-  , bank_full     varchar(255)
   , rate      double    -- value of second given 1 of first
-  , ex_id     varchar(40) primary key -- hash based on start, end currency, and bank
+  , ex_id     varchar(40)  -- hash based on start, end currency, and bank
+  , primary key(start, end, bank)
 );
 
 
 create table profitableTrends(
   start     varchar(40)   -- starting currency abv
-  , start_full    varchar(255)  -- full name of currency
   , end     varchar(40) 
-  , end_full    varchar(255)
   , profit      double    -- profit based on initial currency
   , length    int     -- length of path
-  , expath      varchar(500)  -- in form "USDCITI|EURCITI|USDWELLS"
+  , expath      varchar(500)  primary key -- in form "USDCITI|EURCITI|USDWELLS"
             -- to go from USD in Citi bank to Euros in Citi to USD in wells fargo
   , frequency     int
-  , path_id     varchar(40) primary key -- hashed based on expath variable
 );
 
 
