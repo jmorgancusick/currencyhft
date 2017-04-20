@@ -141,8 +141,8 @@ export default {
       end: '', 
       numEdges: 5,
       exclude: [],
-      inputVal: 0,
-      optRate: .4567,
+      inputVal: null,
+      optRate: null,
       apiData: null, 
       shouldShow: false
     }
@@ -157,9 +157,9 @@ export default {
 
       for (var i = 0; i < exclude.length; ++i){
         if (i === 0){
-          str = "?" + str + "exclude=" + exclude[i];
+          str = str + "?" + "exclude=" + exclude[i];
         } else {
-          str = "&" + str + "exclude=" + exclude[i];
+          str = str + "&" + "exclude=" + exclude[i];
         }
       }
 
@@ -173,6 +173,7 @@ export default {
       })
 
       console.log(this.apiData);
+      
     }
   }, 
   computed: {

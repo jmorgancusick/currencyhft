@@ -100,7 +100,7 @@ export default {
       end: '', 
       inputVal: '',
       apiData: null,
-      rate: 0.4567
+      rate: null
     }
   },
   methods: {
