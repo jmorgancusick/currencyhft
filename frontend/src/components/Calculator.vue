@@ -112,8 +112,11 @@ export default {
       if (this.start !== '' && this.end !== '') {
         console.log('ready!');
 
+        var str = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
+
+        console.log(str);
         // call for calculatorData
-        axios.get("http://localhost:3000/tickerData/").then( (response) => {
+        axios.get(str).then( (response) => {
           console.log(response);
           this.apiData = response.data;
         }).catch( (error) => {
@@ -121,6 +124,8 @@ export default {
         })
 
         console.log(this.apiData);
+
+        this.rate = this.apiData[0].rate;
       }
     }
   },

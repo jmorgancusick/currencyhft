@@ -35,7 +35,7 @@
 
     <!-- Input field for amount and calculate button-->
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-    <el-button @click="shouldShow = true">Calculate</el-button>
+    <el-button @click="fetchPath()">Calculate</el-button>
 
     <!-- Only show optimal conversion and path when user clicks calculate -->
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
@@ -149,7 +149,9 @@ export default {
   }, 
   methods: {
     fetchPath() {
-      shouldShow = true;
+      this.shouldShow = true;
+
+      var exclude = this.exclude;
 
       var str = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
 
@@ -160,6 +162,8 @@ export default {
           str = "&" + str + "exclude=" + exclude[i];
         }
       }
+
+      console.log(str);
       // call for arbitrageData
       axios.get(str).then( (response) => {
         console.log(response);
