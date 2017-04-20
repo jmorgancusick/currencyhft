@@ -130,7 +130,7 @@ export default {
           area: true,
           values: _.map(this.chartData, (t) => {
             return {
-              x: t.date,
+              x: t.timestamp,
               y: t.high
             }
           })
@@ -140,7 +140,7 @@ export default {
           bar: true,
           values: _.map(this.chartData, (t) => {
             return {
-              x: t.date,
+              x: t.timestamp,
               y: t.low
             }
           })
@@ -150,7 +150,7 @@ export default {
           area: true,
           values: _.map(this.chartData, (t) => {
             return {
-              x: t.date,
+              x: t.timestamp,
               y: t.close
             }
           })
@@ -159,8 +159,8 @@ export default {
     }
   },
   methods: {
-    formatDate (d){
-      return d3.time.format('%x')(new Date(d))
+    formatDate (timestamp){
+      return d3.time.format('%x')(new Date(timestamp*1000))
     }
   },
   created () {
