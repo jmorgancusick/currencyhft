@@ -7,6 +7,7 @@ from lxml import html
 import requests
 
 
+# Collects the data from the yahoo server using the function in forexDataScrape
 def getData(ticker):
 
 	endTime = fds.startOfDay(datetime.datetime.utcnow())
@@ -19,7 +20,9 @@ def getData(ticker):
 	return dataMin,dataDay
 
 
-#data = {ticker : data, ticker2: data2}
+# formats the new forex data so it can be sent to database
+# Sends new data to replace the data in the database
+# data = {ticker : data, ticker2: data2}
 def updateTicker(ticker, data, old, db):
  	cols = db.formats["forex"]["cols"]
 
@@ -46,7 +49,7 @@ def updateTicker(ticker, data, old, db):
 		print "ERROR: bulk insert failed for file: ", filename
 
 
-
+# uses the data collected to update the historical tables in the database
 def updateHistory(ticker, data, table, db):
 	bulkUpdate = []
 
@@ -70,21 +73,24 @@ def updateHistory(ticker, data, table, db):
 		print "ERROR: bulk insert failed for file: ", filename
 
 
-
+# the function that is run everyday to update all tables related to the forex market
 def updateForex():
+	#list of used currencies
 	currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD"]
 
+	#create tickers from used currencies
  	currencyPairs = list(itertools.permutations(currencies, 2))
 	currencyTickers = []
-
 	for pair in currencyPairs:
  		currencyTickers.append(pair[0] + pair[1] + "=X")
 
+ 	#connect to database 
 	db = dbapi.API()
 	db.connect()
 	old = db.getAllData('forex')
 	old = mapify(old)
 
+	#run the update for each ticker in the database
 	for ticker in currencyTickers:
 		dataMin,dataDay = getData(ticker)
 		updateTicker(ticker, dataDay, old, db)
@@ -92,12 +98,14 @@ def updateForex():
 		updateHistory(ticker, dataMin, "forexDashMinute", db)
 
 
+# web scraper to get exchange rates from citi bank
 def getCitiRates(currencies):
 	page = requests.get('https://www.citibank.com.au/aus/investments/forex-rates/USD.htm')
 	tree = html.fromstring(page.content)
 	curName = tree.xpath('//tr/td/strong/text()')
 	value = tree.xpath('//tr/td[4]/text()')
 
+	# create the dictionary that holds the rate for each currency
 	values = {}
 	for i in range(0,len(value)):
 		currency = curName[2*i+1]
@@ -108,6 +116,7 @@ def getCitiRates(currencies):
 	return values
 
 
+# web scraper to get exchange rates from HSBC bank
 def getHSBCRates(currencies):
 	page = requests.get('https://www.hsbc.ca/1/2/calculators/foreign-exchange-calculator')
 	tree = html.fromstring(page.content)
@@ -123,7 +132,8 @@ def getHSBCRates(currencies):
 
 	return values
 
-
+# uses the data we are able to get from a bank and
+# extrapolates all unknown conversions from what we have
 def extrapolate(base, data, pairs):
 	exchanges = {}
 	for p in pairs:
@@ -139,6 +149,7 @@ def extrapolate(base, data, pairs):
 	return exchanges
 
 
+#creates the data set that will be sent to the database
 def bankUpdate(data, bank):
 	update = []
 	for d in data.keys():
@@ -151,12 +162,15 @@ def bankUpdate(data, bank):
 
 	return update
 
+
+# function run everyday to update the database bankRates table
 def updateBanks():
 	currencies = ["USD", "EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD"]
 	currencyPairs = list(itertools.permutations(currencies, 2))
 	db = dbapi.API()
 	db.connect()
 
+	#Citi bank
 	values = getCitiRates(currencies)
 	rates = extrapolate("USD", values, currencyPairs)
 	update = bankUpdate(rates, "CIT")
@@ -164,6 +178,7 @@ def updateBanks():
 	if retVal == False:
 		print "ERROR: bulk insert failed for file: ", filename
 
+	#HSBC bank
 	values = getCitiRates(currencies)
 	rates = extrapolate("CAN", values, currencyPairs)
 	update = bankUpdate(rates, "HSB")
@@ -173,6 +188,7 @@ def updateBanks():
 
 
 #data must be two dimensions
+# so converts a list into a dictionary
 def mapify(data):
 	m = {}
 	for row in data:
@@ -181,8 +197,8 @@ def mapify(data):
 
 
 if __name__ == '__main__':
+	#schedule each update to run at midnight and 1 am
  	schedule.every().day.at("00:01").do(updateForex)
  	schedule.every().day.at("01:00").do(updateBanks)
  	while 1:
  		schedule.run_pending()
- 		#time.sleep(1)

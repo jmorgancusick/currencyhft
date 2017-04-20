@@ -12,6 +12,7 @@ import '../theme/menu.css';
 import '../theme/menu-item.css';
 import '../theme/select.css';
 import '../theme/input.css';
+import '../theme/input-number.css';
 import '../nvd3_styles.css';
 
 import axios from 'axios';

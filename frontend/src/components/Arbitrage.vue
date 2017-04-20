@@ -2,39 +2,50 @@
   <div class="arbitrage" ref="arbitrage">
     <!-- <h1>{{ testProps }}</h1> -->
     <h1> {{msg}} </h1>
+    <el-row :gutter="20" style="margin-bottom: 10ps;">
+      <el-col :span="20" :offset="2">
+        <!-- Adds dropdown menus for Start and End currencies -->
+        <!-- Start currency -->
+        <el-select v-model="start" placeholder="Start currency" @change="handleChange()">
+          <el-option
+            v-for="item in startCurrencies"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
+        <!-- End currency -->
+        <el-select v-model="end" placeholder="End currency" @change="handleChange()">
+          <el-option
+            v-for="item in endCurrencies"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
 
-    <!-- Adds dropdown menus for Start and End currencies -->
-    <!-- Start currency -->
-    <el-select v-model="start" placeholder="Start currency">
-      <el-option
-        v-for="item in startCurrencies"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
-    <!-- End currency -->
-    <el-select v-model="end" placeholder="End currency">
-      <el-option
-        v-for="item in endCurrencies"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
+        <!-- Multiple selections to exclude currencies -->
+        <el-select v-model="exclude" multiple placeholder="Exclude currencies" @change="handleChange()">
+          <el-option
+            v-for="item in excludeCurrencies"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
 
-    <!-- Multiple selections to exclude currencies -->
-    <el-select v-model="exclude" multiple placeholder="Exclude currencies">
-      <el-option
-        v-for="item in excludeCurrencies"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
+        <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()" style="margin-bottom: -13px;"></el-input-number>
+      </el-col>
+    </el-row>
 
-    <!-- Input field for amount and calculate button-->
-    <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
+    <el-row :gutter="20">
+      <el-col :span="20" :offset="2">
+        <!-- Input field for amount and calculate button-->
+        <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
+      </el-col>
+    </el-row>
+
+
     <el-button @click="fetchPath()">Calculate</el-button>
 
     <!-- Only show optimal conversion and path when user clicks calculate -->
@@ -141,21 +152,19 @@ export default {
         }],
       start: '',
       end: '', 
-      numEdges: 5,
+      numEdges: null,
       exclude: [],
       regRate: null,
       inputVal: null,
-      optRate: null,
-      optVal: null, 
-      optPath: [],
+      //optRate: null,
+      //optVal: null, 
+      //optPath: [],
       apiData: null, 
       shouldShow: false
     }
   }, 
   methods: {
     fetchPath() {
-      this.shouldShow = true;
-
       // fetching regualr rate
       var regStr = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
 
@@ -174,6 +183,7 @@ export default {
       axios.get(arbStr).then( (response) => {
         console.log(response);
         this.apiData = response.data;
+        this.shouldShow = true;
       }).catch( (error) => {
         console.log("ERROR:", error);
       })
@@ -185,19 +195,32 @@ export default {
         console.log("ERROR:", error);
       })
 
-      console.log(this.apiData);
+      /*if ( this.apiData !== null ){
+        this.shouldShow = true;
+      }*/
+      console.log("API Data", this.apiData);
 
-      this.optRate = this.apiData.totalRate;
+      //this.optRate = this.apiData.totalRate;
 
-      this.optPath = this.apiData.currencies;
+      //this.optPath = this.apiData.currencies;
 
-      this.optVal = this.optRate * this.inputVal;
+      //this.optVal = this.optRate * this.inputVal;
+    }, 
+    handleChange() {
+      this.apiData = null;
+      this.shouldShow = false;
     }
   }, 
-  computed: {/*
+  computed: {
+    optRate() {
+      return this.apiData.totalRate;
+    },
+    optPath() {
+      return this.apiData.currencies;
+    },
     optVal() {
       return this.optRate * this.inputVal;
-    }*/
+    }
   }, 
   props: ["testProps"]
 }
