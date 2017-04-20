@@ -1,14 +1,9 @@
 <template>
   <div class="dashboard">
     <h1>{{ msg }}</h1>
-    <ul>
-      <el-button>Table</el-button>
-      <el-button>Chart</el-button>
-      <el-button>Tickers</el-button>
-    </ul>
 
     <el-row>
-      <el-col >
+      <el-col>
         <div style="align:left;">
           <svg width="1000" height="500">
           <vn-line :model="trends"
@@ -20,6 +15,28 @@
       </el-col>
     </el-row>
     <h1> </h1>
+
+    <!-- Adds dropdown menus for Start and End currencies -->
+    <!-- Start -->
+    <el-select v-model="start" placeholder="Start currency">
+      <el-option
+        v-for="item in startOptions"
+        :label="item.label"
+        :value="item.value"
+        :disabled="item.disabled">
+      </el-option>
+    </el-select>
+    <!-- End -->
+    <el-select v-model="end" placeholder="End currency">
+      <el-option
+        v-for="item in endOptions"
+        :label="item.label"
+        :value="item.value"
+        :disabled="item.disabled">
+      </el-option>
+    </el-select>
+
+
     <el-row>
       <h3>Tickers</h3>
       <ticker v-for="ticker in tickers" :ticker="ticker" />
@@ -39,7 +56,67 @@ export default {
     return {
       msg: 'Dashboard',
       tickers: null ,
-      chartData: null
+      chartData: null,
+      startOptions: [{
+        value: 'Start currency',
+        label: 'Start currency',
+        disabled: true
+      },{
+        value: 'AUD',
+        label: 'AUD'
+      }, {
+        value: 'CAD',
+        label: 'CAD'
+      }, {
+        value: 'CHF',
+        label: 'CHF'
+      }, {
+        value: 'EUR',
+        label: 'EUR'
+      }, {
+        value: 'GBP',
+        label: 'GBP'
+      }, {
+        value: 'JPY',
+        label: 'JPY'
+      }, {
+        value: 'NZD',
+        label: 'NZD'
+      }, {
+        value: 'USD',
+        label: 'USD'
+      }],
+      endOptions: [{
+        value: 'End currency',
+        label: 'End currency',
+        disabled: true
+      },{
+        value: 'AUD',
+        label: 'AUD'
+      }, {
+        value: 'CAD',
+        label: 'CAD'
+      }, {
+        value: 'CHF',
+        label: 'CHF'
+      }, {
+        value: 'EUR',
+        label: 'EUR'
+      }, {
+        value: 'GBP',
+        label: 'GBP'
+      }, {
+        value: 'JPY',
+        label: 'JPY'
+      }, {
+        value: 'NZD',
+        label: 'NZD'
+      }, {
+        value: 'USD',
+        label: 'USD'
+      }],
+      start: '',
+      end: ''
     }
   },
   components: {

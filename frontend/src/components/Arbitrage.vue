@@ -1,9 +1,46 @@
 <template>
-  <div class="arbitrage">
-    <h1>{{ msg }}</h1>
-    <h1>{{ testProps }}</h1>
-    <el-button @click="print()">Click Here</el-button>
-    <h2> {{nicemsg}} </h2>
+  <div class="arbitrage" ref="arbitrage">
+    <!-- <h1>{{ testProps }}</h1> -->
+    <h1> {{msg}} </h1>
+
+    <!-- Adds dropdown menus for Start and End currencies -->
+    <!-- Start currency -->
+    <el-select v-model="start" placeholder="Start currency">
+      <el-option
+        v-for="item in startCurrencies"
+        :label="item.label"
+        :value="item.value"
+        :disabled="item.disabled">
+      </el-option>
+    </el-select>
+    <!-- End currency -->
+    <el-select v-model="end" placeholder="End currency">
+      <el-option
+        v-for="item in endCurrencies"
+        :label="item.label"
+        :value="item.value"
+        :disabled="item.disabled">
+      </el-option>
+    </el-select>
+
+    <!-- Multiple selections to exclude currencies -->
+    <el-select v-model="exclude" multiple placeholder="Exclude currencies">
+      <el-option
+        v-for="item in excludeCurrencies"
+        :label="item.label"
+        :value="item.value"
+        :disabled="item.disabled">
+      </el-option>
+    </el-select>
+
+    <!-- Input field for amount and calculate button-->
+    <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
+    <el-button @click="shouldShow = true">Calculate</el-button>
+
+    <!-- Only show optimal conversion and path when user clicks calculate -->
+    <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
+    <h2 v-if="shouldShow === true">Path:</h2>
+    <h3></h3>
   </div>
 </template>
 
@@ -12,14 +49,121 @@ export default {
   name: 'arbitrage',
   data () {
     return {
-      msg: 'Arbitrage Coming Soon...',
-      nicemsg: ''
+      msg: 'Arbitrage', 
+      startCurrencies: [{
+          value: 'Start currency',
+          label: 'Start currency',
+          disabled: true
+        },{
+          value: 'AUD',
+          label: 'AUD'
+        }, {
+          value: 'CAD',
+          label: 'CAD'
+        }, {
+          value: 'CHF',
+          label: 'CHF'
+        }, {
+          value: 'EUR',
+          label: 'EUR'
+        }, {
+          value: 'GBP',
+          label: 'GBP'
+        }, {
+          value: 'JPY',
+          label: 'JPY'
+        }, {
+          value: 'NZD',
+          label: 'NZD'
+        }, {
+          value: 'USD',
+          label: 'USD'
+        }],
+      endCurrencies: [{
+          value: 'End currency',
+          label: 'End currency',
+          disabled: true
+        },{
+          value: 'AUD',
+          label: 'AUD'
+        }, {
+          value: 'CAD',
+          label: 'CAD'
+        }, {
+          value: 'CHF',
+          label: 'CHF'
+        }, {
+          value: 'EUR',
+          label: 'EUR'
+        }, {
+          value: 'GBP',
+          label: 'GBP'
+        }, {
+          value: 'JPY',
+          label: 'JPY'
+        }, {
+          value: 'NZD',
+          label: 'NZD'
+        }, {
+          value: 'USD',
+          label: 'USD'
+        }],
+      excludeCurrencies: [{
+        value: 'Exclude currencies',
+        label: 'Exclude currencies',
+        disabled: true
+        },{
+          value: 'AUD',
+          label: 'AUD'
+        }, {
+          value: 'CAD',
+          label: 'CAD'
+        }, {
+          value: 'CHF',
+          label: 'CHF'
+        }, {
+          value: 'EUR',
+          label: 'EUR'
+        }, {
+          value: 'GBP',
+          label: 'GBP'
+        }, {
+          value: 'JPY',
+          label: 'JPY'
+        }, {
+          value: 'NZD',
+          label: 'NZD'
+        }, {
+          value: 'USD',
+          label: 'USD'
+        }],
+      start: '',
+      end: '', 
+      exclude: [],
+      inputVal: null,
+      optRate: .4567,
+      apiData: null, 
+      shouldShow: false
     }
-  },
+  }, 
   methods: {
-    print() {
-      this.$emit("testEvent", {obj: this.data1} )
-      this.nicemsg = 'You are awesome!!'
+    fetchPath() {
+      shouldShow = true;
+
+      // call for arbitrageData
+      axios.get("http://localhost:3000/tickerData/").then( (response) => {
+        console.log(response);
+        this.apiData = response.data;
+      }).catch( (error) => {
+        console.log("ERROR:", error);
+      })
+
+      console.log(this.apiData);
+    }
+  } 
+  computed: {
+    optVal() {
+      return this.optRate * this.inputVal;
     }
   }, 
   props: ["testProps"]

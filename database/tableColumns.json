@@ -41,8 +41,8 @@
 		, "rate" 			
 		, "ex_id"
 		, "current_rate"
-  	, "last_rate"
-  	, "change_day"]
+  		, "last_rate"
+  		, "change_day"]
 	, "keys" : [
 		"ticker"]}
 	 
