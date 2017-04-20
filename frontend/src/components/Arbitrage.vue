@@ -35,12 +35,12 @@
 
     <!-- Input field for amount and calculate button-->
     <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-    <el-button @click="shouldShow = true">Calculate</el-button>
+    <el-button @click="fetchPath()">Calculate</el-button>
 
     <!-- Only show optimal conversion and path when user clicks calculate -->
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
     <h2 v-if="shouldShow === true">Path:</h2>
-    <h3></h3>
+    <h3> {{apiData}} </h3>
   </div>
 </template>
 
@@ -139,8 +139,9 @@ export default {
         }],
       start: '',
       end: '', 
+      numEdges: 5,
       exclude: [],
-      inputVal: null,
+      inputVal: 0,
       optRate: .4567,
       apiData: null, 
       shouldShow: false
@@ -148,10 +149,23 @@ export default {
   }, 
   methods: {
     fetchPath() {
-      shouldShow = true;
+      this.shouldShow = true;
 
+      var exclude = this.exclude;
+
+      var str = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
+
+      for (var i = 0; i < exclude.length; ++i){
+        if (i === 0){
+          str = "?" + str + "exclude=" + exclude[i];
+        } else {
+          str = "&" + str + "exclude=" + exclude[i];
+        }
+      }
+
+      console.log(str);
       // call for arbitrageData
-      axios.get("http://localhost:3000/tickerData/").then( (response) => {
+      axios.get(str).then( (response) => {
         console.log(response);
         this.apiData = response.data;
       }).catch( (error) => {
@@ -160,7 +174,7 @@ export default {
 
       console.log(this.apiData);
     }
-  } 
+  }, 
   computed: {
     optVal() {
       return this.optRate * this.inputVal;

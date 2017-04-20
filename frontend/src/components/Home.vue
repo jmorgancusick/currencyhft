@@ -9,6 +9,7 @@
       </el-carousel>
     </div>
     
+    <!--
     <div id="img">
       <img src="../assets/temp-logo.svg">
     </div>
@@ -17,7 +18,7 @@
       <h1>{{ msg }}</h1>
       <h1>{{ testProps }}</h1>
       <el-button @click="test()">Click Here</el-button>
-    </div>
+    </div> -->
   </div>
 </template>
 
