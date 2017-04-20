@@ -71,7 +71,8 @@ class API{
 
 
   struct chart_info {
-    string timestamp;
+    string date;
+    long timestamp;
     string ticker;
     double high;
     double volume;
@@ -215,7 +216,8 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
           struct tm *date = gmtime(&t);
           char d[20];
           strftime(d, sizeof(d), "%m-%d-%Y+%H:%M:%S", date);
-          rowData.timestamp = d;
+          rowData.date = d;
+          rowData.timestamp = res->getInt("timestamp");
           rowData.ticker = res->getString("ticker");
           rowData.high = res->getDouble("high");
           rowData.volume = res->getDouble("volume");
