@@ -161,6 +161,9 @@ export default {
   methods: {
     formatDate (timestamp){
       return d3.time.format('%x')(new Date(timestamp*1000))
+    }, 
+    handleSelect (){
+      
     }
   },
   created () {

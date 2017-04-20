@@ -23,9 +23,9 @@
     </el-select>
 
     <!-- Input field for amount -->    
-    <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
+    <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input>
 
-    <h2>Conversion: {{ convertedVal }}</h2>
+    <h2> Conversion: {{ convertedVal }} {{end}}</h2>
 
     <h3>{{nicemsg}}</h3>
   </div>
@@ -100,7 +100,8 @@ export default {
       end: '', 
       inputVal: '',
       apiData: null,
-      rate: null
+      rate: null,
+      convertedVal: 0
     }
   },
   methods: {
@@ -126,13 +127,18 @@ export default {
         console.log(this.apiData);
 
         this.rate = this.apiData.rate;
+
+        this.convertedVal = this.inputVal * this.rate;
       }
+    }, 
+    handleInput() {
+      this.convertedVal = this.inputVal * this.rate;
     }
   },
   computed: {
-    convertedVal() {
+    /*convertedVal() {
       return this.inputVal * this.rate;
-    }
+    }*/
   }
 }
 </script>
