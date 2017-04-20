@@ -335,7 +335,7 @@ public:
     vector<string> *p = path.GetPath();
     double totalRate = path.GetTotalRate();
 
-    Local<Array> result = Array::New(isolate);
+    
 
     /*for (unsigned int i = 0; i < path.size(); i++) {
       Local<Object> obj = Object::New(isolate);
@@ -343,18 +343,20 @@ public:
       result->Set(i, obj);
     }*/
 
+
+    Local<Object> result = Object::New(isolate);
+    result->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
+
+    Local<Array> currencies = Array::New(isolate);
+
     int i = 0;
-    for (vector<string>::iterator it = p->begin(); it != p->end(); ++it) {
-      Local<Object> obj = Object::New(isolate);
-      obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, it->data()));
-      result->Set(i, obj);
-      ++i;
+    for (vector<string>::iterator itr = p->begin(); itr != p->end(); itr++, i++) {
+
+      currencies->Set(i, String::NewFromUtf8(isolate, itr->data()));
     }
 
-    i = 0;
-    Local<Object> obj = Object::New(isolate);
-    obj->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
-    result->Set(i, obj);
+    result->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
+
     args.GetReturnValue().Set(result);
 
   }
