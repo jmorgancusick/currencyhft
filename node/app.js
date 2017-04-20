@@ -94,6 +94,11 @@ app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
     ret = addon.calculatorData(req.params.startCurr, req.params.endCurr);
     console.log(ret);
 
+    if(isNaN(ret["rate"])){
+        console.log("rate is not a number, returning 1.")
+        ret["rate"] = 1;
+    }
+
     res.send(ret);
 });
 

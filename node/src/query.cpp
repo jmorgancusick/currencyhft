@@ -386,34 +386,10 @@ public:
     string endCurr = string(*param2);
     
 
-    //ector<string> currencies = db->GetAllCurrencies();
-
-    int i=0;
-    Local<Array> result = Array::New(isolate);
-
     double rate = db->GetForexRate(startCurr + endCurr + "=X");
-    Local<Object> obj = Object::New(isolate);
-    obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
-    result->Set(i, obj);
+    Local<Object> result = Object::New(isolate);
+    result->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
 
-  /*
-    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
-      //iterate through "to nodes"
-      for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
-        //don't store reflex edges
-        if (*it != *it2) {
-          //all edges are initialized to infinity
-          cout << *it << *it2 << endl;
-          double rate = db->GetForexRate(*it+*it2+"=X");
-
-          Local<Object> obj = Object::New(isolate);
-          obj->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
-          result->Set(i, obj);
-          i++;
-        }
-      }
-    }
-  */
     args.GetReturnValue().Set(result);
 
   }
