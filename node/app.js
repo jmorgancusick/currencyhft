@@ -105,15 +105,22 @@ app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
 });
 
 
-process.on('exit', function() {
-  addon.shutdown();
 
-  console.log('Goodbye.');
-});
+function exitHandler(options, err) {
+    if (options.cleanup){
+      console.log('Press Control-D to exit immediately.');
+      addon.shutdown();
+      console.log('Cleanup complete. Goodbye :)');
+    }
+    if (err) console.log(err.stack);
+    if (options.exit) process.exit();
+}
 
-process.on('SIGINT', function () {
-  console.log('Got SIGINT. Shutting down...');
-  console.log('Press Control-D to exit immediately.');
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
 
-  process.exit()
-});
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));

@@ -115,8 +115,8 @@ export default {
         value: 'USD',
         label: 'USD'
       }],
-      start: '',
-      end: ''
+      start: 'EUR',
+      end: 'USD'
     }
   },
   components: {
@@ -163,7 +163,20 @@ export default {
       return d3.time.format('%x')(new Date(timestamp*1000))
     }, 
     handleSelect (){
-      
+      if (this.start !== '' && this.end !== '' && this.start !== this.end) {
+        console.log('select!');
+
+        var str = "http://localhost:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
+        
+        console.log(str);
+        // call for chartData
+        axios.get(str).then( (response) => {
+          console.log(response)
+          this.chartData = response.data;
+        }).catch( (error) => {
+          console.log("ERROR:", error);
+        })
+      }
     }
   },
   created () {
@@ -177,12 +190,15 @@ export default {
 
     // call for chartData
     // http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
-    axios.get("http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
-      console.log(response)
-      this.chartData = response.data;
-    }).catch( (error) => {
-      console.log("ERROR:", error)
-    })
+    // axios.get("http://localhost:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
+    //   console.log(response)
+    //   this.chartData = response.data;
+    // }).catch( (error) => {
+    //   console.log("ERROR:", error)
+    // })
+    
+    this.handleSelect()
+
   }
 }
 </script>
