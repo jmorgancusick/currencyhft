@@ -18,7 +18,7 @@
 
     <!-- Adds dropdown menus for Start and End currencies -->
     <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency">
+    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
       <el-option
         v-for="item in startOptions"
         :label="item.label"
@@ -27,7 +27,7 @@
       </el-option>
     </el-select>
     <!-- End -->
-    <el-select v-model="end" placeholder="End currency">
+    <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
       <el-option
         v-for="item in endOptions"
         :label="item.label"
@@ -115,8 +115,8 @@ export default {
         value: 'USD',
         label: 'USD'
       }],
-      start: '',
-      end: ''
+      start: 'EUR',
+      end: 'USD'
     }
   },
   components: {
@@ -163,7 +163,20 @@ export default {
       return d3.time.format('%x')(new Date(timestamp*1000))
     }, 
     handleSelect (){
+      console.log("HANDLE SELECT");
+      if (this.start !== '' && this.end !== '' && this.start !== this.end) {
+        
+        var str = "http://localhost:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
 
+        // call for chartData
+        // http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
+        axios.get(str).then( (response) => {
+          console.log(response)
+          this.chartData = response.data;
+        }).catch( (error) => {
+          console.log("ERROR:", error)
+        })
+      }
     }
   },
   created () {

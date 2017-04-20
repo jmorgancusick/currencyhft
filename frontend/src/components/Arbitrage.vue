@@ -53,7 +53,7 @@
     <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
     <h3 v-if="shouldShow === true">Regular Rate: {{ regRate }} </h3>
     <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate }} </h3>
-    <h3> {{apiData}} </h3>
+    <!-- <h3> {{apiData}} </h3> -->
   </div>
 </template>
 
@@ -216,7 +216,14 @@ export default {
       return this.apiData.totalRate;
     },
     optPath() {
-      return this.apiData.currencies;
+      var retStr = "";
+      for(var i = 0; i < this.apiData.currencies.length; i++){
+        retStr+=this.apiData.currencies[i];
+        if(i !== this.apiData.currencies.length-1){
+          retStr+=", "
+        }
+      }
+      return retStr;
     },
     optVal() {
       return this.optRate * this.inputVal;
