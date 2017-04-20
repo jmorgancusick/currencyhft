@@ -187,7 +187,7 @@ public:
     cout<<"Number of args: "<<args.Length()<<endl;
 
     //Make sure 2 arguments.  Cast to string
-    if (args.Length() != 2) {
+    if (args.Length() != 4) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
     }
@@ -208,14 +208,13 @@ public:
     v8::String::Utf8Value param2(args[1]->ToString());
     std::string timeframe = std::string(*param2);
     
+    v8::String::Utf8Value param3(args[2]->ToString());
+    std::string startDate = std::string(*param3);
 
+    v8::String::Utf8Value param4(args[3]->ToString());
+    std::string endDate = std::string(*param4);
 
-    string interval = "day";
-    long startDate = 1450000000;
-    long endDate = 1490064000;
-    vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, interval,startDate,endDate);    //Database query
-    //unordered_map<std::string, double> *rows = db->selectHistoricalTickerData(ticker, interval);   //Database query
-  //TODO change data structure to array of struct
+    vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, timeframe, startDate, endDate);    //Database query
 
 
     int i = 0;
@@ -229,7 +228,6 @@ public:
 
       // Creates a new Object on the V8 heap
       Local<Object> obj = Object::New(isolate);
-
 
       //Can call a pack function here to be cleaner once more data
       // Transfers the data from result, to obj (see below)
@@ -253,10 +251,11 @@ public:
 
       result->Set(i, obj); 
     }
-    
+
     args.GetReturnValue().Set(result);
-    
+    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
   }
+
 
 
   //takes in 4 arguments: string starting currency, string ending currency,
