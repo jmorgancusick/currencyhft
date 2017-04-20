@@ -9,11 +9,11 @@
       </el-carousel>
     </div>
     
-    <!--
     <div id="img">
       <img src="../assets/temp-logo.svg">
     </div>
 
+    <!--
     <div>
       <h1>{{ msg }}</h1>
       <h1>{{ testProps }}</h1>
