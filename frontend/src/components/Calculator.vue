@@ -24,10 +24,8 @@
 
     <!-- Input field for amount -->    
     <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input>
-
     <h2> Conversion: {{ convertedVal }} {{end}} </h2>
 
-    <h3>{{nicemsg}}</h3>
   </div>
 </template>
 
@@ -37,7 +35,6 @@ export default {
   data () {
     return {
       msg: 'Currency Calculator',
-      nicemsg: '**future calculator implementation will remove full page view',
       startCurrencies: [{
         value: 'Start currency',
         label: 'Start currency',
@@ -113,10 +110,12 @@ export default {
       if (this.start !== '' && this.end !== '') {
         console.log('ready!');
 
+        // api call formatting
         var str = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
 
         console.log(str);
-        // call for calculatorData
+
+        // call to fetch calculator data from api
         axios.get(str).then( (response) => {
           console.log(response);
           this.apiData = response.data;
@@ -124,10 +123,8 @@ export default {
           console.log("ERROR:", error);
         })
 
-        console.log(this.apiData);
-
+        // seting data object values from api call
         this.rate = this.apiData.rate;
-
         this.convertedVal = this.inputVal * this.rate;
       }
     }, 
@@ -136,7 +133,8 @@ export default {
     }
   },
   computed: {
-    /*convertedVal() {
+    /*
+      convertedVal() {
       return this.inputVal * this.rate;
     }*/
   }

@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <div class="block">
-    <!--<span class="demonstration">Switch when indicator is clicked</span>-->
+    
+      <!-- Carousel Banner -->
       <el-carousel trigger="click">
         <el-carousel-item v-for="item in 3">
           <img src="../assets/temp-banner.svg">
@@ -13,12 +14,6 @@
       <img src="../assets/temp-logo.svg">
     </div>
 
-    <!--
-    <div>
-      <h1>{{ msg }}</h1>
-      <h1>{{ testProps }}</h1>
-      <el-button @click="test()">Click Here</el-button>
-    </div> -->
   </div>
 </template>
 

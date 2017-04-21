@@ -7,7 +7,9 @@ import Calculator from '@/components/Calculator'
 
 Vue.use(Router)
 
+// Vue router for handling navigation
 export default new Router({
+  // pages that are acceessible from NavBar
   routes: [
     {
       path: '/',

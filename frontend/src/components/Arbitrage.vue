@@ -1,6 +1,5 @@
 <template>
   <div class="arbitrage" ref="arbitrage">
-    <!-- <h1>{{ testProps }}</h1> -->
     <h1> {{msg}} </h1>
     <el-row :gutter="20" style="margin-bottom: 10ps;">
       <el-col :span="20" :offset="2">
@@ -38,13 +37,12 @@
       </el-col>
     </el-row>
 
+    <!-- Input field for amount and calculate button-->
     <el-row :gutter="20">
       <el-col :span="20" :offset="2">
-        <!-- Input field for amount and calculate button-->
         <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
       </el-col>
     </el-row>
-
 
     <el-button @click="fetchPath()">Calculate</el-button>
 
@@ -56,7 +54,6 @@
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
     <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
     <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
-    <!-- <h3> {{apiData}} </h3> -->
   </div>
 </template>
 
@@ -68,7 +65,7 @@ export default {
   data () {
     return {
       msg: 'Arbitrage', 
-      startCurrencies: [{
+      startCurrencies: [{ 
           value: 'Start currency',
           label: 'Start currency',
           disabled: true
@@ -161,22 +158,18 @@ export default {
       exclude: [],
       regRate: null,
       inputVal: null,
-      //optRate: null,
-      //optVal: null, 
-      //optPath: [],
       apiData: null, 
       shouldShow: false
     }
   }, 
   methods: {
     fetchPath() {
-      // fetching regualr rate
+      // formatting for string for 
       var regStr = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
-
-      // fetching optimal rate and path ro achieve optimal rate
-      var exclude = this.exclude;
       var arbStr = "http://currencyhft.com:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
 
+      // formatting for excluded array parameter
+      var exclude = this.exclude;
       for (var i = 0; i < exclude.length; ++i){
         if (i === 0){
           arbStr = arbStr + "?" + "exclude=" + exclude[i];
@@ -185,6 +178,7 @@ export default {
         }
       }
 
+      // fetching optimal rate
       axios.get(arbStr).then( (response) => {
         console.log(response);
         this.apiData = response.data;
@@ -193,6 +187,7 @@ export default {
         console.log("ERROR:", error);
       })
 
+      // fetching regualer rate
       axios.get(regStr).then( (response) => {
         console.log(response);
         this.regRate = response.data.rate;
@@ -200,16 +195,6 @@ export default {
         console.log("ERROR:", error);
       })
 
-      /*if ( this.apiData !== null ){
-        this.shouldShow = true;
-      }*/
-      console.log("API Data", this.apiData);
-
-      //this.optRate = this.apiData.totalRate;
-
-      //this.optPath = this.apiData.currencies;
-
-      //this.optVal = this.optRate * this.inputVal;
     }, 
     handleChange() {
       this.apiData = null;

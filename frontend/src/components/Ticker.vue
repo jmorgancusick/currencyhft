@@ -2,6 +2,7 @@
   <div class="ticker">
     <div id="textbox">
       <el-col :span="3">
+        <!-- Data displayed for each ticker -->
         <p style="text-align:left;">{{ id }}
         <span style="float:right;">{{ percentChange }}</span>
         </p>
@@ -20,12 +21,10 @@ export default {
     }
   },
   created () {
+    // sets ticker data object values from props
     console.log(this.ticker);
     this.id = this.ticker.ticker;
     this.percentChange = this.ticker.percentChange;
-
-    /*console.log(this.id);
-    console.log(this.percentChange);*/
   },
   props: ['ticker']
 }

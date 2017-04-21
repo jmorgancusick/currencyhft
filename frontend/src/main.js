@@ -14,18 +14,18 @@ import '../theme/select.css';
 import '../theme/input.css';
 import '../theme/input-number.css';
 import '../nvd3_styles.css';
-
-
 import axios from 'axios';
 
+// library allowing Ajax calls in Vue components
 window.axios = axios;
 
+// Element UI and NVD3 charts
 Vue.use(ElementUI, { locale });
 Vue.use(VueNVD3);
 
 Vue.config.productionTip = false;
 
-/* eslint-disable no-new */
+// eslint-disable no-new 
 new Vue({
   el: '#app',
   router,

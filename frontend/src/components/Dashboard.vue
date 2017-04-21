@@ -26,6 +26,7 @@
         :disabled="item.disabled">
       </el-option>
     </el-select>
+
     <!-- End -->
     <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
       <el-option
@@ -36,7 +37,7 @@
       </el-option>
     </el-select>
 
-
+    <!-- Ticker data -->
     <el-row>
       <h3>Tickers</h3>
       <ticker v-for="ticker in tickers" :ticker="ticker" />

@@ -2,6 +2,7 @@
 
   <div id="app">
     <el-menu theme="dark" :default-active="activeIndex" mode="horizontal" @select="handleSelect">
+      <!-- Router Vue components that link to items on the Navigation Bar -->
       <router-link :to="{name: 'home'}">
         <el-menu-item index="1">Home</el-menu-item>
       </router-link>
@@ -16,12 +17,8 @@
       </router-link>
     </el-menu>
     <div class="line"></div>
-
+    <!-- Necessary line in template to use router -->
     <router-view></router-view>
-    <!--
-    <router-view @testEvent="listener($event)" :testProps="inputMsg"></router-view>
-    <div>
-      <input v-model="inputMsg" type="text">
     </div> -->
   </div>
 </template>
@@ -35,6 +32,7 @@
       };
     },
     methods: {
+      // handles NavBar selection
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
       }
