@@ -1,5 +1,3 @@
-// hello.cc
-
 #include <node.h>
 #include "sql/api.h"
 #include "graph.h"
