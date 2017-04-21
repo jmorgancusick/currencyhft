@@ -18,7 +18,7 @@
 
     <!-- Adds dropdown menus for Start and End currencies -->
     <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency">
+    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
       <el-option
         v-for="item in startOptions"
         :label="item.label"
@@ -27,7 +27,7 @@
       </el-option>
     </el-select>
     <!-- End -->
-    <el-select v-model="end" placeholder="End currency">
+    <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
       <el-option
         v-for="item in endOptions"
         :label="item.label"
@@ -126,6 +126,16 @@ export default {
     trends () {
       return [
         {
+          key: 'close',
+          area: true,
+          values: _.map(this.chartData, (t) => {
+            return {
+              x: t.timestamp,
+              y: t.close
+            }
+          })
+        },
+        {
           key: 'high',
           area: true,
           values: _.map(this.chartData, (t) => {
@@ -144,16 +154,6 @@ export default {
               y: t.low
             }
           })
-        },
-        {
-          key: 'close',
-          area: true,
-          values: _.map(this.chartData, (t) => {
-            return {
-              x: t.timestamp,
-              y: t.close
-            }
-          })
         }
       ]
     }
@@ -163,25 +163,25 @@ export default {
       return d3.time.format('%x')(new Date(timestamp*1000))
     }, 
     handleSelect (){
+      console.log("HANDLE SELECT");
       if (this.start !== '' && this.end !== '' && this.start !== this.end) {
-        console.log('select!');
-
-        var str = "http://localhost:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
         
-        console.log(str);
+        var str = "http://currencyhft.com:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
+
         // call for chartData
+        // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
         axios.get(str).then( (response) => {
           console.log(response)
           this.chartData = response.data;
         }).catch( (error) => {
-          console.log("ERROR:", error);
+          console.log("ERROR:", error)
         })
       }
     }
   },
   created () {
     // call for tickerData
-    axios.get("http://localhost:3000/tickerData/").then( (response) => {
+    axios.get("http://currencyhft.com:3000/tickerData/").then( (response) => {
       console.log(response)
       this.tickers = response.data;
     }).catch( (error) => {
@@ -189,16 +189,13 @@ export default {
     })
 
     // call for chartData
-    // http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
-    // axios.get("http://localhost:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
-    //   console.log(response)
-    //   this.chartData = response.data;
-    // }).catch( (error) => {
-    //   console.log("ERROR:", error)
-    // })
-    
-    this.handleSelect()
-
+    // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
+    axios.get("http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
+      console.log(response)
+      this.chartData = response.data;
+    }).catch( (error) => {
+      console.log("ERROR:", error)
+    })
   }
 }
 </script>

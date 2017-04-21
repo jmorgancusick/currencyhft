@@ -113,7 +113,7 @@ export default {
       if (this.start !== '' && this.end !== '') {
         console.log('ready!');
 
-        var str = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
+        var str = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
 
         console.log(str);
         // call for calculatorData
