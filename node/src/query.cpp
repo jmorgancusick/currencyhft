@@ -17,18 +17,21 @@ using v8::Value;
 using v8::Number;
 using v8::Array;
 
-
 using namespace std;
 
 class REST_API{
 public: 
 
-  // not a currently used function
+  //endpoint to get rate of one currency
+  //1 argument, string name of the currency to get rate of
+  //returns the rate of the currency
+  //not currently used
   static void Exchange(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     cout<<"Number of args: "<<args.Length()<<endl;
     
+    //check number of types of arguments
     if (args.Length() != 1) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -42,9 +45,7 @@ public:
     v8::String::Utf8Value param1(args[0]->ToString());
     string id = string(*param1);
     
-    cout<<"Hello World!"<<endl;
-
-    
+    //get the rate of this currency
     unordered_map<string, double> *rows = db->selectExchangeWithID(id);
 
     int i = 0;
@@ -68,18 +69,16 @@ public:
     }
 
     args.GetReturnValue().Set(result);
-    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
-    
   }
 
-    
-  //not a currently used function
+  //endpoint to return the full table of exchange rates
+  //not currenly used
   static void Table(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    
+    //check number of types of arguments
     if (args.Length() != 1) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -93,7 +92,7 @@ public:
     v8::String::Utf8Value param1(args[0]->ToString());
     string tableName = string(*param1);
 
-    
+    //get all table data
     unordered_map<string, double> *rows = db->selectAllFromTable(tableName);
 
     int i = 0;
@@ -117,24 +116,22 @@ public:
     }
 
     args.GetReturnValue().Set(result);
-    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
-
   }
 
-
-  //calls db api to get all forex data
+  //endpoint to call db api to get all forex data
   //then formats and sends to frontend
   static void TickerData(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    
+    //check number of types of arguments
     if (args.Length() != 0) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
     }
     
+    //all currency pairs of the supported currencies
     unordered_set<std::string> majorTickers ({
       "USDCAD=X", "EURJPY=X",
       "EURUSD=X", "EURCHF=X",
@@ -147,11 +144,13 @@ public:
       "EURAUD=X", "AUDNZD=X"
     });
     
-    unordered_map<std::string, double> *rows = db->selectAllTickerData();   //Get data
+    //get data from the tickers
+    unordered_map<std::string, double> *rows = db->selectAllTickerData();
 
     int i = 0;
 
-    Local<Array> result = Array::New(isolate);    //JSON results Array
+    //JSON results Array
+    Local<Array> result = Array::New(isolate);
     
     //Loop through C++ hashmap
     for(unordered_map<std::string, double>::iterator itr = rows->begin(); itr != rows->end(); itr++){
@@ -177,10 +176,7 @@ public:
     }
 
     args.GetReturnValue().Set(result);
-    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
-    
   }
-
 
   //Used to send request to database api and recieve data for a ticker in a timespan
   //Then formats and sends data back up to the frontend
@@ -189,7 +185,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //Make sure 4 arguments.  Cast to string
+    //check number of types of arguments
     if (args.Length() != 4) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -255,7 +251,6 @@ public:
     }
 
     args.GetReturnValue().Set(result);
-    //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
   }
 
 
@@ -270,7 +265,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //Make sure 4 arguments.  Cast to string
+    //check number of types of arguments
     if (args.Length() != 4) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -302,7 +297,6 @@ public:
 
     int maxNumberExchanges = std::stoi(param3Str.data());
 
-
     if (!args[3]->IsArray()) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
       return;
@@ -314,11 +308,10 @@ public:
 
     vector<std::string> currenciesToExclude;
 
-    std::cout<< "Param 4 Length: " << param4->Length() << std::endl;
-    for(int i=0; i < param4->Length(); i++) {
+    for (int i=0; i < param4->Length(); i++) {
       Local<Value> ele = param4->Get(i);
 
-      if(!ele->IsString()){
+      if (!ele->IsString()){
         isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments in array"));
         return;
       }
@@ -329,22 +322,15 @@ public:
       currenciesToExclude.push_back(tmpStr);
     }
 
-
+    //make set of the exclude currencies
     unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
-
+    
+    //find the optimal path
     Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
     vector<string> *p = path.GetPath();
     double totalRate = path.GetTotalRate();
 
-    
-
-    /*for (unsigned int i = 0; i < path.size(); i++) {
-      Local<Object> obj = Object::New(isolate);
-      obj->Set(String::NewFromUtf8(isolate, "currency"), String::NewFromUtf8(isolate, p[i].data()));
-      result->Set(i, obj);
-    }*/
-
-
+    //format return object
     Local<Object> result = Object::New(isolate);
     result->Set(String::NewFromUtf8(isolate, "totalRate"), Number::New(isolate, totalRate));
 
@@ -352,23 +338,22 @@ public:
 
     int i = 0;
     for (vector<string>::iterator itr = p->begin(); itr != p->end(); itr++, i++) {
-
       currencies->Set(i, String::NewFromUtf8(isolate, itr->data()));
     }
 
     result->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
-
     args.GetReturnValue().Set(result);
-
   }
 
-
+  //endpoint for the calculator page
+  //takes 2 arguments, strings for start and end currency
+  //returns rate as a double
   static void CalculatorData(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //Make sure 2 arguments.
+    //check number of types of arguments
     if (args.Length() != 2) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -390,15 +375,15 @@ public:
     v8::String::Utf8Value param2(args[1]->ToString());
     string endCurr = string(*param2);
     
-
+    //get the rate
     double rate = db->GetForexRate(startCurr + endCurr + "=X");
     Local<Object> result = Object::New(isolate);
     result->Set(String::NewFromUtf8(isolate, "rate"), Number::New(isolate, rate));
 
     args.GetReturnValue().Set(result);
-
   }
 
+  //cleanly shutdown
   static void shutdown(const FunctionCallbackInfo<Value>& args){
     std::cout << "Shutting down REST_API and DB API" << std::endl;
 
@@ -407,10 +392,11 @@ public:
     delete g;
   }
 
-  // statis member variables
+  // static member variables
   static API *db;
   static Graph *g;
 
+  //initialize the endpoints
   static void init(Local<Object> exports) {
     // Establish Node.js addon functions
     NODE_SET_METHOD(exports, "exchange", REST_API::Exchange);
@@ -435,7 +421,8 @@ public:
     REST_API::g = new Graph(currencies);
 
     std::cout << "Made graph" << std::endl;
-
+    
+    //fill in rates
     for (auto it = currencies.begin(); it != currencies.end(); ++it) {
       //iterate through "to nodes"
       for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
@@ -448,19 +435,8 @@ public:
         }
       }
     }
-
-
   }
-
-
-
-
-
 };
-
-
-
-
 
 // Define the static member variables
 API *REST_API::db = NULL;
