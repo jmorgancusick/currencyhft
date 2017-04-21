@@ -133,7 +133,8 @@ def getHSBCRates(currencies):
 	return values
 
 # uses the data we are able to get from a bank and
-# extrapolates all unknown conversions from what we have
+# extrapolates all unknown conversions using the base
+# as a middle man
 def extrapolate(base, data, pairs):
 	exchanges = {}
 	for p in pairs:
