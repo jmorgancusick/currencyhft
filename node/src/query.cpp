@@ -25,6 +25,7 @@ using namespace std;
 class REST_API{
 public: 
 
+  // not a currently used function
   static void Exchange(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
@@ -74,6 +75,7 @@ public:
   }
 
     
+  //not a currently used function
   static void Table(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
@@ -121,6 +123,9 @@ public:
 
   }
 
+
+  //calls db api to get all forex data
+  //then formats and sends to frontend
   static void TickerData(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
@@ -132,7 +137,6 @@ public:
       return;
     }
     
-
     unordered_set<std::string> majorTickers ({
       "USDCAD=X", "EURJPY=X",
       "EURUSD=X", "EURCHF=X",
@@ -144,7 +148,6 @@ public:
       "EURCAD=X", "AUDJPY=X",
       "EURAUD=X", "AUDNZD=X"
     });
-
     
     unordered_map<std::string, double> *rows = db->selectAllTickerData();   //Get data
 
@@ -181,12 +184,14 @@ public:
   }
 
 
+  //Used to send request to database api and recieve data for a ticker in a timespan
+  //Then formats and sends data back up to the frontend
   static void ChartData(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //Make sure 2 arguments.  Cast to string
+    //Make sure 4 arguments.  Cast to string
     if (args.Length() != 4) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -214,13 +219,13 @@ public:
     v8::String::Utf8Value param4(args[3]->ToString());
     std::string endDate = std::string(*param4);
 
+    //call db api to get data
     vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, timeframe, startDate, endDate);    //Database query
 
-
+    //format data to be sent to front end
     int i = 0;
 
     Local<Array> result = Array::New(isolate);
-    
 
     for(vector<API::chart_info>::iterator itr = rows->begin(); itr != rows->end(); itr++, i++){
       cout << itr->timestamp << "\t" << itr->ticker << "\t" << itr->high << "\t" << itr->volume << "\t"
@@ -248,14 +253,12 @@ public:
       obj->Set(String::NewFromUtf8(isolate, "close"),
          Number::New(isolate, itr->close));
       
-
       result->Set(i, obj); 
     }
 
     args.GetReturnValue().Set(result);
     //args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
   }
-
 
 
   //takes in 4 arguments: string starting currency, string ending currency,

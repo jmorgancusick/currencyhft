@@ -114,7 +114,9 @@ class API{
     return rows;
   }
 
-    //only works for string, double pairs
+
+  //selects all rows from a table
+  //only works for string, double pairs
   unordered_map<string, double> * selectAllFromTable(string table){
     unordered_map<string, double> *rows = new unordered_map<string, double>();
 
@@ -125,7 +127,6 @@ class API{
         return NULL; 
       }
 
-      
       pstmt.reset(con->prepareStatement("select * from "+table));
       
       res.reset(pstmt->executeQuery());
@@ -151,6 +152,7 @@ class API{
   }
 
 
+//selects all data from the forex table
 unordered_map<string, double> * selectAllTickerData(){
     unordered_map<string, double> *rows = new unordered_map<string, double>();
 
@@ -171,7 +173,8 @@ unordered_map<string, double> * selectAllTickerData(){
             res.reset(pstmt->getResultSet());
             continue;
           }
-        break;  //No more results
+        break;  
+        //No more results
       }
     } catch(sql::SQLException &e){
       printError(e);
@@ -181,6 +184,9 @@ unordered_map<string, double> * selectAllTickerData(){
     return rows;
   }
 
+
+//gets the historical data for a specified ticker
+//in a certain timespan at a certain interval
 vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, string startDate, string endDate){
     vector<chart_info> *rows = new vector<chart_info>();
 
@@ -203,7 +209,8 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
 
       pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
       pstmt->setString(1,ticker);
-      pstmt->setInt(2,mktime(&endTime));
+      //converts the tm struct to an int
+      pstmt->setInt(2,mktime(&endTime)); 
       pstmt->setInt(3,mktime(&startTime));
 
       //res now has return data
@@ -241,6 +248,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return rows;
   }
 
+
   //retrieves all currencies to store in graph
   vector<string> GetAllCurrencies() {
     vector<string> currencies;
@@ -258,6 +266,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     }
     return currencies;
   }
+
 
   //retrieves forex rate of a particular ticker
   double GetForexRate(const string& ticker) {
@@ -278,6 +287,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return rate;
   }
 
+
   //updates the profitable paths
   void UpdateProfitablePath(const string& expath, const int& length, const double& rate) {
     try{
@@ -293,6 +303,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       printError(e);
     }
   }
+
 
  private:
   string host;
@@ -327,6 +338,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     cout << ", SQLState: " << e.getSQLState() << " )" << endl;
   }
 
+
   bool hasTable(string tableName){
     for(int i = 0; i < numTables; i++){
       if(tableName.compare(tablesWhiteList[i]) == 0){
@@ -336,6 +348,8 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return false;
   }
 
+
+  //converts the time in string form to a unix timestamp
   tm timeConversion(string time){
     istringstream ss(time);
     struct tm timestamp = {};
