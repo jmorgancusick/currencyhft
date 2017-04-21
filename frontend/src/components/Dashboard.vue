@@ -166,10 +166,10 @@ export default {
       console.log("HANDLE SELECT");
       if (this.start !== '' && this.end !== '' && this.start !== this.end) {
         
-        var str = "http://localhost:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
+        var str = "http://currencyhft.com:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
 
         // call for chartData
-        // http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
+        // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
         axios.get(str).then( (response) => {
           console.log(response)
           this.chartData = response.data;
@@ -181,7 +181,7 @@ export default {
   },
   created () {
     // call for tickerData
-    axios.get("http://localhost:3000/tickerData/").then( (response) => {
+    axios.get("http://currencyhft.com:3000/tickerData/").then( (response) => {
       console.log(response)
       this.tickers = response.data;
     }).catch( (error) => {
@@ -189,8 +189,8 @@ export default {
     })
 
     // call for chartData
-    // http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
-    axios.get("http://localhost:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
+    // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
+    axios.get("http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {

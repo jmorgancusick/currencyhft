@@ -48,16 +48,21 @@
 
     <el-button @click="fetchPath()">Calculate</el-button>
 
-    <!-- Only show optimal conversion and path when user clicks calculate -->
-    <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal }}</h2>
+    <!-- Only show optimal conversion and path when user clicks calculate -->   
     <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
-    <h3 v-if="shouldShow === true">Regular Rate: {{ regRate }} </h3>
-    <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate }} </h3>
+    <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | round 10 }} </h3>
+    <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | round 10 }} </h3>
+    <h2 v-if="shouldShow === true">Direct conversion: {{ regVal | round 2 }}</h2>
+    <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
+    <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
+    <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
     <!-- <h3> {{apiData}} </h3> -->
   </div>
 </template>
 
 <script>
+
+
 export default {
   name: 'arbitrage',
   data () {
@@ -166,11 +171,11 @@ export default {
   methods: {
     fetchPath() {
       // fetching regualr rate
-      var regStr = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
+      var regStr = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
 
       // fetching optimal rate and path ro achieve optimal rate
       var exclude = this.exclude;
-      var arbStr = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
+      var arbStr = "http://currencyhft.com:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
 
       for (var i = 0; i < exclude.length; ++i){
         if (i === 0){
@@ -220,13 +225,25 @@ export default {
       for(var i = 0; i < this.apiData.currencies.length; i++){
         retStr+=this.apiData.currencies[i];
         if(i !== this.apiData.currencies.length-1){
-          retStr+=", "
+          retStr+=" -> "
         }
       }
       return retStr;
     },
     optVal() {
       return this.optRate * this.inputVal;
+    },
+    regVal() {
+      return this.regRate * this.inputVal;
+    },
+    profit() {
+      return (this.optRate * this.inputVal) - (this.regRate * this.inputVal);
+    },
+    percReturn() {
+      if(!this.inputVal){
+        return 0;
+      }
+      return (this.optRate - this.regRate) * 100;
     }
   }, 
   props: ["testProps"]
