@@ -84,14 +84,14 @@ app.get('/chartData/:ticker/:timeframe/:startDate/:endDate', function(req, res) 
 
 // Run the shortest path algorithm and return the most profitable path between two currencies
 // and return the most profitable exchange rate using said path
-app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges', function(req, res) {
+app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges/:bankRate', function(req, res) {
     console.log("arbitrage data endpoint");
 
     if (req.query.exclude === undefined){
         req.query.exclude = [];
     }
 
-    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.maxNumberExchanges, req.query.exclude);
+    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.maxNumberExchanges, req.query.exclude, req.params.bankRate);
 
     res.send(ret);
 });

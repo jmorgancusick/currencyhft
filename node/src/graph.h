@@ -26,7 +26,7 @@ class Graph {
 
   public:
     //===========Constructors===========
-    Graph(const vector<string>& currencies);
+    Graph(const vector<string>& currencies, bool bankFlag);
 
     //===========Setters================
     void InitializeCurrencies(const vector<string>& currencies);
@@ -37,6 +37,7 @@ class Graph {
     double GetEdgeWeight(const string& startCurr, const string& endCurr) const;
     vector<string> GetCurrencies() const;
     vector<Cycle> GetCycles();
+    bool GetBankflag() {return bank;}
 
     //===========Helpers================
     bool CheckCurrency(const string& curr) const;
@@ -44,7 +45,7 @@ class Graph {
     //optimal path functions
     DistanceEstimates FindOptimalPaths(const string& start, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit);
     vector<string> GetOptimalPath(const DistanceEstimates& dists, const string& end) const;
-    void FindCycles();
+    void FindCycles(const string& startCurr);
     void UpdateCyclesDB();
 
   private:
@@ -57,6 +58,7 @@ class Graph {
     //number of nodes in graph
     unsigned int N;
     vector<Cycle> cycles;
+    bool bank;
 };
 
 #endif

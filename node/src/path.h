@@ -37,6 +37,7 @@ class Path {
     //optimal path, stored as vector of nodes from start to end in order
     vector<string> path;
     double totalRate;
+    bool bank;
 };
 
 #endif

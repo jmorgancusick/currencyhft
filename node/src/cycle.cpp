@@ -4,7 +4,7 @@
 using namespace std;
 
 //construct cycles based on a mapping of nodes
-Cycle::Cycle(const unordered_map<string, string>& path) {
+Cycle::Cycle(const unordered_map<string, string>& path, bool bankFlag) {
   unsigned int size = path.size();
   vector<string> keys;
   keys.reserve(size);
@@ -29,10 +29,12 @@ Cycle::Cycle(const unordered_map<string, string>& path) {
     current = (*(path.find(current))).second;
     cycle.push_back(current);
   }
+
+  bank = bankFlag;
 }
 
 //construct cycles based on a vector of nodes
-Cycle::Cycle(const vector<string>& path) {
+Cycle::Cycle(const vector<string>& path, bool bankFlag) {
   unsigned int size = path.size();
   cycle.reserve(size);
 
@@ -52,6 +54,8 @@ Cycle::Cycle(const vector<string>& path) {
   for (unsigned int i = 0; i < start; ++i) {
     cycle.push_back(path[i]);
   }
+
+  bank = bankFlag;
 }
 
 //check if a mapping of nodes is equivalent to this cycle
@@ -121,12 +125,24 @@ double Cycle::CalcRate() {
   double totalRate = 1;
 
   while (itrTo != cycle.end()) {
-    totalRate *= db->GetForexRate(*itrFrom+*itrTo+"=X");
+    //choose appropriate rates for bank or forex
+    if (bank) {
+      totalRate *= db->GetBankRate((*itrFrom).substr(0,3),(*itrTo).substr(0,3),(*itrTo).substr(3,3));
+    }
+    else {
+      totalRate *= db->GetForexRate(*itrFrom+*itrTo+"=X");
+    }
     ++itrTo;
     ++itrFrom;
   }
 
-  totalRate *= db->GetForexRate(*itrFrom+*cycle.begin()+"=X");
+  if (bank) {
+    totalRate *= db->GetBankRate((*itrFrom).substr(0,3),(*cycle.begin()).substr(0,3),(*cycle.begin()).substr(3,3));
+  }
+  else {
+    totalRate *= db->GetForexRate(*itrFrom+*cycle.begin()+"=X");
+  }
+
   rate = totalRate;
   delete db;
   return totalRate;

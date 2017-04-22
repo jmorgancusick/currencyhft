@@ -47,7 +47,6 @@ class API{
     	
     	myfile.close();
 
-
     	try{
     	  
     	  driver = get_driver_instance();
@@ -55,7 +54,6 @@ class API{
     	  con.reset(driver->connect(host, user, pass));
     	  con->setSchema(db);
 
-    	  
     	} catch(sql::SQLException &e){
     	  printError(e);
     	  con.reset();
@@ -69,7 +67,6 @@ class API{
     return 0;
   }
 
-
   struct chart_info {
     string date;
     long timestamp;
@@ -81,14 +78,12 @@ class API{
     double close;
   };
 
-
   //only works for string, double pairs
   unordered_map<string, double> * selectExchangeWithID(string id){
     unordered_map<string, double> *rows = new unordered_map<string, double>();
 
     cout<<"id: "<<id<<endl;
     try{
-
       pstmt.reset(con->prepareStatement("select * from stock where id=?"));
       pstmt->setString(1,id);
       
@@ -114,21 +109,18 @@ class API{
     return rows;
   }
 
-
   //selects all rows from a table
   //only works for string, double pairs
   unordered_map<string, double> * selectAllFromTable(string table){
     unordered_map<string, double> *rows = new unordered_map<string, double>();
 
     try{
-
       if(!hasTable(table)){
         cout << "No table named: " << table << " Exists in tablesWhiteList" << endl;
         return NULL; 
       }
 
       pstmt.reset(con->prepareStatement("select * from "+table));
-      
       res.reset(pstmt->executeQuery());
 
       for(;;)
@@ -150,7 +142,6 @@ class API{
     }
     return rows;
   }
-
 
 //selects all data from the forex table
 unordered_map<string, double> * selectAllTickerData(){
@@ -183,7 +174,6 @@ unordered_map<string, double> * selectAllTickerData(){
     }
     return rows;
   }
-
 
 //gets the historical data for a specified ticker
 //in a certain timespan at a certain interval
@@ -248,7 +238,6 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return rows;
   }
 
-
   //retrieves all currencies to store in graph
   vector<string> GetAllCurrencies() {
     vector<string> currencies;
@@ -267,6 +256,22 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return currencies;
   }
 
+  //retrieves all banks to store in graph
+  vector<string> GetAllBanks() {
+    vector<string> banks;
+    try{
+      pstmt.reset(con->prepareStatement("select distinct bank from bankRates"));
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        banks.push_back(res->getString("bank"));
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+      return {};
+    }
+    return banks;
+  }
 
   //retrieves forex rate of a particular ticker
   double GetForexRate(const string& ticker) {
@@ -287,6 +292,26 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return rate;
   }
 
+  //retrieves bank rate of two currencies
+  double GetBankRate(const string& start, const string& end, const string& bank) {
+    //initialize as NaN
+    double rate = numeric_limits<double>::quiet_NaN();
+    try{
+      pstmt.reset(con->prepareStatement("select rate from bankRates where start = ? and end = ? and bank = ?"));
+      pstmt->setString(1,start);
+      pstmt->setString(2,end);
+      pstmt->setString(3,bank);
+
+      res.reset(pstmt->executeQuery());
+      res->next();
+
+      rate = res->getDouble("rate");
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rate;
+  }
 
   //updates the profitable paths
   void UpdateProfitablePath(const string& expath, const int& length, const double& rate) {
@@ -304,17 +329,14 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     }
   }
 
-
  private:
   string host;
   string user;
   string pass;
   string db;
 
-
   int numTables = 1;
   string tablesWhiteList[1] = {"stock"};
-
 
   sql::Driver * driver;
  
@@ -338,7 +360,6 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     cout << ", SQLState: " << e.getSQLState() << " )" << endl;
   }
 
-
   bool hasTable(string tableName){
     for(int i = 0; i < numTables; i++){
       if(tableName.compare(tablesWhiteList[i]) == 0){
@@ -347,7 +368,6 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     }
     return false;
   }
-
 
   //converts the time in string form to a unix timestamp
   tm timeConversion(string time){
@@ -358,9 +378,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       cout << "# ERR: could not convert time" << endl;
     }
     return timestamp;
-  }
-  
+  }  
 };
-
 
 #endif

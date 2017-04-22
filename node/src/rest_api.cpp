@@ -31,7 +31,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
     
-    //check number of types of arguments
+    //check number and types of arguments
     if (args.Length() != 1) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -78,7 +78,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //check number of types of arguments
+    //check number and types of arguments
     if (args.Length() != 1) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -125,7 +125,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //check number of types of arguments
+    //check number and types of arguments
     if (args.Length() != 0) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -185,7 +185,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //check number of types of arguments
+    //check number and types of arguments
     if (args.Length() != 4) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -254,8 +254,9 @@ public:
   }
 
 
-  //takes in 4 arguments: string starting currency, string ending currency,
-  //array of strings of currencies to exclude, and int maximum number of exchanges in the path
+  //takes in 5 arguments: string starting currency, string ending currency,
+  //array of strings of currencies to exclude, int maximum number of exchanges in the path
+  //and a string that is "bank" to use bank rates or anything else to use forex rates
   //if no currencies should be excluded, give an empty array
   //if there is no limit to the number of exchanges, give a value of 0
   //returns 2 parameters: array for strings of the currencies that form the optimal path, and
@@ -265,8 +266,8 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //check number of types of arguments
-    if (args.Length() != 4) {
+    //check number and types of arguments
+    if (args.Length() != 5) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
     }
@@ -325,10 +326,24 @@ public:
     //make set of the exclude currencies
     unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
     
+    v8::String::Utf8Value param5(args[4]->ToString());
+    string bankFlag = string(*param5);
+
     //find the optimal path
-    Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
-    vector<string> *p = path.GetPath();
-    double totalRate = path.GetTotalRate();
+    vector<string> *p;
+    double totalRate;
+
+    //get path based on forex or bankrates
+    if (bankFlag == "bank") {
+      Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+      p = path.GetPath();
+      totalRate = path.GetTotalRate();
+    }
+    else {
+      Path path = Path(*gBank, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+      p = path.GetPath();
+      totalRate = path.GetTotalRate();
+    }
 
     //format return object
     Local<Object> result = Object::New(isolate);
@@ -353,7 +368,7 @@ public:
 
     cout<<"Number of args: "<<args.Length()<<endl;
 
-    //check number of types of arguments
+    //check number and types of arguments
     if (args.Length() != 2) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
@@ -390,11 +405,13 @@ public:
     // Clear memory
     delete db;
     delete g;
+    delete gBank;
   }
 
   // static member variables
   static API *db;
   static Graph *g;
+  static Graph *gBank;
 
   //initialize the endpoints
   static void init(Local<Object> exports) {
@@ -418,7 +435,7 @@ public:
     // Create graph
     vector<string> currencies = db->GetAllCurrencies();
 
-    REST_API::g = new Graph(currencies);
+    REST_API::g = new Graph(currencies, false);
 
     std::cout << "Made graph" << std::endl;
     
@@ -429,9 +446,51 @@ public:
         //don't store reflex edges
         if (*it != *it2) {
           //all edges are initialized to infinity
-          cout << *it << *it2 << endl;
           double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+          cout << *it << " " << *it2 << " " << rate << endl;
           g->SetEdgeWeight(*it, *it2, rate);
+        }
+      }
+    }
+
+    vector<string> banks = db->GetAllBanks();
+
+    vector<string> bankCurrencies;
+
+    for (auto bankItr = banks.begin(); bankItr != banks.end(); ++bankItr) {
+      for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+        cout << *it+*bankItr << endl;
+        bankCurrencies.push_back(*it+*bankItr);
+      }
+    }
+
+    REST_API::gBank = new Graph(bankCurrencies, true);
+    cout << "Made bank graph" << std::endl;
+
+    //fill in bank rates
+    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+      //iterate through "to nodes"
+      for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+        //don't store reflex edges
+        if (*it != *it2) {
+          for (auto bankItr = banks.begin(); bankItr != banks.end(); ++ bankItr) {
+            double rate = -log(db->GetBankRate(*it, *it2, *bankItr));
+            for (auto bankItr2 = banks.begin(); bankItr2 != banks.end(); ++ bankItr2) {
+              cout << *it+*bankItr << " " << *it2+*bankItr2 << " " << rate << endl;
+              gBank->SetEdgeWeight(*it+*bankItr, *it2+*bankItr2, rate);
+            }
+          }
+        }
+      }
+    }
+
+    //currencies always have rate 1.0 to themselves in other banks
+    for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+      for (auto bankItr = banks.begin(); bankItr != banks.end(); ++ bankItr) {
+        for (auto bankItr2 = banks.begin(); bankItr2 != banks.end(); ++ bankItr2) {
+          if (*bankItr != *bankItr2) {
+            gBank->SetEdgeWeight(*it+*bankItr, *it+*bankItr2, 1.0);
+          }
         }
       }
     }
@@ -441,6 +500,7 @@ public:
 // Define the static member variables
 API *REST_API::db = NULL;
 Graph *REST_API::g = NULL;
+Graph *REST_API::gBank = NULL;
 
 // Expose Node Module
 NODE_MODULE(addon, REST_API::init)

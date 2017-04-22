@@ -7,8 +7,9 @@ using namespace std;
 
 //construct a Graph based on the list of currencies to store
 //currencies must contain every currency that will be stored in the Graph
-Graph::Graph(const vector<string>& currencies) {
+Graph::Graph(const vector<string>& currencies, bool bankFlag) {
   InitializeCurrencies(currencies);
+  bank = bankFlag;
 }
 
 //initialize Graph nodes and weights based on input currencies
@@ -151,7 +152,7 @@ void Graph::BellmanFord(DistanceEstimates& dists, const unordered_set<string>& i
                 continue;
               }
 
-              //perform the distance update update
+              //perform the distance update
               dists[next].first = distStart + edgeWeight;
               dists[next].second = current;
               distsChanged = true;
@@ -190,7 +191,7 @@ int Graph::CheckPath(const DistanceEstimates& dists, const string& start, const 
         path.push_back(end);
         reverse(path.begin(), path.end());
 
-        Cycle cycle = Cycle(path);
+        Cycle cycle = Cycle(path, bank);
         for (unsigned int i = 0; i < cycles.size(); ++i) {
           if (cycle.CheckEquivalent(cycles[i])) {
             return -1;
@@ -253,7 +254,7 @@ string Graph::GetPrevNode(const DistanceEstimates& dists, const string& node) co
 }
 
 //finds and stores the negative cycles in the graph
-void Graph::FindCycles() {
+void Graph::FindCycles(const string& startCurr) {
   DistanceEstimates dists;
   dists.reserve(N);
 
@@ -265,11 +266,9 @@ void Graph::FindCycles() {
     dists[*it] = make_pair(numeric_limits<double>::infinity(), "");
   }
 
-  string start = "USD";
-
   //starting node has 0 distance to itself, and its previous node is set to special value HEAD
-  dists[start].first = 0;
-  dists[start].second = "HEAD";
+  dists[startCurr].first = 0;
+  dists[startCurr].second = "HEAD";
 
   //perform the (modified) Bellman-Ford algorithm to find shortest paths
   unordered_set<string> ignoreCurrencies;

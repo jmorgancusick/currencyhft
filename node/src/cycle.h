@@ -17,8 +17,8 @@ class Cycle {
 
   public:
     //===========Constructors===========
-    Cycle(const unordered_map<string, string>& path);
-    Cycle(const vector<string>& path);
+    Cycle(const unordered_map<string, string>& path, bool bankFlag);
+    Cycle(const vector<string>& path, bool bankFlag);
 
     //===========Setters================
     double CalcRate();
@@ -36,6 +36,7 @@ class Cycle {
   private:
     vector<string> cycle;
     double rate;
+    bool bank;
 };
 
 #endif
