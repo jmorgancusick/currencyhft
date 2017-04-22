@@ -366,6 +366,10 @@ public:
   }
 
 
+  //endpoint to return the profitable paths in the current graph
+  //takes 2 arguments, int for max number of paths to return,
+  //and string that is "bank" to get bank data
+  //returns array of paths and their total rates
   static void ProfitablePathsData(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
