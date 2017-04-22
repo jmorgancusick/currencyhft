@@ -292,6 +292,25 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
     return rate;
   }
 
+  //retrieves all forex rates
+  unordered_map<string, double> GetForexRates() {
+    unordered_map<string, double> rates;
+    try{
+      pstmt.reset(con->prepareStatement("select ticker, current_rate from forex"));
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        string ticker = res->getString("ticker");
+        double rate = res->getDouble("current_rate");
+        rates[ticker] = rate;
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rates;
+  }
+
   //retrieves bank rate of two currencies
   double GetBankRate(const string& start, const string& end, const string& bank) {
     //initialize as NaN
@@ -311,6 +330,27 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
       printError(e);
     }
     return rate;
+  }
+
+  //retrieves all bank rates
+  unordered_map<string, double> GetBankRates() {
+    unordered_map<string, double> rates;
+    try{
+      pstmt.reset(con->prepareStatement("select start, end, bank, rate from bankRates"));
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        string start = res->getString("start");
+        string end = res->getString("end");
+        string bank = res->getString("bank");
+        double rate = res->getDouble("rate");
+        rates[start+end+bank] = rate;
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rates;
   }
 
   //updates the profitable paths

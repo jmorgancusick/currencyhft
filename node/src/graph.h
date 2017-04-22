@@ -46,7 +46,7 @@ class Graph {
     DistanceEstimates FindOptimalPaths(const string& start, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit);
     vector<string> GetOptimalPath(const DistanceEstimates& dists, const string& end) const;
     void FindCycles(const string& startCurr);
-    void UpdateCyclesDB();
+    void UpdateCyclesDB(API *db);
 
   private:
     void BellmanFord(DistanceEstimates& dists, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit, const bool storeCycles);

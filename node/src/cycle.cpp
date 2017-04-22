@@ -1,5 +1,4 @@
 #include "cycle.h"
-#include "sql/api.h"
 
 using namespace std;
 
@@ -114,10 +113,7 @@ bool Cycle::CheckEquivalent(Cycle& other) {
 }
 
 //calculates the total rate of one loop of the cycle, from start node back to itself
-double Cycle::CalcRate() {
-  API *db = new API();
-  int retVal = db->connect();
-
+double Cycle::CalcRate(API *db) {
   auto itrTo = cycle.begin();
   ++itrTo;
   auto itrFrom = cycle.begin();
@@ -144,17 +140,43 @@ double Cycle::CalcRate() {
   }
 
   rate = totalRate;
-  delete db;
   return totalRate;
 }
 
-void Cycle::UpdateDatabase() const {
+double Cycle::CalcRate(unordered_map<string, double>& rates) {
+    auto itrTo = cycle.begin();
+  ++itrTo;
+  auto itrFrom = cycle.begin();
+
+  double totalRate = 1;
+
+  while (itrTo != cycle.end()) {
+    //choose appropriate rates for bank or forex
+    if (bank) {
+      totalRate *= rates[(*itrFrom).substr(0,3)+(*itrTo).substr(0,3)+(*itrTo).substr(3,3)];
+    }
+    else {
+      totalRate *= rates[*itrFrom+*itrTo+"=X"];
+    }
+    ++itrTo;
+    ++itrFrom;
+  }
+
+  if (bank) {
+    totalRate *= rates[(*itrFrom).substr(0,3)+(*cycle.begin()).substr(0,3)+(*cycle.begin()).substr(3,3)];
+  }
+  else {
+    totalRate *= rates[*itrFrom+*cycle.begin()+"=X"];
+  }
+
+  rate = totalRate;
+  return totalRate;
+}
+
+void Cycle::UpdateDatabase(API *db) const {
   string expath = cycle[0];
   for (unsigned int j = 1; j < cycle.size(); ++j) {
     expath += "|" + cycle[j];
   }
-  API *db = new API();
-  int retVal = db->connect();
   db->UpdateProfitablePath(expath, cycle.size(), GetTotalRate());
-  delete db;
 }

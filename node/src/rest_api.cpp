@@ -335,12 +335,12 @@ public:
 
     //get path based on forex or bankrates
     if (bankFlag == "bank") {
-      Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+      Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges, db);
       p = path.GetPath();
       totalRate = path.GetTotalRate();
     }
     else {
-      Path path = Path(*gBank, startCurr, endCurr, excludeCurrs, maxNumberExchanges);
+      Path path = Path(*gBank, startCurr, endCurr, excludeCurrs, maxNumberExchanges, db);
       p = path.GetPath();
       totalRate = path.GetTotalRate();
     }
@@ -432,8 +432,12 @@ public:
       return;
     }
 
+    cout << fixed << setprecision(14);
+
     // Create graph
     vector<string> currencies = db->GetAllCurrencies();
+
+    unordered_map<string, double> forexRates = db->GetForexRates();
 
     REST_API::g = new Graph(currencies, false);
 
@@ -446,10 +450,24 @@ public:
         //don't store reflex edges
         if (*it != *it2) {
           //all edges are initialized to infinity
-          double rate = -log(db->GetForexRate(*it+*it2+"=X"));
+          double rate = -log(forexRates[*it+*it2+"=X"]);
           cout << *it << " " << *it2 << " " << rate << endl;
           g->SetEdgeWeight(*it, *it2, rate);
         }
+      }
+    }
+
+    g->FindCycles("USD");
+    vector<Cycle> cycles = g->GetCycles();
+
+    cout << "Found " << cycles.size() << " cycles" << endl;
+
+    for (unsigned int i = 0; i < cycles.size(); ++i) {
+      double rate = cycles[i].CalcRate(forexRates);
+      cout << "Cycle " << i+1 << ", rate " << rate << endl;
+      vector<string>* cycle = cycles[i].GetCycle();
+      for (unsigned int j = 0; j < cycle->size(); ++j) {
+        cout << "\t" << (*cycle)[j] << endl;
       }
     }
 
@@ -459,10 +477,11 @@ public:
 
     for (auto bankItr = banks.begin(); bankItr != banks.end(); ++bankItr) {
       for (auto it = currencies.begin(); it != currencies.end(); ++it) {
-        cout << *it+*bankItr << endl;
         bankCurrencies.push_back(*it+*bankItr);
       }
     }
+
+    unordered_map<string, double> bankRates = db->GetBankRates();
 
     REST_API::gBank = new Graph(bankCurrencies, true);
     cout << "Made bank graph" << std::endl;
@@ -474,7 +493,7 @@ public:
         //don't store reflex edges
         if (*it != *it2) {
           for (auto bankItr = banks.begin(); bankItr != banks.end(); ++ bankItr) {
-            double rate = -log(db->GetBankRate(*it, *it2, *bankItr));
+            double rate = -log(bankRates[*it+*it2+*bankItr]);
             for (auto bankItr2 = banks.begin(); bankItr2 != banks.end(); ++ bankItr2) {
               cout << *it+*bankItr << " " << *it2+*bankItr2 << " " << rate << endl;
               gBank->SetEdgeWeight(*it+*bankItr, *it2+*bankItr2, rate);
@@ -494,6 +513,21 @@ public:
         }
       }
     }
+
+    gBank->FindCycles("USDCIT");
+    vector<Cycle> cyclesBank = gBank->GetCycles();
+
+    cout << "Found " << cyclesBank.size() << " cycles" << endl;
+
+    for (unsigned int i = 0; i < cyclesBank.size(); ++i) {
+      double rate = cyclesBank[i].CalcRate(bankRates);
+      cout << "Cycle " << i+1 << ", rate " << rate << endl;
+      vector<string>* cycle = cyclesBank[i].GetCycle();
+      for (unsigned int j = 0; j < cycle->size(); ++j) {
+        cout << "\t" << (*cycle)[j] << endl;
+     }
+    }
+
   }
 };
 

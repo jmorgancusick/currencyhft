@@ -1,5 +1,4 @@
 #include "graph.h"
-#include "sql/api.h"
 #include <limits>
 #include <algorithm>
 
@@ -281,8 +280,8 @@ vector<Cycle> Graph::GetCycles() {
 }
 
 //update the DB with found cycles
-void Graph::UpdateCyclesDB() {
+void Graph::UpdateCyclesDB(API *db) {
   for (unsigned int i = 0; i < cycles.size(); ++i) {
-    cycles[i].UpdateDatabase();
+    cycles[i].UpdateDatabase(db);
   }
 }

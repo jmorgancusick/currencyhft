@@ -1,5 +1,4 @@
 #include "path.h"
-#include "sql/api.h"
 #include <limits>
 #include <utility>
 #include <iostream>
@@ -7,7 +6,7 @@
 using namespace std;
 
 //construct a path based on a given graph, starting currency, and ending currency
-Path::Path(Graph& graph, const string& start, const string& end, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit) {
+Path::Path(Graph& graph, const string& start, const string& end, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit, API *db) {
   //find and store the optimal path
   DistanceEstimates dists = graph.FindOptimalPaths(start, ignoreCurrencies, exchangeLimit);
   path = graph.GetOptimalPath(dists, end);
@@ -20,16 +19,13 @@ Path::Path(Graph& graph, const string& start, const string& end, const unordered
     return;
   }
 
-  CalcTotalRate();
+  CalcTotalRate(db);
 
   cout << "Found optimal path from " << start << " to " << end << endl;
 }
 
 //sets the total rate of converting from start to end
-double Path::CalcTotalRate() {
-  API *db = new API();
-  int retVal = db->connect();
-
+double Path::CalcTotalRate(API *db) {
   auto itrTo = path.begin();
   ++itrTo;
   auto itrFrom = path.begin();
@@ -51,8 +47,6 @@ double Path::CalcTotalRate() {
     ++itrTo;
     ++itrFrom;
   }
-
-  delete db;
 
   totalRate = result;
   cout << "Total Rate: " << totalRate << endl;
