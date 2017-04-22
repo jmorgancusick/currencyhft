@@ -27,7 +27,7 @@ class Cycle {
 
     //===========Getters================
     vector<string>* GetCycle() {return &cycle;}
-    unsigned int const GetSize() const {return cycle.size();}
+    unsigned int GetSize() const {return cycle.size();}
     double GetTotalRate() const {return rate;}
 
     //===========Helpers================

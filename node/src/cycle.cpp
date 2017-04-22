@@ -38,7 +38,7 @@ Cycle::Cycle(const vector<string>& path, bool bankFlag) {
   cycle.reserve(size);
 
   //find the first node in alphanumerical order
-  int start = 0;
+  unsigned int start = 0;
   for (unsigned int i = 1; i < size; ++i) {
     if (path[i] < path[start]) {
       start = i;

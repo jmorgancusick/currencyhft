@@ -96,6 +96,14 @@ app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges/:bankRate', func
     res.send(ret);
 });
 
+// Returbs the profitable cycles of the selected graph
+app.get('/profitablePathsData/:maxNumberCycles/:bankRate', function(req, res) {
+    console.log("profitable paths data endpoint");
+
+    ret = addon.profitablePathsData(req.params.maxNumberCycles, req.params.bankRate);
+
+    res.send(ret);
+});
 
 // Return the most recent exchange rate between two currencies
 app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {

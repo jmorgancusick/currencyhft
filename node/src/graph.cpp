@@ -275,8 +275,8 @@ void Graph::FindCycles(const string& startCurr) {
 }
 
 //returns the cycles that have been found
-vector<Cycle> Graph::GetCycles() {
-  return cycles;
+vector<Cycle>* Graph::GetCycles() {
+  return &cycles;
 }
 
 //update the DB with found cycles

@@ -36,7 +36,7 @@ class Graph {
     unsigned int GetSize() const {return N;}
     double GetEdgeWeight(const string& startCurr, const string& endCurr) const;
     vector<string> GetCurrencies() const;
-    vector<Cycle> GetCycles();
+    vector<Cycle>* GetCycles();
     bool GetBankflag() {return bank;}
 
     //===========Helpers================

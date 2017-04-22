@@ -309,7 +309,7 @@ public:
 
     vector<std::string> currenciesToExclude;
 
-    for (int i=0; i < param4->Length(); i++) {
+    for (unsigned int i = 0; i < param4->Length(); i++) {
       Local<Value> ele = param4->Get(i);
 
       if (!ele->IsString()){
@@ -325,7 +325,12 @@ public:
 
     //make set of the exclude currencies
     unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
-    
+
+    if (!args[4]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
     v8::String::Utf8Value param5(args[4]->ToString());
     string bankFlag = string(*param5);
 
@@ -357,6 +362,94 @@ public:
     }
 
     result->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
+    args.GetReturnValue().Set(result);
+  }
+
+
+  static void ProfitablePathsData(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    cout<<"Number of args: "<<args.Length()<<endl;
+
+    //check number and types of arguments
+    if (args.Length() != 2) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
+
+    if (!args[0]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param1(args[0]->ToString());
+    std::string param1Str = std::string(*param1);
+
+    unsigned int cyclesCount = std::stoi(param1Str.data());
+
+    if (!args[1]->IsString()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
+    }
+
+    v8::String::Utf8Value param2(args[1]->ToString());
+    string bankFlag = string(*param2);
+
+    vector<Cycle>* cycles;
+    if (bankFlag == "bank") {
+      cycles = gBank->GetCycles();
+    }
+    else {
+      cycles = g->GetCycles();
+    }
+
+    //create mapping from rates to cycles
+    map<double, vector<Cycle*>> rateToCycles;
+    for (unsigned int i = 0; i < cycles->size(); ++i) {
+      double rate = (*cycles)[i].GetTotalRate();
+      map<double, vector<Cycle*>>::iterator foundCycles = rateToCycles.find(rate);
+      vector<Cycle*> cycleAdd;
+      if (foundCycles == rateToCycles.end()) {
+        cycleAdd.push_back(&(*cycles)[i]);
+      }
+      else {
+        vector<Cycle*> cycleAdd = foundCycles->second;
+      }
+      rateToCycles[rate] = cycleAdd;
+    }
+
+    //format return object
+    Local<Array> result = Array::New(isolate);
+
+    //return up to cyclesCount number of cycles, or stop at end of cycles
+    unsigned int count = 0;
+    map<double, vector<Cycle*>>::iterator itr;
+    itr == rateToCycles.end();
+    while (count < cyclesCount && count < cycles->size()) {
+      Local<Object> obj = Object::New(isolate);
+      itr--;
+      vector<Cycle*> rateCycles = itr->second;
+
+      for (unsigned int i = 0; i < rateCycles.size(); i++) {
+        vector<string>* cycle = (*rateCycles[i]).GetCycle();
+
+        //set cycle's rate
+        obj->Set(String::NewFromUtf8(isolate, "cycleRate"), Number::New(isolate, itr->first));
+
+        Local<Array> currencies = Array::New(isolate);
+
+        //add currencies in cycle
+        int j = 0;
+        for (vector<string>::iterator itr2 = cycle->begin(); itr2 != cycle->end(); itr2++, j++) {
+         currencies->Set(j, String::NewFromUtf8(isolate, itr2->data()));
+        }
+
+        obj->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
+        count++;
+      }
+      result->Set(count, obj); 
+    }
+
     args.GetReturnValue().Set(result);
   }
 
@@ -421,6 +514,7 @@ public:
     NODE_SET_METHOD(exports, "tickerData", REST_API::TickerData);
     NODE_SET_METHOD(exports, "chartData", REST_API::ChartData);
     NODE_SET_METHOD(exports, "arbitrageData", REST_API::ArbitrageData);
+    NODE_SET_METHOD(exports, "profitablePathsData", REST_API::ProfitablePathsData);
     NODE_SET_METHOD(exports, "calculatorData", REST_API::CalculatorData);
     NODE_SET_METHOD(exports, "shutdown", REST_API::shutdown);
 
@@ -458,14 +552,14 @@ public:
     }
 
     g->FindCycles("USD");
-    vector<Cycle> cycles = g->GetCycles();
+    vector<Cycle>* cycles = g->GetCycles();
 
-    cout << "Found " << cycles.size() << " cycles" << endl;
+    cout << "Found " << cycles->size() << " cycles" << endl;
 
-    for (unsigned int i = 0; i < cycles.size(); ++i) {
-      double rate = cycles[i].CalcRate(forexRates);
+    for (unsigned int i = 0; i < cycles->size(); ++i) {
+      double rate = (*cycles)[i].CalcRate(forexRates);
       cout << "Cycle " << i+1 << ", rate " << rate << endl;
-      vector<string>* cycle = cycles[i].GetCycle();
+      vector<string>* cycle = (*cycles)[i].GetCycle();
       for (unsigned int j = 0; j < cycle->size(); ++j) {
         cout << "\t" << (*cycle)[j] << endl;
       }
@@ -515,14 +609,14 @@ public:
     }
 
     gBank->FindCycles("USDCIT");
-    vector<Cycle> cyclesBank = gBank->GetCycles();
+    vector<Cycle>* cyclesBank = gBank->GetCycles();
 
-    cout << "Found " << cyclesBank.size() << " cycles" << endl;
+    cout << "Found " << cyclesBank->size() << " cycles" << endl;
 
-    for (unsigned int i = 0; i < cyclesBank.size(); ++i) {
-      double rate = cyclesBank[i].CalcRate(bankRates);
+    for (unsigned int i = 0; i < cyclesBank->size(); ++i) {
+      double rate = (*cyclesBank)[i].CalcRate(bankRates);
       cout << "Cycle " << i+1 << ", rate " << rate << endl;
-      vector<string>* cycle = cyclesBank[i].GetCycle();
+      vector<string>* cycle = (*cyclesBank)[i].GetCycle();
       for (unsigned int j = 0; j < cycle->size(); ++j) {
         cout << "\t" << (*cycle)[j] << endl;
      }
