@@ -356,10 +356,11 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, 
   //updates the profitable paths
   void UpdateProfitablePath(const string& expath, const int& length, const double& rate) {
     try{
-      pstmt.reset(con->prepareStatement("insert into profitableTrends (expath, length, profit, frequency) values (?, ?, ?, 1) on duplicate key update frequency=frequency+1"));
+      pstmt.reset(con->prepareStatement("insert into profitableTrends (expath, length, profit, frequency) values (?, ?, ?, 1) on duplicate key update profit = ?, frequency = frequency+1"));
       pstmt->setString(1,expath);
-      pstmt->setString(2,to_string(length));
-      pstmt->setString(3,to_string(rate));
+      pstmt->setInt(2,length);
+      pstmt->setDouble(3,rate);
+      pstmt->setDouble(4,rate);
 
       res.reset(pstmt->executeQuery());
 

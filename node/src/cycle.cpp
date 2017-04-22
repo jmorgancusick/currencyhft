@@ -178,5 +178,6 @@ void Cycle::UpdateDatabase(API *db) const {
   for (unsigned int j = 1; j < cycle.size(); ++j) {
     expath += "|" + cycle[j];
   }
+  cout << GetTotalRate() << " " << expath << endl;
   db->UpdateProfitablePath(expath, cycle.size(), GetTotalRate());
 }
