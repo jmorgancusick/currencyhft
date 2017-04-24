@@ -96,7 +96,7 @@ app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges/:bankRate', func
     res.send(ret);
 });
 
-// Returbs the profitable cycles of the selected graph
+// Returns the profitable cycles of the selected graph
 app.get('/profitablePathsData/:maxNumberCycles/:bankRate', function(req, res) {
     console.log("profitable paths data endpoint");
 

@@ -340,12 +340,14 @@ public:
 
     //get path based on forex or bankrates
     if (bankFlag == "bank") {
-      Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges, db);
+      cout << "Using bank rates" << endl;
+      Path path = Path(*gBank, startCurr, endCurr, excludeCurrs, maxNumberExchanges, db);
       p = path.GetPath();
       totalRate = path.GetTotalRate();
     }
     else {
-      Path path = Path(*gBank, startCurr, endCurr, excludeCurrs, maxNumberExchanges, db);
+      cout << "Using forex rates" << endl;
+      Path path = Path(*g, startCurr, endCurr, excludeCurrs, maxNumberExchanges, db);
       p = path.GetPath();
       totalRate = path.GetTotalRate();
     }
@@ -356,8 +358,12 @@ public:
 
     Local<Array> currencies = Array::New(isolate);
 
-    int i = 0;
-    for (vector<string>::iterator itr = p->begin(); itr != p->end(); itr++, i++) {
+    //for some reason, the first currency in the list is sometimes malformed
+    //since we know what the start currency is anyway, just use that instead
+    currencies->Set(0, String::NewFromUtf8(isolate, startCurr.data()));
+
+    int i = 1;
+    for (vector<string>::iterator itr = p->begin()+1; itr != p->end(); itr++, i++) {
       currencies->Set(i, String::NewFromUtf8(isolate, itr->data()));
     }
 
@@ -401,9 +407,11 @@ public:
 
     vector<Cycle>* cycles;
     if (bankFlag == "bank") {
+      cout << "Using bank rates" << endl;
       cycles = gBank->GetCycles();
     }
     else {
+      cout << "Using forex rates" << endl;
       cycles = g->GetCycles();
     }
 
@@ -568,8 +576,6 @@ public:
         cout << "\t" << (*cycle)[j] << endl;
       }
 */    }
-
-    g->UpdateCyclesDB(db);
 
     vector<string> banks = db->GetAllBanks();
 
