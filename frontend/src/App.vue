@@ -19,7 +19,6 @@
     <div class="line"></div>
     <!-- Necessary line in template to use router -->
     <router-view></router-view>
-    </div> -->
   </div>
 </template>
 
