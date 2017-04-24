@@ -295,33 +295,34 @@ public:
     }
 
     v8::String::Utf8Value param3(args[2]->ToString());
-    std::string param3Str = std::string(*param3);
+    string param3Str = std::string(*param3);
 
     int maxNumberExchanges = std::stoi(param3Str.data());
 
-    if (!args[3]->IsArray()) {
-      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
-      return;
-    }
-
-    Local<Array> param4 = Local<Array>::Cast(args[3]);
-
-    std::cout << "Array cast" << std::endl;
-
     vector<std::string> currenciesToExclude;
-
-    for (unsigned int i = 0; i < param4->Length(); i++) {
-      Local<Value> ele = param4->Get(i);
-
-      if (!ele->IsString()){
-        isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments in array"));
-        return;
-      }
-
+    if (args[3]->IsString()) {
+      v8::String::Utf8Value param4(args[3]->ToString());
+      string param4Str = std::string(*param4);
+      currenciesToExclude.push_back(param4Str);
+    }
+    else if (args[3]->IsArray()) {
+      cout << "Array" << endl;
+      Local<Array> param4 = Local<Array>::Cast(args[3]);
+      for (unsigned int i = 0; i < param4->Length(); i++) {
+        Local<Value> ele = param4->Get(i);
+        if (!ele->IsString()){
+          isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments in array"));
+          return;
+        }
       v8::String::Utf8Value arrEle(ele->ToString());
       std::string tmpStr = std::string(*arrEle);
 
       currenciesToExclude.push_back(tmpStr);
+      }
+    }
+    else {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
+      return;
     }
 
     //make set of the exclude currencies
@@ -449,7 +450,6 @@ public:
 
     for (unsigned int i = 0; count < cyclesCount && i < rates.size(); ++i) {
       Local<Object> obj = Object::New(isolate);
-      cout << rates[i] << endl;
       vector<Cycle*> rateCycles = rateToCycles[rates[i]];
       for (unsigned int j = 0; j < rateCycles.size(); j++) {
         Cycle cyc = *(rateCycles[j]);
@@ -457,7 +457,6 @@ public:
         obj->Set(String::NewFromUtf8(isolate, "cycleRate"), Number::New(isolate, rates[i]));
         Local<Array> currencies = Array::New(isolate);
         for (unsigned int k = 0; k < cycle.size(); k++) {
-          cout << cycle[k] << endl;
           currencies->Set(k, String::NewFromUtf8(isolate, cycle[k].data()));
         }
         obj->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
