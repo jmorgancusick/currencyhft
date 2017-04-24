@@ -4,6 +4,7 @@
 #include "path.h"
 #include "string"
 #include <unordered_set>
+#include <unordered_map>
 #include <typeinfo>
 
 namespace demo{
@@ -415,53 +416,55 @@ public:
       cycles = g->GetCycles();
     }
 
+    cout << "Create mapping" << endl;
+
+    vector<double> rates;
+
     //create mapping from rates to cycles
-    map<double, vector<Cycle*>> rateToCycles;
+    unordered_map<double, vector<Cycle*>> rateToCycles;
     for (unsigned int i = 0; i < cycles->size(); ++i) {
       double rate = (*cycles)[i].GetTotalRate();
-      map<double, vector<Cycle*>>::iterator foundCycles = rateToCycles.find(rate);
+      unordered_map<double, vector<Cycle*>>::iterator foundCycles = rateToCycles.find(rate);
       vector<Cycle*> cycleAdd;
       if (foundCycles == rateToCycles.end()) {
         cycleAdd.push_back(&(*cycles)[i]);
+        rates.push_back(rate);
       }
       else {
-        vector<Cycle*> cycleAdd = foundCycles->second;
+        cycleAdd = foundCycles->second;
       }
       rateToCycles[rate] = cycleAdd;
     }
+
+    sort(rates.rbegin(), rates.rend());
+
+
+    cout << "Format output" << endl;
 
     //format return object
     Local<Array> result = Array::New(isolate);
 
     //return up to cyclesCount number of cycles, or stop at end of cycles
     unsigned int count = 0;
-    map<double, vector<Cycle*>>::iterator itr;
-    itr == rateToCycles.end();
-    while (count < cyclesCount && count < cycles->size()) {
+
+    for (unsigned int i = 0; count < cyclesCount && i < rates.size(); ++i) {
       Local<Object> obj = Object::New(isolate);
-      itr--;
-      vector<Cycle*> rateCycles = itr->second;
-
-      for (unsigned int i = 0; i < rateCycles.size(); i++) {
-        vector<string>* cycle = (*rateCycles[i]).GetCycle();
-
-        //set cycle's rate
-        obj->Set(String::NewFromUtf8(isolate, "cycleRate"), Number::New(isolate, itr->first));
-
+      cout << rates[i] << endl;
+      vector<Cycle*> rateCycles = rateToCycles[rates[i]];
+      for (unsigned int j = 0; j < rateCycles.size(); j++) {
+        Cycle cyc = *(rateCycles[j]);
+        vector<string> cycle = *(cyc.GetCycle());
+        obj->Set(String::NewFromUtf8(isolate, "cycleRate"), Number::New(isolate, rates[i]));
         Local<Array> currencies = Array::New(isolate);
-
-        //add currencies in cycle
-        int j = 0;
-        for (vector<string>::iterator itr2 = cycle->begin(); itr2 != cycle->end(); itr2++, j++) {
-         currencies->Set(j, String::NewFromUtf8(isolate, itr2->data()));
+        for (unsigned int k = 0; k < cycle.size(); k++) {
+          cout << cycle[k] << endl;
+          currencies->Set(k, String::NewFromUtf8(isolate, cycle[k].data()));
         }
-
         obj->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
-        count++;
       }
-      result->Set(count, obj); 
+      result->Set(count, obj);
+      count++;
     }
-
     args.GetReturnValue().Set(result);
   }
 
