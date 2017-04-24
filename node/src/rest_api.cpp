@@ -328,6 +328,17 @@ public:
     //make set of the exclude currencies
     unordered_set<string> excludeCurrs(currenciesToExclude.begin(), currenciesToExclude.end());
 
+    //check if start or end currencies are excluded
+    if (excludeCurrs.find(startCurr.substr(0,3)) != excludeCurrs.end()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Cannot exclude start currency"));
+      return;
+    }
+
+    if (excludeCurrs.find(endCurr.substr(0,3)) != excludeCurrs.end()) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Cannot exclude end currency"));
+      return;
+    }
+
     if (!args[4]->IsString()) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong arguments"));
       return;
