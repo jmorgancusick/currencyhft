@@ -89,7 +89,7 @@ DistanceEstimates Graph::FindOptimalPaths(const string& start, const unordered_s
   vector<string> currencies = GetCurrencies();
 
   for (auto it = currencies.begin(); it != currencies.end(); ++it) {
-    if (ignoreCurrencies.find(*it) == ignoreCurrencies.end()) {
+    if (ignoreCurrencies.find((*it).substr(0,3)) == ignoreCurrencies.end()) {
       //first element of pair is the distance estimate to the node, initalized to infinity
       //second element is the previous node to reach this one, initialized to empty string
       dists[*it] = make_pair(numeric_limits<double>::infinity(), "");
@@ -116,7 +116,7 @@ void Graph::BellmanFord(DistanceEstimates& dists, const unordered_set<string>& i
   currencies.reserve(N - ignoreCurrencies.size());
 
   for (auto it = currenciesAll.begin(); it != currenciesAll.end(); ++it) {
-    if (ignoreCurrencies.find(*it) == ignoreCurrencies.end()) {
+    if (ignoreCurrencies.find((*it).substr(0,3)) == ignoreCurrencies.end()) {
       currencies.push_back(*it);
     }
   }

@@ -303,7 +303,7 @@ public:
     if (args[3]->IsString()) {
       v8::String::Utf8Value param4(args[3]->ToString());
       string param4Str = std::string(*param4);
-      currenciesToExclude.push_back(param4Str);
+      currenciesToExclude.push_back(param4Str.substr(0,3));
     }
     else if (args[3]->IsArray()) {
       cout << "Array" << endl;
@@ -317,7 +317,7 @@ public:
       v8::String::Utf8Value arrEle(ele->ToString());
       std::string tmpStr = std::string(*arrEle);
 
-      currenciesToExclude.push_back(tmpStr);
+      currenciesToExclude.push_back(tmpStr.substr(0,3));
       }
     }
     else {
