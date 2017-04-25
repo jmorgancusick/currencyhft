@@ -74,10 +74,10 @@ app.get('/tickerData/', function(req, res) {
 
 // Return high, low and close exchange rates for single ticker over a period of time.
 // This data is used to populate the Dashboard chart
-app.get('/chartData/:ticker/:timeframe/:startDate/:endDate', function(req, res) {
+app.get('/chartData/:ticker/:timeframe', function(req, res) {
     console.log("chart data endpoint");
 
-    ret = addon.chartData(req.params.ticker,req.params.timeframe,req.params.startDate,req.params.endDate);
+    ret = addon.chartData(req.params.ticker,req.params.timeframe);
 
     res.send(ret);
 });
