@@ -26,6 +26,10 @@
 #define PASS "worldpass"
 #define DB "world"
 
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/date_clock_device.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 using namespace std;
 
 class API{
@@ -177,31 +181,99 @@ unordered_map<string, double> * selectAllTickerData(){
 
 //gets the historical data for a specified ticker
 //in a certain timespan at a certain interval
-vector<chart_info> * selectHistoricalTickerData(string ticker, string interval, string startDate, string endDate){
+vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe){
     vector<chart_info> *rows = new vector<chart_info>();
 
     try{
       //mysql query
       string table;
-      if(interval == "minute"){
+
+      //====TIME LOGIC====
+      //get todays date
+      boost::gregorian::date endDate(boost::gregorian::day_clock::universal_day());
+      //start date (init before subtracting)
+      boost::gregorian::date startDate(endDate);
+
+      int subYears = 0;
+      int subMonths = 0;
+      int subDays = 0;
+
+
+      //set database
+      if(timeframe == "1d"){           // 1 min interval
         table = "forexDashMinute";
-      }
-      else if(interval == "day"){
+
+        // Initialize days object with 1 day                                   
+        subDays = 1;
+
+
+      } else if(timeframe == "5d"){    // 5 min interval
+        table = "forexDashMinute";
+
+        // Initialize days object with 5 days                                   
+        subDays = 5;
+
+
+      } else if(timeframe == "ytd"){   // 1 day interval
         table = "forexDashDaily";
-      }
-      else {
+
+        subMonths = startDate.month()-1;
+        subDays = startDate.day()-1;
+
+      } else if(timeframe == "1y"){    // 1 day interval
+        table = "forexDashDaily";
+
+        // Initialize days object with 1 Year                                  
+        subYears = 1;
+
+
+      } else if(timeframe == "2y"){    // 1 day interval
+        table = "forexDashDaily";
+
+        // Initialize days object with 2 Years                                   
+        subYears = 2;
+
+
+      } else if(timeframe == "5y"){    // 7 day interval
+        table = "forexDashDaily";
+
+        // Initialize days object with 5 Years                                   
+        subYears = 5;
+
+      } else{
         cout << "# ERR: Improper input for variable interval in selectHistoricalTickerData" << endl;
         return NULL;
       }
 
-      struct tm startTime = timeConversion(startDate);
-      struct tm endTime = timeConversion(endDate);
+      // Calculate start date
+      boost::gregorian::years yearsObj(subYears);
+      boost::gregorian::months monthsObj(subMonths);
+      boost::gregorian::days daysObj(subDays);
 
+      startDate = startDate - yearsObj;
+      startDate = startDate - monthsObj;
+      startDate = startDate - daysObj;
+
+      std::cout<<"Start Date: " << startDate << std::endl;
+      std::cout<<"End Date: " << endDate << std::endl;
+      std::cout<<"table: " << table << std::endl;
+
+      // Convert to POSIX
+      boost::posix_time::ptime const time_epoch(boost::gregorian::date(1970, 1, 1));
+      boost::posix_time::ptime startTimePOSIX(startDate);
+      boost::posix_time::ptime endTimePOSIX(endDate);
+
+      auto startTimestamp = (startTimePOSIX-time_epoch).total_seconds();
+      auto endTimestamp = (endTimePOSIX-time_epoch).total_seconds();
+
+      std::cout<< "start ts: "<< startTimestamp << std::endl;
+      std::cout<< "end ts: "<<endTimestamp << std::endl;
+
+      // Query MySQL
       pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
       pstmt->setString(1,ticker);
-      //converts the tm struct to an int
-      pstmt->setInt(2,mktime(&endTime)); 
-      pstmt->setInt(3,mktime(&startTime));
+      pstmt->setInt(2,endTimestamp); 
+      pstmt->setInt(3,startTimestamp);
 
       //res now has return data
       res.reset(pstmt->executeQuery());

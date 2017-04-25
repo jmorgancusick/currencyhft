@@ -187,7 +187,7 @@ public:
     cout<<"Number of args: "<<args.Length()<<endl;
 
     //check number and types of arguments
-    if (args.Length() != 4) {
+    if (args.Length() != 2) {
       isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
       return;
     }
@@ -208,14 +208,14 @@ public:
     v8::String::Utf8Value param2(args[1]->ToString());
     std::string timeframe = std::string(*param2);
     
-    v8::String::Utf8Value param3(args[2]->ToString());
-    std::string startDate = std::string(*param3);
-
-    v8::String::Utf8Value param4(args[3]->ToString());
-    std::string endDate = std::string(*param4);
 
     //call db api to get data
-    vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, timeframe, startDate, endDate);    //Database query
+    vector<API::chart_info> *rows = db->selectHistoricalTickerData(ticker, timeframe);    //Database query
+    if (rows == NULL){
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Error getting historical data from DB"));
+      return;
+    }
+
 
     //format data to be sent to front end
     int i = 0;
