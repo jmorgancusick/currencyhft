@@ -2,6 +2,19 @@
   <div class="dashboard">
     <h1>{{ msg }}</h1>
 
+    <!-- Time range selection buttons -->
+    <el-row>
+      <el-tabs v-model="range" @tab-click="handleRange">
+        <el-tab-pane label="1 Day" name="1d"></el-tab-pane>
+        <el-tab-pane label="5 Days" name="5d"></el-tab-pane>
+        <el-tab-pane label="YTD" name="ytd"></el-tab-pane>
+        <el-tab-pane label="1 Year" name="1y"></el-tab-pane>
+        <el-tab-pane label="2 Years" name="2y"></el-tab-pane>
+        <el-tab-pane label="5 Years" name="5y"></el-tab-pane>
+      </el-tabs>
+    </el-row>
+
+    <!-- Chart -->
     <el-row>
       <el-col>
         <div style="align:left;">
@@ -17,25 +30,26 @@
     <h1> </h1>
 
     <!-- Adds dropdown menus for Start and End currencies -->
-    <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
-      <el-option
-        v-for="item in startOptions"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
-
-    <!-- End -->
-    <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
-      <el-option
-        v-for="item in endOptions"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
+    <el-row>
+      <!-- Start -->
+      <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
+        <el-option
+          v-for="item in startOptions"
+          :label="item.label"
+          :value="item.value"
+          :disabled="item.disabled">
+        </el-option>
+      </el-select>
+      <!-- End -->
+      <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
+        <el-option
+          v-for="item in endOptions"
+          :label="item.label"
+          :value="item.value"
+          :disabled="item.disabled">
+        </el-option>
+      </el-select>
+    </el-row>
 
     <!-- Ticker data -->
     <el-row>
@@ -117,7 +131,8 @@ export default {
         label: 'USD'
       }],
       start: 'EUR',
-      end: 'USD'
+      end: 'USD',
+      range: 'ytd'
     }
   },
   components: {
@@ -178,6 +193,9 @@ export default {
           console.log("ERROR:", error)
         })
       }
+    },
+    handleRange (str){
+      console.log("Time range selected: ", this.range);
     }
   },
   created () {
@@ -191,7 +209,7 @@ export default {
 
     // call for chartData
     // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
-    axios.get("http://currencyhft.com:3000/chartData/EURUSD=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
+    axios.get("http://currencyhft.com:3000/chartData/EURUSD=X/day/ytd").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {
