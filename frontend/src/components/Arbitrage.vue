@@ -3,6 +3,10 @@
     <h1> {{msg}} </h1>
     <el-row :gutter="20" style="margin-bottom: 10ps;">
       <el-col :span="20" :offset="2">
+        <!-- Adds Forex or Banks Selection and Response-->
+        <el-radio class="radio" v-model="ifBank" label="1">Forex</el-radio>
+        <el-radio class="radio" v-model="ifBank" label="2">Banks</el-radio>
+
         <!-- Adds dropdown menus for Start and End currencies -->
         <!-- Start currency -->
         <el-select v-model="start" placeholder="Start currency" @change="handleChange()">
@@ -152,6 +156,7 @@ export default {
           value: 'USD',
           label: 'USD'
         }],
+      ifBank: 0,
       start: '',
       end: '', 
       numEdges: null,
