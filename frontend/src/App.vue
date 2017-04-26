@@ -19,6 +19,13 @@
     <div class="line"></div>
     <!-- Necessary line in template to use router -->
     <router-view></router-view>
+
+    <div>
+      <footer>
+        <p>Posted by: Currency Exchange Team</p>
+        <p><a href="https://github.com/jmcusick/currencyhft">GitHub</a></p>
+      </footer>
+    </div>
   </div>
 </template>
 
