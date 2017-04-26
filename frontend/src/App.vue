@@ -58,5 +58,11 @@
 a:link{
   text-decoration: none;
 }
+a {
+  color: #42b983;
+}
+p {
+  color: #42b983;
+}
 </style>
 

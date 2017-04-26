@@ -61,7 +61,7 @@ methods
   background-repeat: no-repeat;
   background-size: 100%;
   width: 100%;
-  height: 500px;
+  height: 900px;
 }
 .secimg {
   background-image: url('../assets/temp-banner.svg');
