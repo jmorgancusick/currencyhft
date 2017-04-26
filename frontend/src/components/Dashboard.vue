@@ -14,20 +14,18 @@
       </el-tabs>
     </el-row>
 
+
     <!-- Chart -->
     <el-row>
-      <el-col>
-        <div style="align:left;">
-          <svg width="1000" height="500">
-          <vn-line :model="trends"
-                  :x-format="formatDate"
-                  y-format="">
-          </vn-line> 
-          </svg>
-        </div>
-      </el-col>
+      <div style="align:left;">
+        <svg width="1000" height="440">
+        <vn-line :model="trends"
+                :x-format="formatDate"
+                y-format="">
+        </vn-line> 
+        </svg>
+      </div>
     </el-row>
-    <h1> </h1>
 
     <!-- Adds dropdown menus for Start and End currencies -->
     <el-row>
@@ -183,7 +181,7 @@ export default {
       if (this.start !== '' && this.end !== '' && this.start !== this.end) {
         
         // http://currencyhft.com:3000/chartData/NZDEUR=X/
-        var str = "http://localhost:3000/chartData/"+this.start+this.end+"=X/" + this.range;
+        var str = "http://currencyhft.com:3000/chartData/"+this.start+this.end+"=X/" + this.range;
 
         // call for chartData
         axios.get(str).then( (response) => {
@@ -201,7 +199,7 @@ export default {
   },
   created () {
     // call for tickerData
-    axios.get("http://localhost:3000/tickerData/").then( (response) => {
+    axios.get("http://currencyhft.com:3000/tickerData/").then( (response) => {
       console.log(response)
       this.tickers = response.data;
     }).catch( (error) => {
@@ -210,7 +208,7 @@ export default {
 
     // call for chartData
     // http://currencyhft.com:3000/chartData/NZDEUR=X/ 
-    axios.get("http://localhost:3000/chartData/EURUSD=X/ytd").then( (response) => {
+    axios.get("http://currencyhft.com:3000/chartData/EURUSD=X/ytd").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {
