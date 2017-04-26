@@ -2,7 +2,7 @@
   <div class="dashboard">
     <h1>{{ msg }}</h1>
 
-    <!-- Time range selection -->
+    <!-- Time range selectiong -->
     <el-row>
       <el-tabs v-model="range" @tab-click="handleSelect">
         <el-tab-pane label="1 Day" name="1d"></el-tab-pane>
