@@ -49,8 +49,9 @@ def parseResponse(response):
   print raw
 
   data = {}
-  data["timestamp"] = raw["chart"]["result"][0]["timestamp"]
-  data["quote"] = raw["chart"]["result"][0]["indicators"]["quote"][0]
+  if "timestamp" in raw["chart"]["result"][0]:
+    data["timestamp"] = raw["chart"]["result"][0]["timestamp"]
+    data["quote"] = raw["chart"]["result"][0]["indicators"]["quote"][0]
   return data
 
 def execScrape(ticker, startTime, endTime, interval):
@@ -66,12 +67,13 @@ def execScrape(ticker, startTime, endTime, interval):
   # parse response
   data = parseResponse(response)
 
-  # dump data
-  filename = ticker+"_"+str(startTime.strftime("%Y-%m-%d@%H:%M:%S"))+"_to_"+str(endTime.strftime("%Y-%m-%d@%H:%M:%S"))+"_"+interval+".txt"
-  filepath = "data/"+ticker+"/"+filename
-  #print filepath
-  with open(filepath, 'w') as f:
-    json.dump(data, f)
+  if data:
+    # dump data
+    filename = ticker+"_"+str(startTime.strftime("%Y-%m-%d@%H:%M:%S"))+"_to_"+str(endTime.strftime("%Y-%m-%d@%H:%M:%S"))+"_"+interval+".txt"
+    filepath = "data/"+ticker+"/"+filename
+    #print filepath
+    with open(filepath, 'w') as f:
+      json.dump(data, f)
 
   return data
   
