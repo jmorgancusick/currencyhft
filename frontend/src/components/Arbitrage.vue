@@ -170,8 +170,8 @@ export default {
   methods: {
     fetchPath() {
       // formatting for string for 
-      var regStr = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
-      var arbStr = "http://currencyhft.com:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
+      var regStr = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
+      var arbStr = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
 
       // formatting for excluded array parameter
       var exclude = this.exclude;
@@ -206,7 +206,7 @@ export default {
       this.shouldShow = false;
     },
     handleRadio() {
-      
+
     }
   }, 
   computed: {

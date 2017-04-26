@@ -12,7 +12,7 @@
         :disabled="item.disabled">
       </el-option>
     </el-select>
-    
+
     <!-- End -->
     <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
       <el-option
@@ -112,7 +112,7 @@ export default {
         console.log('ready!');
 
         // api call formatting
-        var str = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
+        var str = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
 
         console.log(str);
 

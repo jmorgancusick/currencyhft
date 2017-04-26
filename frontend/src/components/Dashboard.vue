@@ -2,9 +2,9 @@
   <div class="dashboard">
     <h1>{{ msg }}</h1>
 
-    <!-- Time range selection buttons -->
+    <!-- Time range selection -->
     <el-row>
-      <el-tabs v-model="range" @tab-click="handleRange">
+      <el-tabs v-model="range" @tab-click="handleSelect">
         <el-tab-pane label="1 Day" name="1d"></el-tab-pane>
         <el-tab-pane label="5 Days" name="5d"></el-tab-pane>
         <el-tab-pane label="YTD" name="ytd"></el-tab-pane>
@@ -182,10 +182,10 @@ export default {
       console.log("HANDLE SELECT");
       if (this.start !== '' && this.end !== '' && this.start !== this.end) {
         
-        var str = "http://currencyhft.com:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
+        // http://currencyhft.com:3000/chartData/NZDEUR=X/
+        var str = "http://localhost:3000/chartData/"+this.start+this.end+"=X/" + this.range;
 
         // call for chartData
-        // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
         axios.get(str).then( (response) => {
           console.log(response)
           this.chartData = response.data;
@@ -194,13 +194,14 @@ export default {
         })
       }
     },
-    handleRange (str){
+    handleRange (){
       console.log("Time range selected: ", this.range);
+      t
     }
   },
   created () {
     // call for tickerData
-    axios.get("http://currencyhft.com:3000/tickerData/").then( (response) => {
+    axios.get("http://localhost:3000/tickerData/").then( (response) => {
       console.log(response)
       this.tickers = response.data;
     }).catch( (error) => {
@@ -208,8 +209,8 @@ export default {
     })
 
     // call for chartData
-    // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
-    axios.get("http://currencyhft.com:3000/chartData/EURUSD=X/day/ytd").then( (response) => {
+    // http://currencyhft.com:3000/chartData/NZDEUR=X/ 
+    axios.get("http://localhost:3000/chartData/EURUSD=X/ytd").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {
