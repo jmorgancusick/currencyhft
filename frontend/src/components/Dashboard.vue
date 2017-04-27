@@ -179,7 +179,15 @@ export default {
   },
   methods: {
     formatDate (timestamp){
-      return d3.time.format('%x')(new Date(timestamp*1000))
+      var fmt = ""
+      if (this.range === "1d"){
+        console.log("fmt 1")
+        fmt = "%I:%M %p"
+      } else{
+        console.log("fmt 1")
+        fmt = "%b %d, %Y"
+      }
+      return d3.time.format.utc(fmt)(new Date(timestamp*1000))
     }, 
     handleSelect (){
       console.log("HANDLE SELECT");
@@ -199,7 +207,6 @@ export default {
     },
     handleRange (){
       console.log("Time range selected: ", this.range);
-      t
     }
   },
   created () {

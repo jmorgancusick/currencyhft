@@ -15,6 +15,7 @@ import '../theme/input.css';
 import '../theme/input-number.css';
 import '../nvd3_styles.css';
 import axios from 'axios';
+import Vue2Filters from 'vue2-filters'
 
 // library allowing Ajax calls in Vue components
 window.axios = axios;
@@ -22,6 +23,8 @@ window.axios = axios;
 // Element UI and NVD3 charts
 Vue.use(ElementUI, { locale });
 Vue.use(VueNVD3);
+Vue.use(Vue2Filters);
+
 
 Vue.config.productionTip = false;
 
