@@ -1,32 +1,34 @@
 <template>
   <div class="calculator">
-    <h1 style="padding: 30px;">{{ msg }}</h1>
+    <h1 style="padding: 30px; margin-bottom: -10px;">{{ msg }}</h1>
 
-    <!-- Adds dropdown menus for Start and End currencies -->
-    <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()" style="padding: 10px;">
-      <el-option
-        v-for="item in startCurrencies"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
+    <div style="margin-bottom: 10px;">
+      <!-- Adds dropdown menus for Start and End currencies -->
+      <!-- Start -->
+      <el-select v-model="start" placeholder="Start currency" @change="handleSelect()" style="padding: 15px;">
+        <el-option
+          v-for="item in startCurrencies"
+          :label="item.label"
+          :value="item.value"
+          :disabled="item.disabled">
+        </el-option>
+      </el-select>
 
-    <!-- End -->
-    <el-select v-model="end" placeholder="End currency" @change="handleSelect()" style="padding: 10px;">
-      <el-option
-        v-for="item in endCurrencies"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
+      <!-- End -->
+      <el-select v-model="end" placeholder="End currency" @change="handleSelect()" style="padding: 15px;">
+        <el-option
+          v-for="item in endCurrencies"
+          :label="item.label"
+          :value="item.value"
+          :disabled="item.disabled">
+        </el-option>
+      </el-select>
+    </div>
 
     <!-- Input field for amount --> 
     <el-row :gutter="20">
       <el-col :span="10" :offset="7">
-        <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input style="padding: 10px;">
+        <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input style="padding: 15px;">
         <h2 v-if="start !== null && end !== null && convertedVal !== 0"> {{inputVal}} {{start}} = {{ convertedVal }} {{end}} </h2>
       </el-col>
     </el-row>   

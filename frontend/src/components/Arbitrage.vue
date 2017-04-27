@@ -1,16 +1,16 @@
 <template>
   <div class="arbitrage" ref="arbitrage">
-    <h1 style="padding: 30px;"> {{msg}} </h1>
+    <h1 style="padding: 30px; margin-bottom: -10px;"> {{msg}} </h1>
     <el-row :gutter="20" style="margin-bottom: 10px;">
-      <div style="align:left;">
-        <el-col :span="6" :offset="4">
+      <el-col :span="16" :offset="4">
+        <div style="align:left;">
           <!-- Adds Forex or Banks Selection and Response
           <el-radio class="radio" v-model="ifBank" label="0" @change="handleRadio()">Forex</el-radio>
           <el-radio class="radio" v-model="ifBank" label="1" @change="handleRadio()">Banks</el-radio> -->
 
           <!-- Adds dropdown menus for Start and End currencies -->
           <!-- Start currency -->
-          <el-select v-model="start" placeholder="Start currency" @change="handleChange()" style="padding: 10px;">
+          <el-select v-model="start" placeholder="Start currency" @change="handleChange()" style="padding: 15px;">
             <el-option
               v-for="item in startCurrencies"
               :label="item.label"
@@ -19,7 +19,7 @@
             </el-option>
           </el-select>
           <!-- End currency -->
-          <el-select v-model="end" placeholder="End currency" @change="handleChange()" style="padding: 10px;">
+          <el-select v-model="end" placeholder="End currency" @change="handleChange()" style="padding: 15px;">
             <el-option
               v-for="item in endCurrencies"
               :label="item.label"
@@ -29,7 +29,7 @@
           </el-select>
 
           <!-- Multiple selections to exclude currencies -->
-          <el-select v-model="exclude" multiple placeholder="Exclude currencies" @change="handleChange()" style="padding: 10px;">
+          <el-select v-model="exclude" multiple placeholder="Exclude currencies" @change="handleChange()" style="padding: 15px;">
             <el-option
               v-for="item in excludeCurrencies"
               :label="item.label"
@@ -40,25 +40,31 @@
 
           <el-row>
             <!--<h3>Max Number of Edges in Path: </h3>-->
-            <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()"></el-input-number>
+            <div style="margin-top: 10px; margin-bottom: 10px;">
+              <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()"></el-input-number>
+            </div>
           </el-row>
 
           <!-- Input field for amount and calculate button-->
-          <el-row>
-            <el-col>
-              <el-input v-model="inputVal" placeholder="Enter amount..." style="padding: 10px;"></el-input>
+          <el-row :gutter="20">
+            <el-col :span="16" :offset="4">
+              <div style="margin-bottom: 10px;">
+                <el-input v-model="inputVal" placeholder="Enter amount..." style="padding: 10px;"></el-input>
+              </div>
             </el-col>
           </el-row>
 
           <el-row :gutter="20">
             <el-button @click="fetchPath()">Calculate</el-button>
           </el-row>
-        </el-col>
-      </div>
+        </div>
+      </el-col>
+    </el-row>
 
-      <el-col :span="6" :offset="14" >
+    <el-row :gutter="20">
+      <el-col :span="16" :offset="4" >
         <!-- Only show optimal conversion and path when user clicks calculate -->  
-        <div style="text-align:left;"> 
+        <div> 
           <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
           <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | round 10 }} </h3>
           <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | round 10 }} </h3>
