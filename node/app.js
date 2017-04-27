@@ -118,3 +118,12 @@ app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
 
     res.send(ret);
 });
+
+// Return the most recent exchange rate between two currencies
+app.get('/dailyArbitrage', function(req, res) {
+    console.log("daily arbitrage endpoint");
+
+    ret = addon.dailyArbitrage();
+
+    res.send(ret);
+});

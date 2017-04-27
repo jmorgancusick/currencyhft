@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <typeinfo>
+#include <math.h> 
 
 namespace demo{
 
@@ -516,6 +517,98 @@ public:
     args.GetReturnValue().Set(result);
   }
 
+  //endpoint for the calculator page
+  //takes 2 arguments, strings for start and end currency
+  //returns rate as a double
+  static void DailyArbitrage(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    cout<<"Number of args: "<<args.Length()<<endl;
+
+    //check number and types of arguments
+    if (args.Length() != 0) {
+      isolate->ThrowException(v8::String::NewFromUtf8(isolate, "Wrong number of arguments"));
+      return;
+    }
+
+    //return object
+    Local<Object> result = Object::New(isolate);
+
+    Local<Array> cyclesArr = Array::New(isolate);
+
+
+    //calculate the rates
+    std::cout<<"Calculating rates"<<std::endl;
+
+    double dailyReturn = 0.0;
+    double yearlyReturn = 0.0;
+    double principle = 100.0;
+    double current = principle;
+
+
+    //calculate the rates and setup the return structure
+    int cycleCounter = 0;
+    for(map<long, Graph *>::iterator itr = graphs->begin(); itr != graphs->end(); itr++, cycleCounter++){
+      // std::cout<<"Timestamp: "<< itr->first << std::endl;
+
+      //get best cycle
+      vector<Cycle>* cycles;
+      cycles = itr->second->GetCycles();
+      double bestRate = -1.0;
+      int bestIndex = 0;
+      //find best cycle
+      for (int i = 0; i < cycles->size(); i++){
+        if((*cycles)[i].GetTotalRate() > bestRate){
+          bestRate = (*cycles)[i].GetTotalRate();
+          bestIndex = i;
+        }
+      }
+
+      //only exchange if there is a profit
+      if(bestRate > 1.0){
+        current = current * bestRate;
+      }
+
+
+      // Creates a new Object on the V8 heap
+      Local<Object> obj = Object::New(isolate);
+
+      Local<Array> currencies = Array::New(isolate);
+
+      vector<string>* cycleString = (*cycles)[bestIndex].GetCycle();
+      for ( int j = 0; j<cycleString->size(); j++) {
+        currencies->Set(j, String::NewFromUtf8(isolate, (*cycleString)[j].data()));
+      }
+      //complete the cycle
+      currencies->Set(cycleString->size(), String::NewFromUtf8(isolate, (*cycleString)[0].data()));
+
+
+      obj->Set(String::NewFromUtf8(isolate, "timestamp"),
+         Number::New(isolate, itr->first));
+      obj->Set(String::NewFromUtf8(isolate, "rate"), 
+         Number::New(isolate, bestRate));
+      obj->Set(String::NewFromUtf8(isolate, "currencies"), currencies);
+
+      cyclesArr->Set(cycleCounter,obj);
+
+
+      std::cout<<cycleCounter<<" -- current: "<<current<<" bestRate: "<<bestRate<<std::endl;
+    }
+
+
+    dailyReturn = (current/principle)-1;
+    yearlyReturn = exp(dailyReturn*365);
+    std::cout<<"dailyReturn: "<<dailyReturn<<std::endl;
+    std::cout<<"yearlyReturn: "<<yearlyReturn<<std::endl;
+
+    //create the return object
+    result->Set(String::NewFromUtf8(isolate, "dailyReturn"), Number::New(isolate, dailyReturn));
+    result->Set(String::NewFromUtf8(isolate, "yearlyReturn"), Number::New(isolate, yearlyReturn));
+    result->Set(String::NewFromUtf8(isolate, "cycles"), cyclesArr);
+
+    args.GetReturnValue().Set(result);
+  }
+
   //cleanly shutdown
   static void shutdown(const FunctionCallbackInfo<Value>& args){
     std::cout << "Shutting down REST_API and DB API" << std::endl;
@@ -524,15 +617,24 @@ public:
     delete db;
     delete g;
     delete gBank;
+
+    for (map<long, Graph *>::iterator itr = REST_API::graphs->begin(); itr!=REST_API::graphs->end(); itr++){
+      delete itr->second;
+    }
+    delete graphs;
   }
 
   // static member variables
   static API *db;
   static Graph *g;
   static Graph *gBank;
+  static map<long, Graph *> *graphs;
 
   //initialize the endpoints
   static void init(Local<Object> exports) {
+
+    std::cout<<"================INIT=============="<<std::endl;
+
     // Establish Node.js addon functions
     NODE_SET_METHOD(exports, "exchange", REST_API::Exchange);
     NODE_SET_METHOD(exports, "table", REST_API::Table);
@@ -541,6 +643,7 @@ public:
     NODE_SET_METHOD(exports, "arbitrageData", REST_API::ArbitrageData);
     NODE_SET_METHOD(exports, "profitablePathsData", REST_API::ProfitablePathsData);
     NODE_SET_METHOD(exports, "calculatorData", REST_API::CalculatorData);
+    NODE_SET_METHOD(exports, "dailyArbitrage", REST_API::DailyArbitrage);
     NODE_SET_METHOD(exports, "shutdown", REST_API::shutdown);
 
     // Connect to Database
@@ -555,6 +658,66 @@ public:
 
     // Create graph
     vector<string> currencies = db->GetAllCurrencies();
+
+    //graph for past 10 days of data
+    map<long, unordered_map<string, double> > forexRateMap = db->GetCurrentForexDayRates();
+
+    std::cout<<"FOREX RATE LENGTH: "<<forexRateMap.size()<<std::endl;
+
+
+    REST_API::graphs = new map<long, Graph*>();
+
+    int counter = 0;
+    for(map<long, unordered_map<string, double> >::iterator itr = forexRateMap.begin(); itr != forexRateMap.end(); itr++){
+      if(counter%10==0){
+        std::cout<<"Initialized "<<counter<<" graphs of "<<forexRateMap.size()<<std::endl;
+      }
+
+      Graph *tmpG = new Graph(currencies, false);
+
+      // std::cout << "Made graph" << std::endl;
+      
+      //fill in rates
+      for (auto it = currencies.begin(); it != currencies.end(); ++it) {
+        //iterate through "to nodes"
+        for (auto it2 = currencies.begin(); it2 != currencies.end(); ++it2) {
+          //don't store reflex edges
+          if (*it != *it2) {
+            //all edges are initialized to infinity
+            double rate = -log(itr->second[*it+*it2+"=X"]);
+  //          cout << *it << " " << *it2 << " " << rate << endl;
+            tmpG->SetEdgeWeight(*it, *it2, rate);
+          }
+        }
+      }
+
+      tmpG->FindCycles("USD");
+      vector<Cycle>* cycles = tmpG->GetCycles();
+
+      cout << "\tFound " << cycles->size() << " cycles" << endl;
+
+      for (unsigned int i = 0; i < cycles->size(); ++i) {
+        double rate = (*cycles)[i].CalcRate(itr->second);
+  /*      cout << "Cycle " << i+1 << ", rate " << rate << endl;
+        vector<string>* cycle = (*cycles)[i].GetCycle();
+        for (unsigned int j = 0; j < cycle->size(); ++j) {
+          cout << "\t" << (*cycle)[j] << endl;
+        }
+  */    }
+      
+      //add to static class variable
+      (*REST_API::graphs)[itr->first] = tmpG;
+
+      // REST_API::graphs->insert(std::make_pair(itr->first, tmpG));
+
+      counter++;
+    }
+
+
+
+
+
+
 
     unordered_map<string, double> forexRates = db->GetForexRates();
 
@@ -644,8 +807,8 @@ public:
       vector<string>* cycle = (*cyclesBank)[i].GetCycle();
       for (unsigned int j = 0; j < cycle->size(); ++j) {
         cout << "\t" << (*cycle)[j] << endl;
-     }
-*/    }
+     } */
+    }
 
   }
 };
@@ -654,6 +817,7 @@ public:
 API *REST_API::db = NULL;
 Graph *REST_API::g = NULL;
 Graph *REST_API::gBank = NULL;
+map<long, Graph *> *REST_API::graphs = NULL;
 
 // Expose Node Module
 NODE_MODULE(addon, REST_API::init)
