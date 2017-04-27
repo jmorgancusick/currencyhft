@@ -68,12 +68,12 @@
         <!-- Only show optimal conversion and path when user clicks calculate -->  
         <div> 
           <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
-          <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | round 10 }} </h3>
-          <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | round 10 }} </h3>
-          <h2 v-if="shouldShow === true">Direct conversion: {{ regVal | round 2 }}</h2>
-          <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
-          <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
-          <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
+          <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | currency('',4) }} </h3>
+          <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | currency('',4) }} </h3>
+          <h2 v-if="shouldShow === true">Direct conversion: {{ regVal | currency('',2) }}</h2>
+          <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | currency('',2) }}</h2>
+          <h2 v-if="shouldShow === true">Profit: {{ profit | currency('',8) }}</h2>
+          <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | currency('',8) }}%</h2>
         </div>
       </el-col>
     </el-row>
@@ -177,7 +177,7 @@ export default {
       ifBank: '0',
       start: '',
       end: '', 
-      numEdges: null,
+      numEdges: 7,
       exclude: [],
       regRate: null,
       inputVal: null,

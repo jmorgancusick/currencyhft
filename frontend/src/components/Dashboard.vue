@@ -150,7 +150,7 @@ export default {
           values: _.map(this.chartData, (t) => {
             return {
               x: t.timestamp,
-              y: t.close
+              y: t.close.toFixed(4)
             }
           })
         },
@@ -160,7 +160,7 @@ export default {
           values: _.map(this.chartData, (t) => {
             return {
               x: t.timestamp,
-              y: t.high
+              y: t.high.toFixed(4)
             }
           })
         },
@@ -170,7 +170,7 @@ export default {
           values: _.map(this.chartData, (t) => {
             return {
               x: t.timestamp,
-              y: t.low
+              y: t.low.toFixed(4)
             }
           })
         }

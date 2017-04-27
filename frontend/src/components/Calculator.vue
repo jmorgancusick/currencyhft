@@ -29,7 +29,7 @@
     <el-row :gutter="20">
       <el-col :span="10" :offset="7">
         <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input style="padding: 15px;">
-        <h2 v-if="start !== null && end !== null && convertedVal !== 0"> {{inputVal}} {{start}} = {{ convertedVal }} {{end}} </h2>
+        <h2 v-if="start !== null && end !== null && convertedVal !== 0"> {{inputVal | currency('', 2)}} {{start}} = {{ convertedVal | currency('', 2) }} {{end}} </h2>
       </el-col>
     </el-row>   
     
