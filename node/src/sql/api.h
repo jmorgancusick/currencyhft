@@ -272,7 +272,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
       std::cout<< "end ts: "<<endTimestamp << std::endl;
 
       // Query MySQL
-      pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<=? and timestamp>? order by timestamp"));
+      pstmt.reset(con->prepareStatement("select * from "+table+" where ticker=? and timestamp<? and timestamp>=? order by timestamp"));
       pstmt->setString(1,ticker);
       pstmt->setInt(2,endTimestamp); 
       pstmt->setInt(3,startTimestamp);
@@ -488,7 +488,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
     std::cout<< "end ts: "<<endTimestamp << std::endl;
 
     try{
-      pstmt.reset(con->prepareStatement("select distinct timestamp from forexDashMinute where timestamp<=? and timestamp>? order by timestamp desc"));
+      pstmt.reset(con->prepareStatement("select distinct timestamp from forexDashMinute where timestamp<? and timestamp>=? order by timestamp desc"));
       pstmt->setInt(1,endTimestamp); 
       pstmt->setInt(2,startTimestamp);
 

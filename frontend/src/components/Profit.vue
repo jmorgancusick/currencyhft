@@ -6,8 +6,18 @@
         <el-col :span="20" :offset="2">
           <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
           <p>Daily Profit: {{dailyReturn * inputVal}}</p>
+          <p>Daily Return: {{dailyReturn*100}}%</p>
           <p>Yearly Profit: {{yearlyReturn * inputVal}}</p>
-          <p>Cycles: {{cycles}}</p>
+          <p>Yearly Return: {{yearlyReturn*100}}%</p>
+
+          <div style="width: 100%; height: 450px;">
+            <el-row :gutter="20">
+              <el-col :span="18" :offset="3">
+                <h3>Tickers</h3>
+                 <cycle v-for="cycle in cycles" :cycle="cycle"/>
+              </el-col>
+            </el-row>
+          </div>
         </el-col>
       </el-row>
     </div>
@@ -15,6 +25,8 @@
 </template>
 
 <script>
+import Cycle from './Cycle.vue';
+
 export default {
   name: 'profit',
   data () {
