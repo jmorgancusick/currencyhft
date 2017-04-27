@@ -4,8 +4,8 @@
     <el-row :gutter="20" style="margin-bottom: 10ps;">
       <el-col :span="20" :offset="2">
         <!-- Adds Forex or Banks Selection and Response-->
-        <el-radio class="radio" v-model="ifBank" label="1" @change="handleChange()">Forex</el-radio>
-        <el-radio class="radio" v-model="ifBank" label="2" @change="handleChange()">Banks</el-radio>
+        <el-radio class="radio" v-model="ifBank" label="0" @change="handleChange()">Forex</el-radio>
+        <el-radio class="radio" v-model="ifBank" label="1" @change="handleChange()">Banks</el-radio>
 
         <!-- Adds dropdown menus for Start and End currencies -->
         <!-- Start currency -->
@@ -37,7 +37,13 @@
           </el-option>
         </el-select>
 
-        <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()" style="margin-bottom: -13px;"></el-input-number>
+        <el-row>
+          <h3>Max Number of Edges in Path: </h3>
+          <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()"></el-input-number>
+
+          <h3>Number of Cycles to Display</h3>
+          <el-input-number v-model="numCycles" :min="1" :max="100" @change="handleChange()"></el-input-number>
+        </el-row>
       </el-col>
     </el-row>
 
@@ -58,12 +64,12 @@
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
     <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
     <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
+    <h2 v-if="shouldShow === true">{{numCycles}} Most Profitable Paths:</h2>
+    <h2 v-if="shouldShow === true">{{optCycles}}</h2>
   </div>
 </template>
 
 <script>
-
-
 export default {
   name: 'arbitrage',
   data () {
@@ -156,22 +162,27 @@ export default {
           value: 'USD',
           label: 'USD'
         }],
-      ifBank: 0,
+      type: 'forex',
+      ifBank: '0',
       start: '',
       end: '', 
       numEdges: null,
       exclude: [],
       regRate: null,
       inputVal: null,
-      apiData: null, 
+      apiData: null,
+      cyclesData: null,
+      cyclesArr: [],
+      numCycles: null,
       shouldShow: false
     }
   }, 
   methods: {
     fetchPath() {
       // formatting for string for 
-      var regStr = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
-      var arbStr = "http://localhost:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString();
+      var regStr = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
+      var arbStr = "http://currencyhft.com:3000/arbitrageData/" + this.start + "/" + this.end + "/" + this.numEdges.toString() + '/' + this.type;
+      var proStr = "http://currencyhft.com:3000/profitablePathsData/" + this.numCycles + "/" + this.type;
 
       // formatting for excluded array parameter
       var exclude = this.exclude;
@@ -187,6 +198,15 @@ export default {
       axios.get(arbStr).then( (response) => {
         console.log(response);
         this.apiData = response.data;
+      }).catch( (error) => {
+        console.log("ERROR:", error);
+      })
+
+      // fetching optimal cycles
+      axios.get(proStr).then( (response) => {
+        console.log(response);
+        this.cyclesData = response.data;
+        console.log(this.cyclesData);
         this.shouldShow = true;
       }).catch( (error) => {
         console.log("ERROR:", error);
@@ -199,10 +219,10 @@ export default {
       }).catch( (error) => {
         console.log("ERROR:", error);
       })
-
     }, 
     handleChange() {
       this.apiData = null;
+      this.cyclesData = null;
       this.shouldShow = false;
     },
     handleRadio() {
@@ -222,6 +242,22 @@ export default {
         }
       }
       return retStr;
+    },
+    optCycles() {
+      var retArr = [];
+      var retStr = "";
+      console.log(this.cyclesData)
+      if (this.cyclesData !== null){
+        for(var j = 0; j < this.cyclesData.length; j++){
+          retArr[j] = this.cyclesData[j];
+          retStr += j + ". ";
+          for(var k = 0; k < this.cyclesData[j].currencies.length; k++){
+            retStr += this.cyclesData
+          }
+        }
+      }
+      console.log(retStr);
+      return retArr;
     },
     optVal() {
       return this.optRate * this.inputVal;

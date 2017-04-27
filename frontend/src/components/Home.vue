@@ -3,14 +3,24 @@
     <div class="block">
     
       <!-- Carousel Banner -->
-      <el-carousel trigger="click">
-        <el-carousel-item v-for="item in 3">
-          <img src="../assets/temp-banner.svg">
-        </el-carousel-item>
-      </el-carousel>
+      <div class="bgimg">
+        <!--<img src="../assets/currency-green.svg">-->
+      </div>
+
+      <div style="height: 400px;">
+
+      </div>
+
+      <div class="secimg" style="margin-bottom: -50px;">
+        <!--<el-carousel trigger="click">
+          <el-carousel-item v-for="item in 3">
+            <img src="../assets/temp-banner.svg">
+          </el-carousel-item>
+        </el-carousel> -->
+      </div>
     </div>
     
-    <div id="img">
+    <div id="img" style="margin-bottom: 10px;">
       <img src="../assets/temp-logo.svg">
     </div>
 
@@ -46,6 +56,20 @@ methods
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.bgimg {
+  background-image: url('../assets/currency-green.svg');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  width: 100%;
+  height: 900px;
+}
+.secimg {
+  background-image: url('../assets/temp-banner.svg');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  width: 100%;
+  height: 500px;
+}
 .el-carousel__item {
   display: block;
   color: #475669;

@@ -112,7 +112,7 @@ export default {
         console.log('ready!');
 
         // api call formatting
-        var str = "http://localhost:3000/calculatorData/" + this.start + "/" + this.end;
+        var str = "http://currencyhft.com:3000/calculatorData/" + this.start + "/" + this.end;
 
         console.log(str);
 
