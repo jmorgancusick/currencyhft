@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h1>{{ msg }}</h1>
+    <h1 style="padding: 30px;">{{ msg }}</h1>
 
     <!-- Time range selectiong -->
     <el-row>
@@ -227,8 +227,10 @@ export default {
 .el-col {
   border-radius: 4px;
 }
-h1, h2 {
+h1 {
   font-weight: normal;
+  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
+  color: #0c5a2f;
 }
 
 ul {

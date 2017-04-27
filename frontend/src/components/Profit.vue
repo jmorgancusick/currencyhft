@@ -1,6 +1,7 @@
 <template>
   <div class="profit">
     <div style="height: 100%;">
+      <h1 style="padding: 30px;">Profits</h1>
       <el-row :gutter="20">
         <el-col :span="20" :offset="2">
           <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
@@ -55,8 +56,10 @@ export default {
 .el-col {
   padding: 25px;
 }
-h1, h2 {
+h1 {
   font-weight: normal;
+  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
+  color: #0c5a2f;
 }
 
 ul {

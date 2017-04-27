@@ -1,71 +1,74 @@
 <template>
   <div class="arbitrage" ref="arbitrage">
-    <h1> {{msg}} </h1>
-    <el-row :gutter="20" style="margin-bottom: 10ps;">
-      <el-col :span="20" :offset="2">
-        <!-- Adds Forex or Banks Selection and Response
-        <el-radio class="radio" v-model="ifBank" label="0" @change="handleRadio()">Forex</el-radio>
-        <el-radio class="radio" v-model="ifBank" label="1" @change="handleRadio()">Banks</el-radio> -->
+    <h1 style="padding: 30px;"> {{msg}} </h1>
+    <el-row :gutter="20" style="margin-bottom: 10px;">
+      <div style="align:left;">
+        <el-col :span="6" :offset="4">
+          <!-- Adds Forex or Banks Selection and Response
+          <el-radio class="radio" v-model="ifBank" label="0" @change="handleRadio()">Forex</el-radio>
+          <el-radio class="radio" v-model="ifBank" label="1" @change="handleRadio()">Banks</el-radio> -->
 
-        <!-- Adds dropdown menus for Start and End currencies -->
-        <!-- Start currency -->
-        <el-select v-model="start" placeholder="Start currency" @change="handleChange()">
-          <el-option
-            v-for="item in startCurrencies"
-            :label="item.label"
-            :value="item.value"
-            :disabled="item.disabled">
-          </el-option>
-        </el-select>
-        <!-- End currency -->
-        <el-select v-model="end" placeholder="End currency" @change="handleChange()">
-          <el-option
-            v-for="item in endCurrencies"
-            :label="item.label"
-            :value="item.value"
-            :disabled="item.disabled">
-          </el-option>
-        </el-select>
+          <!-- Adds dropdown menus for Start and End currencies -->
+          <!-- Start currency -->
+          <el-select v-model="start" placeholder="Start currency" @change="handleChange()" style="padding: 10px;">
+            <el-option
+              v-for="item in startCurrencies"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled">
+            </el-option>
+          </el-select>
+          <!-- End currency -->
+          <el-select v-model="end" placeholder="End currency" @change="handleChange()" style="padding: 10px;">
+            <el-option
+              v-for="item in endCurrencies"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled">
+            </el-option>
+          </el-select>
 
-        <!-- Multiple selections to exclude currencies -->
-        <el-select v-model="exclude" multiple placeholder="Exclude currencies" @change="handleChange()">
-          <el-option
-            v-for="item in excludeCurrencies"
-            :label="item.label"
-            :value="item.value"
-            :disabled="item.disabled">
-          </el-option>
-        </el-select>
+          <!-- Multiple selections to exclude currencies -->
+          <el-select v-model="exclude" multiple placeholder="Exclude currencies" @change="handleChange()" style="padding: 10px;">
+            <el-option
+              v-for="item in excludeCurrencies"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled">
+            </el-option>
+          </el-select>
 
-        <el-row>
-          <h3>Max Number of Edges in Path: </h3>
-          <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()"></el-input-number>
+          <el-row>
+            <!--<h3>Max Number of Edges in Path: </h3>-->
+            <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()"></el-input-number>
+          </el-row>
 
-          <!--<h3>Number of Cycles to Display</h3>
-          <el-input-number v-model="numCycles" :min="1" :max="100" @change="handleChange()"></el-input-number>-->
-        </el-row>
+          <!-- Input field for amount and calculate button-->
+          <el-row>
+            <el-col>
+              <el-input v-model="inputVal" placeholder="Enter amount..." style="padding: 10px;"></el-input>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="20">
+            <el-button @click="fetchPath()">Calculate</el-button>
+          </el-row>
+        </el-col>
+      </div>
+
+      <el-col :span="6" :offset="14" >
+        <!-- Only show optimal conversion and path when user clicks calculate -->  
+        <div style="text-align:left;"> 
+          <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
+          <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | round 10 }} </h3>
+          <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | round 10 }} </h3>
+          <h2 v-if="shouldShow === true">Direct conversion: {{ regVal | round 2 }}</h2>
+          <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
+          <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
+          <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
+        </div>
       </el-col>
     </el-row>
-
-    <!-- Input field for amount and calculate button-->
-    <el-row :gutter="20">
-      <el-col :span="20" :offset="2">
-        <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-      </el-col>
-    </el-row>
-
-    <el-button @click="fetchPath()">Calculate</el-button>
-
-    <!-- Only show optimal conversion and path when user clicks calculate -->   
-    <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
-    <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | round 10 }} </h3>
-    <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | round 10 }} </h3>
-    <h2 v-if="shouldShow === true">Direct conversion: {{ regVal | round 2 }}</h2>
-    <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
-    <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
-    <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
-    <!--<h2 v-if="shouldShow === true">{{numCycles}} Most Profitable Paths:</h2>
-    <h2 v-if="shouldShow === true">{{optCycles}}</h2>-->
   </div>
 </template>
 
@@ -290,8 +293,10 @@ export default {
   box-sizing: border-box;
 }
 
-h1, h2 {
+h1{
   font-weight: normal;
+  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
+  color: #0c5a2f;
 }
 
 ul {

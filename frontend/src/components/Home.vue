@@ -4,9 +4,13 @@
     
       <!-- Carousel Banner -->
       <div class="bgimg">
-        <div class="title">
-          <h1>Currency Exchange</h1>
-        </div>
+        <el-row :gutter="20">
+          <el-col :span="20" :offset="2">
+            <div class="title">
+              <h1>Currency Exchange</h1>
+            </div>
+          </el-col>
+        </el-row>
         <!--<img src="../assets/currency-green.svg">-->
       </div>
 
@@ -68,15 +72,8 @@ methods
   height: 900px;
 }
 .title {
-  padding: 30px;
-  margin: auto;
-  top: 100;
-  bottom:0;
-  right: 0;
-  left: 0;
-  width: 1000px;
-  display: inline-block;
-  position: absolute;
+  margin-top: 495px;
+  opacity: 0.75;
 }
 .secimg {
   background-image: url('../assets/temp-banner.svg');
@@ -98,10 +95,14 @@ methods
   height: 10px;
 }
 h1 {
-  font-size: 80px;
+  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
+  font-size: 60px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 26.4px;
   color: white;
   text-align: center;
-  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
 }
 h2 {
   font-weight: normal;

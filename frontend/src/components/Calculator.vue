@@ -1,6 +1,6 @@
 <template>
   <div class="calculator">
-    <h1>{{ msg }}</h1>
+    <h1 style="padding: 30px;">{{ msg }}</h1>
 
     <!-- Adds dropdown menus for Start and End currencies -->
     <!-- Start -->
@@ -160,8 +160,10 @@ export default {
   position:relative;
   height: 830px;
 }
-h1, h2 {
+h1 {
   font-weight: normal;
+  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
+  color: #0c5a2f;
 }
 
 ul {
