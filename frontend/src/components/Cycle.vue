@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import d3 from 'd3';
+
 export default {
   name: 'cycle',
   data () {
@@ -27,11 +29,17 @@ export default {
   created () {
     // sets ticker data object values from props
     console.log(this.cycle);
-    this.timestamp = this.cycle.timestamp;
-    this.rate = this.cycle.rate.toFixed(8);
+
+    this.timestamp = d3.time.format.utc('%I:%M %p')(new Date(this.cycle.timestamp*1000))
+
+
+    this.rate = this.cycle.rate-1
+    this.rate = this.rate.toFixed(8)
+
+
     var currencyStr = "";
     for(var i = 0; i < this.cycle.currencies.length; i++){
-      retStr+=this.cycle.currencies[i];
+      currencyStr+=this.cycle.currencies[i];
       if(i !== this.cycle.currencies.length-1){
         currencyStr+=" -> "
       }

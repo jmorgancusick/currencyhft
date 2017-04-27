@@ -5,10 +5,10 @@
       <el-row :gutter="20">
         <el-col :span="20" :offset="2">
           <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-          <p>Daily Profit: {{dailyReturn * inputVal}}</p>
-          <p>Daily Return: {{dailyReturn*100}}%</p>
-          <p>Yearly Profit: {{yearlyReturn * inputVal}}</p>
-          <p>Yearly Return: {{yearlyReturn*100}}%</p>
+          <p>Daily Profit: {{dailyReturn * inputVal | currency('$', 2)}}</p>
+          <p>Daily Return: {{dailyReturn*100 | currency('', 4) }}%</p>
+          <p>Yearly Profit: {{yearlyReturn * inputVal | currency('$', 2)}}</p>
+          <p>Yearly Return: {{yearlyReturn*100 | currency('', 4)}}%</p>
 
           <div style="width: 100%; height: 450px;">
             <el-row :gutter="20">
@@ -46,8 +46,8 @@ export default {
     axios.get("http://currencyhft.com:3000/dailyArbitrage/").then( (response) => {
       console.log(response)
       this.dailyData = response.data;
-      this.dailyReturn = this.dailyData.dailyReturn;
-      this.yearlyReturn = this.dailyData.yearlyReturn;
+      this.dailyReturn = this.dailyData.dailyReturn.toFixed(6);   //multiplied by 100, yields 4 decimal points
+      this.yearlyReturn = this.dailyData.yearlyReturn.toFixed(6); //multiplied by 100, yields 4 decimal points
       this.cycles = this.dailyData.cycles;
       console.log("Got Daily:", this.dailyReturn);
       console.log("Got Yearly:", this.yearlyReturn);
