@@ -63,7 +63,7 @@ export default {
 .profit {
   margin:0;
   padding:0;
-  min-height: 100%;
+  min-height: 900px;
   height: 100%;
   box-sizing: border-box;
 }
