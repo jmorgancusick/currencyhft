@@ -203,15 +203,17 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
       if(timeframe == "1d"){           // 1 min interval
         table = "forexDashMinute";
 
-        // Initialize days object with 1 day                                   
-        subDays = 1;
+        // Initialize days object with 1 day   
+        //TODO: change back to 1                                
+        subDays = 2;
 
 
       } else if(timeframe == "5d"){    // 5 min interval
         table = "forexDashMinute";
 
-        // Initialize days object with 5 days                                   
-        subDays = 5;
+        // Initialize days object with 5 days 
+        //TODO: change back to 5                                  
+        subDays = 6;
 
 
       } else if(timeframe == "ytd"){   // 1 day interval
@@ -382,6 +384,141 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
     }
     return rates;
   }
+
+  //retrieves all forex rates (close) at time
+  unordered_map<string, double> GetForexDayRates(long timestamp) {
+    unordered_map<string, double> rates;
+    try{
+      pstmt.reset(con->prepareStatement("select ticker, close from forexDashDaily where timestamp=?"));
+      pstmt->setString(1,std::to_string(timestamp));
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        string ticker = res->getString("ticker");
+        double rate = res->getDouble("close");
+        rates[ticker] = rate;
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rates;
+  }
+
+
+  //retrieves all forex rates (close) at time
+  unordered_map<string, double> GetForexMinRates(long timestamp) {
+    unordered_map<string, double> rates;
+    try{
+      pstmt.reset(con->prepareStatement("select ticker, close from forexDashMinute where timestamp=?"));
+      pstmt->setString(1,std::to_string(timestamp));
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        string ticker = res->getString("ticker");
+        double rate = res->getDouble("close");
+        rates[ticker] = rate;
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+    return rates;
+  }
+
+
+  //retrieves all forex rates from day db
+  map< long, unordered_map<string, double> > GetRecentForexDayRates(unsigned int numDays) {
+    map<long, unordered_map<string, double> > dayRates;
+
+    vector<long> timestamps;
+
+    try{
+      pstmt.reset(con->prepareStatement("select distinct timestamp from forexDashDaily order by timestamp desc limit ?"));
+      pstmt->setString(1, std::to_string(numDays));
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        timestamps.push_back(res->getInt("timestamp"));
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+
+    //reverse order, put oldest data in index 0 (newest timestamp is in last index)
+    for(int i = timestamps.size()-1; i >= 0; i--){
+      unordered_map<string, double> rates = GetForexDayRates(timestamps[i]);
+      dayRates[timestamps[i]] = rates;
+    }
+
+
+
+    return dayRates;
+  }
+
+
+  //retrieves all forex rates from minute db
+  map< long, unordered_map<string, double> > GetCurrentForexDayRates() {
+    map<long, unordered_map<string, double> > dayRates;
+    vector<long> timestamps;
+
+    //get todays date
+    boost::gregorian::date endDate(boost::gregorian::day_clock::universal_day());
+    //start date (init before subtracting)
+    boost::gregorian::date startDate(endDate);
+
+    // Calculate start date
+    // TODO: CHANGE BACK TO ONE DAY
+    boost::gregorian::days daysObj(2);
+    startDate = startDate - daysObj;
+
+    std::cout<<"Start Date: " << startDate << std::endl;
+    std::cout<<"End Date: " << endDate << std::endl;
+
+    // Convert to POSIX
+    boost::posix_time::ptime const time_epoch(boost::gregorian::date(1970, 1, 1));
+    boost::posix_time::ptime startTimePOSIX(startDate);
+    boost::posix_time::ptime endTimePOSIX(endDate);
+
+    auto startTimestamp = (startTimePOSIX-time_epoch).total_seconds();
+    auto endTimestamp = (endTimePOSIX-time_epoch).total_seconds();
+
+    std::cout<< "start ts: "<< startTimestamp << std::endl;
+    std::cout<< "end ts: "<<endTimestamp << std::endl;
+
+    try{
+      pstmt.reset(con->prepareStatement("select distinct timestamp from forexDashMinute where timestamp<=? and timestamp>? order by timestamp desc"));
+      pstmt->setInt(1,endTimestamp); 
+      pstmt->setInt(2,startTimestamp);
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        timestamps.push_back(res->getInt("timestamp"));
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+
+    std::cout<< "timestamps length: "<<timestamps.size()<<std::endl;
+
+    //reverse order, put oldest data in index 0 (newest timestamp is in last index)
+    for(int i = timestamps.size()-1; i >= 0; i--){
+      unordered_map<string, double> rates = GetForexMinRates(timestamps[i]);
+      dayRates[timestamps[i]] = rates;
+      if(i%10 == 0){
+        std::cout<<"queried "<<i<<" of "<<timestamps.size()<<std::endl;
+      }
+    }
+
+
+
+    return dayRates;
+  }
+
+
+
 
   //retrieves bank rate of two currencies
   double GetBankRate(const string& start, const string& end, const string& bank) {
