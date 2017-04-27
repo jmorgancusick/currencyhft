@@ -1,19 +1,19 @@
 <template>
   <div class="profit">
     <div style="height: 100%;">
-      <h1 style="padding: 30px;">Profits</h1>
+      <h1 style="padding: 30px; margin-bottom: -10px;">Profits</h1>
       <el-row :gutter="20">
-        <el-col :span="20" :offset="2">
+        <el-col :span="18" :offset="3">
           <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-          <p>Daily Profit: {{dailyReturn * inputVal | currency('$', 2)}}</p>
-          <p>Daily Return: {{dailyReturn*100 | currency('', 4) }}%</p>
-          <p>Yearly Profit: {{yearlyReturn * inputVal | currency('$', 2)}}</p>
-          <p>Yearly Return: {{yearlyReturn*100 | currency('', 4)}}%</p>
+          <h3>Daily Profit: {{dailyReturn * inputVal | currency('$', 2)}}</h3>
+          <h3>Daily Return: {{dailyReturn*100 | currency('', 4) }}%</h3>
+          <h3>Yearly Profit: {{yearlyReturn * inputVal | currency('$', 2)}}</h3>
+          <h3>Yearly Return: {{yearlyReturn*100 | currency('', 4)}}%</h3>
 
           <div style="width: 100%; height: 450px;">
             <el-row :gutter="20">
               <el-col :span="18" :offset="3">
-                <h3>Cycles</h3>
+                <h2><strong>Cycles</strong></h2>
                  <cycle v-for="cycle in cycles" :cycle="cycle"/>
               </el-col>
             </el-row>
@@ -87,7 +87,7 @@ li {
   margin: 0 10px;
 }
 
-a {
+a, h2 {
   color: #42b983;
 }
 </style>

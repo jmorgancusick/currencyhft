@@ -7,15 +7,36 @@
         <el-row :gutter="20">
           <el-col :span="20" :offset="2">
             <div class="title">
+              <img src="../assets/logo-currency.png" style="margin-bottom: 30px;">
               <h1>Currency Exchange</h1>
             </div>
           </el-col>
         </el-row>
-        <!--<img src="../assets/currency-green.svg">-->
+        <!--<img src="../assets/currency-green.svg">--> 
       </div>
-
+  
       <div style="height: 400px;">
+        <div style="margin-top: 40px;">
+        <el-row :gutter="20">
+          <el-col :span="4" :offset="3">
+            <div>
+              <p>CurrencyHFT is a web application that aims to capture the small arbitrage opportunities that might exist among different currency exchange rates. This investigative software reveals what profits could be made using triangular arbitrage in the Foreign Exchange Market.</p>
+            </div>
+          </el-col>
 
+          <el-col :span="4" :offset="3">
+            <div>
+              <p>The Foreign Exchange Market (FOREX) is a global decentralized marketplace in which the world's currencies are exchanged. It is the largest and most liquid market, with trading exceeding trillions of dollars each day.</p>
+            </div>
+          </el-col>
+
+          <el-col :span="4" :offset="3">
+            <div>
+              <p>CurrencyHFT is an open source project created for Rensselaer Polytechnic Institute's Software Design and Documentation course. The development team includes: Matthew Cordone, John Cusick, Patrick Engelsman, James Nakashian and Ayushi Mishra. </p>
+            </div>
+          </el-col>
+        </el-row>
+        </div>
       </div>
 
       <div class="secimg" style="margin-bottom: -50px;">
@@ -72,8 +93,8 @@ methods
   height: 900px;
 }
 .title {
-  margin-top: 495px;
-  opacity: 0.75;
+  margin-top: 350px;
+  opacity: 0.70;
 }
 .secimg {
   background-image: url('../assets/temp-banner.svg');
@@ -93,6 +114,15 @@ methods
   margin: auto;
   width: 15%; 
   height: 10px;
+}
+p {
+  font-size: 14px;
+  font-style: normal;
+  font-variant: normal;
+  color:#0c5a2f;
+  line-height: 30px;
+  text-align: justify;
+  text-justify: inter-word;
 }
 h1 {
   font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;

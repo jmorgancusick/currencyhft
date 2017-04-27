@@ -4,9 +4,11 @@
     <el-row :gutter="20" style="margin-bottom: 10px;">
       <el-col :span="16" :offset="4">
         <div style="align:left;">
+          <el-row>
           <!-- Adds Forex or Banks Selection and Response
           <el-radio class="radio" v-model="ifBank" label="0" @change="handleRadio()">Forex</el-radio>
           <el-radio class="radio" v-model="ifBank" label="1" @change="handleRadio()">Banks</el-radio> -->
+          </el-row>
 
           <!-- Adds dropdown menus for Start and End currencies -->
           <!-- Start currency -->
