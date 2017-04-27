@@ -14,7 +14,6 @@
       </el-tabs>
     </el-row>
 
-
     <!-- Chart -->
     <el-row>
       <div style="align:left;">
@@ -28,32 +27,38 @@
     </el-row>
 
     <!-- Adds dropdown menus for Start and End currencies -->
-    <el-row>
-      <!-- Start -->
-      <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
-        <el-option
-          v-for="item in startOptions"
-          :label="item.label"
-          :value="item.value"
-          :disabled="item.disabled">
-        </el-option>
-      </el-select>
-      <!-- End -->
-      <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
-        <el-option
-          v-for="item in endOptions"
-          :label="item.label"
-          :value="item.value"
-          :disabled="item.disabled">
-        </el-option>
-      </el-select>
-    </el-row>
+    <div style="height: 100px;">
+      <el-row>
+        <!-- Start -->
+        <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
+          <el-option
+            v-for="item in startOptions"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
+        <!-- End -->
+        <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
+          <el-option
+            v-for="item in endOptions"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
+      </el-row>
+    </div>
 
     <!-- Ticker data -->
-    <el-row>
-      <h3>Tickers</h3>
-      <ticker v-for="ticker in tickers" :ticker="ticker" />
-    </el-row>
+    <div style="width: 100%; height: 450px;">
+      <el-row :gutter="20">
+        <el-col :span="18" :offset="3">
+          <h3>Tickers</h3>
+          <ticker v-for="ticker in tickers" :ticker="ticker"/>
+        </el-col>
+      </el-row>
+    </div>
 
   </div>
 </template>

@@ -3,9 +3,9 @@
     <h1> {{msg}} </h1>
     <el-row :gutter="20" style="margin-bottom: 10ps;">
       <el-col :span="20" :offset="2">
-        <!-- Adds Forex or Banks Selection and Response-->
-        <el-radio class="radio" v-model="ifBank" label="0" @change="handleChange()">Forex</el-radio>
-        <el-radio class="radio" v-model="ifBank" label="1" @change="handleChange()">Banks</el-radio>
+        <!-- Adds Forex or Banks Selection and Response
+        <el-radio class="radio" v-model="ifBank" label="0" @change="handleRadio()">Forex</el-radio>
+        <el-radio class="radio" v-model="ifBank" label="1" @change="handleRadio()">Banks</el-radio> -->
 
         <!-- Adds dropdown menus for Start and End currencies -->
         <!-- Start currency -->
@@ -41,8 +41,8 @@
           <h3>Max Number of Edges in Path: </h3>
           <el-input-number v-model="numEdges" :min="1" :max="7" @change="handleChange()"></el-input-number>
 
-          <h3>Number of Cycles to Display</h3>
-          <el-input-number v-model="numCycles" :min="1" :max="100" @change="handleChange()"></el-input-number>
+          <!--<h3>Number of Cycles to Display</h3>
+          <el-input-number v-model="numCycles" :min="1" :max="100" @change="handleChange()"></el-input-number>-->
         </el-row>
       </el-col>
     </el-row>
@@ -64,8 +64,8 @@
     <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | round 2 }}</h2>
     <h2 v-if="shouldShow === true">Profit: {{ profit | round 4 }}</h2>
     <h2 v-if="shouldShow === true">Percent Return: {{ percReturn | round 4 }}%</h2>
-    <h2 v-if="shouldShow === true">{{numCycles}} Most Profitable Paths:</h2>
-    <h2 v-if="shouldShow === true">{{optCycles}}</h2>
+    <!--<h2 v-if="shouldShow === true">{{numCycles}} Most Profitable Paths:</h2>
+    <h2 v-if="shouldShow === true">{{optCycles}}</h2>-->
   </div>
 </template>
 
@@ -197,20 +197,21 @@ export default {
       // fetching optimal rate
       axios.get(arbStr).then( (response) => {
         console.log(response);
+        this.shouldShow = true;
         this.apiData = response.data;
       }).catch( (error) => {
         console.log("ERROR:", error);
       })
 
       // fetching optimal cycles
-      axios.get(proStr).then( (response) => {
+      /*axios.get(proStr).then( (response) => {
         console.log(response);
         this.cyclesData = response.data;
         console.log(this.cyclesData);
-        this.shouldShow = true;
+        //this.shouldShow = true;
       }).catch( (error) => {
         console.log("ERROR:", error);
-      })
+      })*/
 
       // fetching regualer rate
       axios.get(regStr).then( (response) => {
@@ -281,6 +282,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.arbitrage{
+  margin:0;
+  padding:0;
+  min-height: 100%;
+  height: 830px;
+  box-sizing: border-box;
+}
+
 h1, h2 {
   font-weight: normal;
 }

@@ -2,8 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
 import Dashboard from '@/components/Dashboard'
-import Arbitrage from '@/components/Arbitrage'
 import Calculator from '@/components/Calculator'
+import Arbitrage from '@/components/Arbitrage'
+import Profit from '@/components/Profit'
 
 Vue.use(Router)
 
@@ -21,15 +22,20 @@ export default new Router({
       name: 'dashboard',
       component: Dashboard
     }, 
-    { 
-      path: '/arbitrage',
-      name: 'arbitrage',
-      component: Arbitrage
-    }, 
     {
       path: '/calculator',
       name: 'calculator',
       component: Calculator
+    }, 
+    { 
+      path: '/arbitrage',
+      name: 'arbitrage',
+      component: Arbitrage
+    },
+    {
+      path: '/profit',
+      name: 'profit',
+      component: Profit
     }
   ]
 })
