@@ -13,7 +13,7 @@
           <div style="width: 100%; height: 450px;">
             <el-row :gutter="20">
               <el-col :span="18" :offset="3">
-                <h3>Tickers</h3>
+                <h3>Cycles</h3>
                  <cycle v-for="cycle in cycles" :cycle="cycle"/>
               </el-col>
             </el-row>

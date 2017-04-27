@@ -1,5 +1,5 @@
 <template>
-  <div class="ticker">
+  <div class="cycle">
     <div id="textbox">
       <el-col :span="4">
         <!-- Data displayed for each ticker -->
