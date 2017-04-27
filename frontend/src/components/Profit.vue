@@ -10,14 +10,16 @@
           <h3>Yearly Profit: {{yearlyReturn * inputVal | currency('$', 2)}}</h3>
           <h3>Yearly Return: {{yearlyReturn*100 | currency('', 4)}}%</h3>
         </el-col>
-        <div style="width: 100%; height: 450px;">
-          <el-row :gutter="20">
-            <el-col :span="22" :offset="1">
-              <h2><strong>Cycles</strong></h2>
-               <cycle v-for="cycle in cycles" :cycle="cycle"/>
-            </el-col>
-          </el-row>
-        </div>
+        <el-col>
+          <div style="width: 100%; height: 450px;">
+            <el-row :gutter="20">
+              <el-col :span="22" :offset="1">
+                <h2><strong>Cycles</strong></h2>
+                 <cycle v-for="cycle in cycles" :cycle="cycle"/>
+              </el-col>
+            </el-row>
+          </div>
+        </el-col>
       </el-row>
     </div>
   </div>
