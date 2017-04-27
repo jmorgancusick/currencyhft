@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h1 style="padding: 30px;">{{ msg }}</h1>
+    <h1 style="padding: 30px; margin-bottom: -10px;">{{ msg }}</h1>
 
     <!-- Time range selectiong -->
     <el-row>
