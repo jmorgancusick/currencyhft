@@ -68,8 +68,8 @@
         <!-- Only show optimal conversion and path when user clicks calculate -->  
         <div> 
           <h2 v-if="shouldShow === true">Path: {{ optPath }} </h2>
-          <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | currency('',4) }} </h3>
-          <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | currency('',4) }} </h3>
+          <h3 v-if="shouldShow === true">Direct Rate: {{ regRate | currency('',8) }} </h3>
+          <h3 v-if="shouldShow === true">Optimal Rate: {{ optRate | currency('',8) }} </h3>
           <h2 v-if="shouldShow === true">Direct conversion: {{ regVal | currency('',2) }}</h2>
           <h2 v-if="shouldShow === true">Optimal conversion: {{ optVal | currency('',2) }}</h2>
           <h2 v-if="shouldShow === true">Profit: {{ profit | currency('',8) }}</h2>
