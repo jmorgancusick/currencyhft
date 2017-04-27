@@ -3,14 +3,12 @@
     <div id="textbox">
       <el-col :span="4">
         <!-- Data displayed for each ticker -->
-        <el-button style="width: 150px;">
           <p style="text-align:left;"> {{ timestamp }} {{ rate }}
 
           <span class="percentChange" style="float:right;">
             <strong>{{ currencies}}</strong>
           </span>
           </p>
-        </el-button>
       </el-col>
     </div>
   </div>

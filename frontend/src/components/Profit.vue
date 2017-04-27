@@ -38,6 +38,9 @@ export default {
       cycles:[]
     }
   },
+  components: {
+      Cycle
+  },
   created () {
     // call for the Daily Arbitrage most profitable paths
     axios.get("http://currencyhft.com:3000/dailyArbitrage/").then( (response) => {

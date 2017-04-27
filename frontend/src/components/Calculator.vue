@@ -4,7 +4,7 @@
 
     <!-- Adds dropdown menus for Start and End currencies -->
     <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
+    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()" style="padding: 10px;">
       <el-option
         v-for="item in startCurrencies"
         :label="item.label"
@@ -14,7 +14,7 @@
     </el-select>
 
     <!-- End -->
-    <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
+    <el-select v-model="end" placeholder="End currency" @change="handleSelect()" style="padding: 10px;">
       <el-option
         v-for="item in endCurrencies"
         :label="item.label"
@@ -25,8 +25,8 @@
 
     <!-- Input field for amount --> 
     <el-row :gutter="20">
-      <el-col :span="20" :offset="2">
-        <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input>
+      <el-col :span="10" :offset="7">
+        <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input style="padding: 10px;">
         <h2 v-if="start !== null && end !== null && convertedVal !== 0"> {{inputVal}} {{start}} = {{ convertedVal }} {{end}} </h2>
       </el-col>
     </el-row>   
