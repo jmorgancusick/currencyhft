@@ -23,9 +23,14 @@
       </el-option>
     </el-select>
 
-    <!-- Input field for amount -->    
-    <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input>
-    <h2> Conversion: {{ convertedVal }} {{end}} </h2>
+    <!-- Input field for amount --> 
+    <el-row :gutter="20">
+      <el-col :span="20" :offset="2">
+        <el-input v-model="inputVal" placeholder="Enter amount..." @change="handleSelect()"></el-input>
+        <h2 v-if="start !== null && end !== null && convertedVal !== 0"> {{inputVal}} {{start}} = {{ convertedVal }} {{end}} </h2>
+      </el-col>
+    </el-row>   
+    
 
   </div>
 </template>
@@ -94,12 +99,14 @@ export default {
         value: 'USD',
         label: 'USD'
       }],
-      start: '',
-      end: '', 
+      start: null,
+      end: null, 
       inputVal: '',
+      startVal: 1,
       apiData: null,
       rate: null,
-      convertedVal: 0
+      convertedVal: 0,
+      shouldShow: false
     }
   },
   methods: {
@@ -108,7 +115,7 @@ export default {
       this.nicemsg = 'You are awesome!!';
     },
     handleSelect() {
-      if (this.start !== '' && this.end !== '') {
+      if (this.start !== null && this.end !== null) {
         console.log('ready!');
 
         // api call formatting
@@ -120,17 +127,20 @@ export default {
         axios.get(str).then( (response) => {
           console.log(response);
           this.apiData = response.data;
+          this.shouldShow = true;
         }).catch( (error) => {
           console.log("ERROR:", error);
         })
 
         // seting data object values from api call
         this.rate = this.apiData.rate;
-        this.convertedVal = this.inputVal * this.rate;
+        this.startVal = this.inputVal;
+        this.convertedVal = this.startVal * this.rate;
       }
     }, 
     handleInput() {
-      this.convertedVal = this.inputVal * this.rate;
+      this.startVal = this.inputVal;
+      this.convertedVal = this.startVal * this.rate;
     }
   },
   computed: {

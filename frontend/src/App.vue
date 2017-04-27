@@ -82,6 +82,9 @@ footer {
   width:100%;
   background-color:#EEF6F1;
 }
+.uk-link, a {
+  color: #42b983;
+}
 a:link{
   text-decoration: none;
   color: #42b983;

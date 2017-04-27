@@ -1,11 +1,15 @@
 <template>
   <div class="profit">
-    <el-row :gutter="20">
-      <el-col :span="20" :offset="2">
-        <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
-        <p>{{dailyData}}</p>
-      </el-col>
-    </el-row>
+    <div style="height: 100%;">
+      <el-row :gutter="20">
+        <el-col :span="20" :offset="2">
+          <el-input v-model="inputVal" placeholder="Enter amount..."></el-input>
+          <p>Daily Profit: {{dailyReturn * inputVal}}</p>
+          <p>Yearly Profit: {{yearlyReturn * inputVal}}</p>
+          <p>Cycles: {{cycles}}</p>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -14,8 +18,11 @@ export default {
   name: 'profit',
   data () {
     return {
-      inputVal: null, 
-      dailyData: null
+      inputVal: 1, 
+      dailyData: null,
+      dailyReturn: null,
+      yearlyReturn: null,
+      cycles:[]
     }
   },
   created () {
@@ -23,6 +30,12 @@ export default {
     axios.get("http://currencyhft.com:3000/dailyArbitrage/").then( (response) => {
       console.log(response)
       this.dailyData = response.data;
+      this.dailyReturn = this.dailyData.dailyReturn;
+      this.yearlyReturn = this.dailyData.yearlyReturn;
+      this.cycles = this.dailyData.cycles;
+      console.log("Got Daily:", this.dailyReturn);
+      console.log("Got Yearly:", this.yearlyReturn);
+      console.log("Got Cycles:", this.cycles);
     }).catch( (error) => {
       console.log("ERROR:", error)
     })

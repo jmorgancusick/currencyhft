@@ -7,7 +7,7 @@
           <p style="text-align:left;"> {{ id }} {{ space }}
 
           <span class="percentChange" style="float:right;">
-            {{ percentChange }}
+            <strong>{{ percentChange }}</strong>
           </span>
           </p>
         </el-button>
