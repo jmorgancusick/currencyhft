@@ -1,10 +1,9 @@
 #include "cycle.h"
-#include "sql/api.h"
 
 using namespace std;
 
 //construct cycles based on a mapping of nodes
-Cycle::Cycle(const unordered_map<string, string>& path) {
+Cycle::Cycle(const unordered_map<string, string>& path, bool bankFlag) {
   unsigned int size = path.size();
   vector<string> keys;
   keys.reserve(size);
@@ -29,15 +28,17 @@ Cycle::Cycle(const unordered_map<string, string>& path) {
     current = (*(path.find(current))).second;
     cycle.push_back(current);
   }
+
+  bank = bankFlag;
 }
 
 //construct cycles based on a vector of nodes
-Cycle::Cycle(const vector<string>& path) {
+Cycle::Cycle(const vector<string>& path, bool bankFlag) {
   unsigned int size = path.size();
   cycle.reserve(size);
 
   //find the first node in alphanumerical order
-  int start = 0;
+  unsigned int start = 0;
   for (unsigned int i = 1; i < size; ++i) {
     if (path[i] < path[start]) {
       start = i;
@@ -52,6 +53,8 @@ Cycle::Cycle(const vector<string>& path) {
   for (unsigned int i = 0; i < start; ++i) {
     cycle.push_back(path[i]);
   }
+
+  bank = bankFlag;
 }
 
 //check if a mapping of nodes is equivalent to this cycle
@@ -110,10 +113,7 @@ bool Cycle::CheckEquivalent(Cycle& other) {
 }
 
 //calculates the total rate of one loop of the cycle, from start node back to itself
-double Cycle::CalcRate() {
-  API *db = new API();
-  int retVal = db->connect();
-
+double Cycle::CalcRate(API *db) {
   auto itrTo = cycle.begin();
   ++itrTo;
   auto itrFrom = cycle.begin();
@@ -121,24 +121,63 @@ double Cycle::CalcRate() {
   double totalRate = 1;
 
   while (itrTo != cycle.end()) {
-    totalRate *= db->GetForexRate(*itrFrom+*itrTo+"=X");
+    //choose appropriate rates for bank or forex
+    if (bank) {
+      totalRate *= db->GetBankRate((*itrFrom).substr(0,3),(*itrTo).substr(0,3),(*itrTo).substr(3,3));
+    }
+    else {
+      totalRate *= db->GetForexRate(*itrFrom+*itrTo+"=X");
+    }
     ++itrTo;
     ++itrFrom;
   }
 
-  totalRate *= db->GetForexRate(*itrFrom+*cycle.begin()+"=X");
+  if (bank) {
+    totalRate *= db->GetBankRate((*itrFrom).substr(0,3),(*cycle.begin()).substr(0,3),(*cycle.begin()).substr(3,3));
+  }
+  else {
+    totalRate *= db->GetForexRate(*itrFrom+*cycle.begin()+"=X");
+  }
+
   rate = totalRate;
-  delete db;
   return totalRate;
 }
 
-void Cycle::UpdateDatabase() const {
+double Cycle::CalcRate(unordered_map<string, double>& rates) {
+    auto itrTo = cycle.begin();
+  ++itrTo;
+  auto itrFrom = cycle.begin();
+
+  double totalRate = 1;
+
+  while (itrTo != cycle.end()) {
+    //choose appropriate rates for bank or forex
+    if (bank) {
+      totalRate *= rates[(*itrFrom).substr(0,3)+(*itrTo).substr(0,3)+(*itrTo).substr(3,3)];
+    }
+    else {
+      totalRate *= rates[*itrFrom+*itrTo+"=X"];
+    }
+    ++itrTo;
+    ++itrFrom;
+  }
+
+  if (bank) {
+    totalRate *= rates[(*itrFrom).substr(0,3)+(*cycle.begin()).substr(0,3)+(*cycle.begin()).substr(3,3)];
+  }
+  else {
+    totalRate *= rates[*itrFrom+*cycle.begin()+"=X"];
+  }
+
+  rate = totalRate;
+  return totalRate;
+}
+
+void Cycle::UpdateDatabase(API *db) const {
   string expath = cycle[0];
   for (unsigned int j = 1; j < cycle.size(); ++j) {
     expath += "|" + cycle[j];
   }
-  API *db = new API();
-  int retVal = db->connect();
+  cout << GetTotalRate() << " " << expath << endl;
   db->UpdateProfitablePath(expath, cycle.size(), GetTotalRate());
-  delete db;
 }

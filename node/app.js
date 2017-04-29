@@ -74,28 +74,36 @@ app.get('/tickerData/', function(req, res) {
 
 // Return high, low and close exchange rates for single ticker over a period of time.
 // This data is used to populate the Dashboard chart
-app.get('/chartData/:ticker/:timeframe/:startDate/:endDate', function(req, res) {
+app.get('/chartData/:ticker/:timeframe', function(req, res) {
     console.log("chart data endpoint");
 
-    ret = addon.chartData(req.params.ticker,req.params.timeframe,req.params.startDate,req.params.endDate);
+    ret = addon.chartData(req.params.ticker,req.params.timeframe);
 
     res.send(ret);
 });
 
 // Run the shortest path algorithm and return the most profitable path between two currencies
 // and return the most profitable exchange rate using said path
-app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges', function(req, res) {
+app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges/:bankRate', function(req, res) {
     console.log("arbitrage data endpoint");
 
     if (req.query.exclude === undefined){
         req.query.exclude = [];
     }
 
-    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.maxNumberExchanges, req.query.exclude);
+    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.maxNumberExchanges, req.query.exclude, req.params.bankRate);
 
     res.send(ret);
 });
 
+// Returns the profitable cycles of the selected graph
+app.get('/profitablePathsData/:maxNumberCycles/:bankRate', function(req, res) {
+    console.log("profitable paths data endpoint");
+
+    ret = addon.profitablePathsData(req.params.maxNumberCycles, req.params.bankRate);
+
+    res.send(ret);
+});
 
 // Return the most recent exchange rate between two currencies
 app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
@@ -107,6 +115,15 @@ app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
         console.log("rate is not a number, returning 1.")
         ret["rate"] = 1;
     }
+
+    res.send(ret);
+});
+
+// Return the most recent exchange rate between two currencies
+app.get('/dailyArbitrage', function(req, res) {
+    console.log("daily arbitrage endpoint");
+
+    ret = addon.dailyArbitrage();
 
     res.send(ret);
 });

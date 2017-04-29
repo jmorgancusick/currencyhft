@@ -1,47 +1,64 @@
 <template>
   <div class="dashboard">
-    <h1>{{ msg }}</h1>
+    <h1 style="padding: 30px; margin-bottom: -10px;">{{ msg }}</h1>
 
+    <!-- Time range selectiong -->
     <el-row>
-      <el-col>
-        <div style="align:left;">
-          <svg width="1000" height="500">
-          <vn-line :model="trends"
-                  :x-format="formatDate"
-                  y-format="">
-          </vn-line> 
-          </svg>
-        </div>
-      </el-col>
+      <el-tabs v-model="range" @tab-click="handleSelect">
+        <el-tab-pane label="1 Day" name="1d"></el-tab-pane>
+        <el-tab-pane label="5 Days" name="5d"></el-tab-pane>
+        <el-tab-pane label="YTD" name="ytd"></el-tab-pane>
+        <el-tab-pane label="1 Year" name="1y"></el-tab-pane>
+        <el-tab-pane label="2 Years" name="2y"></el-tab-pane>
+        <el-tab-pane label="5 Years" name="5y"></el-tab-pane>
+      </el-tabs>
     </el-row>
-    <h1> </h1>
+
+    <!-- Chart -->
+    <el-row>
+      <div style="align:left;">
+        <svg width="1000" height="440">
+        <vn-line :model="trends"
+                :x-format="formatDate"
+                y-format="">
+        </vn-line> 
+        </svg>
+      </div>
+    </el-row>
 
     <!-- Adds dropdown menus for Start and End currencies -->
-    <!-- Start -->
-    <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
-      <el-option
-        v-for="item in startOptions"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
-
-    <!-- End -->
-    <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
-      <el-option
-        v-for="item in endOptions"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled">
-      </el-option>
-    </el-select>
+    <div style="height: 100px;">
+      <el-row>
+        <!-- Start -->
+        <el-select v-model="start" placeholder="Start currency" @change="handleSelect()">
+          <el-option
+            v-for="item in startOptions"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
+        <!-- End -->
+        <el-select v-model="end" placeholder="End currency" @change="handleSelect()">
+          <el-option
+            v-for="item in endOptions"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled">
+          </el-option>
+        </el-select>
+      </el-row>
+    </div>
 
     <!-- Ticker data -->
-    <el-row>
-      <h3>Tickers</h3>
-      <ticker v-for="ticker in tickers" :ticker="ticker" />
-    </el-row>
+    <div style="width: 100%; height: 450px;">
+      <el-row :gutter="20">
+        <el-col :span="18" :offset="3">
+          <h3>Tickers</h3>
+          <ticker v-for="ticker in tickers" :ticker="ticker"/>
+        </el-col>
+      </el-row>
+    </div>
 
   </div>
 </template>
@@ -117,7 +134,8 @@ export default {
         label: 'USD'
       }],
       start: 'EUR',
-      end: 'USD'
+      end: 'USD',
+      range: 'ytd'
     }
   },
   components: {
@@ -132,7 +150,7 @@ export default {
           values: _.map(this.chartData, (t) => {
             return {
               x: t.timestamp,
-              y: t.close
+              y: t.close.toFixed(4)
             }
           })
         },
@@ -142,7 +160,7 @@ export default {
           values: _.map(this.chartData, (t) => {
             return {
               x: t.timestamp,
-              y: t.high
+              y: t.high.toFixed(4)
             }
           })
         },
@@ -152,7 +170,7 @@ export default {
           values: _.map(this.chartData, (t) => {
             return {
               x: t.timestamp,
-              y: t.low
+              y: t.low.toFixed(4)
             }
           })
         }
@@ -161,16 +179,24 @@ export default {
   },
   methods: {
     formatDate (timestamp){
-      return d3.time.format('%x')(new Date(timestamp*1000))
+      var fmt = ""
+      if (this.range === "1d"){
+        console.log("fmt 1")
+        fmt = "%I:%M %p"
+      } else{
+        console.log("fmt 1")
+        fmt = "%b %d, %Y"
+      }
+      return d3.time.format.utc(fmt)(new Date(timestamp*1000))
     }, 
     handleSelect (){
       console.log("HANDLE SELECT");
       if (this.start !== '' && this.end !== '' && this.start !== this.end) {
         
-        var str = "http://currencyhft.com:3000/chartData/"+this.start+this.end+"=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20";
+        // http://currencyhft.com:3000/chartData/NZDEUR=X/
+        var str = "http://currencyhft.com:3000/chartData/"+this.start+this.end+"=X/" + this.range;
 
         // call for chartData
-        // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
         axios.get(str).then( (response) => {
           console.log(response)
           this.chartData = response.data;
@@ -178,6 +204,9 @@ export default {
           console.log("ERROR:", error)
         })
       }
+    },
+    handleRange (){
+      console.log("Time range selected: ", this.range);
     }
   },
   created () {
@@ -190,8 +219,8 @@ export default {
     })
 
     // call for chartData
-    // http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20
-    axios.get("http://currencyhft.com:3000/chartData/NZDEUR=X/day/05-12-2013+08:36:30/06-12-2013+09:23:20").then( (response) => {
+    // http://currencyhft.com:3000/chartData/NZDEUR=X/ 
+    axios.get("http://currencyhft.com:3000/chartData/EURUSD=X/ytd").then( (response) => {
       console.log(response)
       this.chartData = response.data;
     }).catch( (error) => {
@@ -205,8 +234,10 @@ export default {
 .el-col {
   border-radius: 4px;
 }
-h1, h2 {
+h1 {
   font-weight: normal;
+  font-family: Didot, "Didot LT STD", "Hoefler Text", Garamond, "Times New Roman", serif;
+  color: #0c5a2f;
 }
 
 ul {

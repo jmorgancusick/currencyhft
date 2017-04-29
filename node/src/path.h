@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "graph.h"
+#include "sql/api.h"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ using namespace std;
 class Path {
   public:
     //===========Constructors===========
-    Path(Graph& graph, const string& start, const string& end, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit);
+    Path(Graph& graph, const string& start, const string& end, const unordered_set<string>& ignoreCurrencies, const int exchangeLimit, API *db);
 
     //===========Setters================
     
@@ -32,11 +33,12 @@ class Path {
     double ConvertEndAmount(const double& amount) const {return amount/totalRate;}
 
   private:
-    double CalcTotalRate();
+    double CalcTotalRate(API *db);
     
     //optimal path, stored as vector of nodes from start to end in order
     vector<string> path;
     double totalRate;
+    bool bank;
 };
 
 #endif
