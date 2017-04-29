@@ -1,9 +1,16 @@
-/**
- * Module dependencies.
- */
+/* app.js
+Data server used for serving Forex and bank data to the frontend via a REST_API.
+Algorithms are also exposed to the frontend.
+*/
 
+// ===================
+// Server Dependencies
+// ===================
+
+// C++ Binary
 const addon = require('./src/build/Release/addon');
 
+// JavaScript Libraries
 var express = require('express');
 var path = require('path');
 var fs = require('fs');
@@ -12,60 +19,111 @@ var exec = require('child_process').exec;
 var bodyParser = require('body-parser');
 var app = express();
 
+// =====================
+// Server Initialization
+// =====================
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));  //all html in public
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
-
-console.log("__dirname: "+__dirname);
-
 app.listen(3000, function () {
   console.log('photosbyjac.com node server listening on port 3000');
 });
 
-app.get('/exchange/:id', function(req, res) {
+// =============
+// Exit handling
+// =============
 
-    // log id
-    console.log(req.params.id);
+function exitHandler(options, err) {
+    if (options.cleanup){
+      console.log('Press Control-D to exit immediately.');
+      addon.shutdown();
+      console.log('Cleanup complete. Goodbye :)');
+    }
+    if (err) console.log(err.stack);
+    if (options.exit) process.exit();
+}
 
-    ret = addon.exchange(req.params.id);
-    console.log(ret);
-    
-    res.send(ret);
-});
+//cleanup when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
 
-app.get('/table/:tableName', function(req, res) {
-    // log table name
-    console.log(req.params.tableName);
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 
-    ret = addon.table(req.params.tableName);
-    console.log(ret);
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-    res.send(ret);
-});
+// ==============
+// Data Endpoints
+// ==============
 
+// Return the 18 most popular currency pairs along with their most recent exchange rate
 app.get('/tickerData/', function(req, res) {
-    // function takes 0 args (automatic load)
+    console.log("ticker data endpoint");
 
     ret = addon.tickerData();
-    console.log(ret);
     
     res.send(ret);
 
 });
 
+// Return high, low and close exchange rates for single ticker over a period of time.
+// This data is used to populate the Dashboard chart
 app.get('/chartData/:ticker/:timeframe', function(req, res) {
-    // log chartId
-    console.log(req.params.ticker);
-    console.log(req.params.timeframe);
+    console.log("chart data endpoint");
 
     ret = addon.chartData(req.params.ticker,req.params.timeframe);
-    console.log(ret);
+
+    res.send(ret);
+});
+
+// Run the shortest path algorithm and return the most profitable path between two currencies
+// and return the most profitable exchange rate using said path
+app.get('/arbitrageData/:startCurr/:endCurr/:maxNumberExchanges/:bankRate', function(req, res) {
+    console.log("arbitrage data endpoint");
+
+    if (req.query.exclude === undefined){
+        req.query.exclude = [];
+    }
+
+    ret = addon.arbitrageData(req.params.startCurr, req.params.endCurr, req.params.maxNumberExchanges, req.query.exclude, req.params.bankRate);
+
+    res.send(ret);
+});
+
+// Returns the profitable cycles of the selected graph
+app.get('/profitablePathsData/:maxNumberCycles/:bankRate', function(req, res) {
+    console.log("profitable paths data endpoint");
+
+    ret = addon.profitablePathsData(req.params.maxNumberCycles, req.params.bankRate);
+
+    res.send(ret);
+});
+
+// Return the most recent exchange rate between two currencies
+app.get('/calculatorData/:startCurr/:endCurr', function(req, res) {
+    console.log("calculator data endpoint");
+
+    ret = addon.calculatorData(req.params.startCurr, req.params.endCurr);
+
+    if(isNaN(ret["rate"])){
+        console.log("rate is not a number, returning 1.")
+        ret["rate"] = 1;
+    }
+
+    res.send(ret);
+});
+
+// Return the most recent exchange rate between two currencies
+app.get('/dailyArbitrage', function(req, res) {
+    console.log("daily arbitrage endpoint");
+
+    ret = addon.dailyArbitrage();
 
     res.send(ret);
 });

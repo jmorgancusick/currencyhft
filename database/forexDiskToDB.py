@@ -1,5 +1,5 @@
 '''
-forexDataScrape.py
+forexDiskToDB.py
 
 Usage:
 forexDiskToDB.py
@@ -34,7 +34,6 @@ def main():
     #create ticker in forex table
     obj = {}
     obj["ticker"] = ticker
-    db.insert("forex", obj, requireData=False)
     
     for filename in glob.glob(folder+'/*.txt'):
       
@@ -64,9 +63,11 @@ def main():
           obj["timestamp"] = data["timestamp"][i]
           obj["volume"] = data["quote"]["volume"][i]
           obj["close"] = data["quote"]["close"][i]
-          obj["high"] = data["quote"]["high"][i]
           obj["open"] = data["quote"]["open"][i]
-          obj["low"] = data["quote"]["low"][i]
+          
+          # YAHOO DATA HIGH AND LOW ARE BACKWARDS
+          obj["high"] = data["quote"]["low"][i]
+          obj["low"] = data["quote"]["high"][i]
 
           #print obj
 

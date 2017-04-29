@@ -4,14 +4,17 @@
 import MySQLdb as sql
 import json
 
+
+#Class that handles all SQL calls from the python code
 class API:
 
-  defaultCredsFile = "../../stockCredentials.txt"
+  defaultCredsFile = "../../credentials.txt"
   formats = None
   db = None
   cur = None
 
   def __init__(self):
+    #gets the database table formats from a file
     formatFile = open("tableColumns.json",'r')
     self.formats = json.loads(formatFile.read())
     formatFile.close()
@@ -31,9 +34,11 @@ class API:
     except Exception as e:
       print "ERROR: database connection error\n"+str(e)
 
+
   #close database connection
   def close(self):
     self.db.close()
+
 
   #takes an array of rows and calls commit after
   def bulkInsert(self, table, data):
@@ -88,10 +93,7 @@ class API:
     else:
       insertion += " ON DUPLICATE KEY UPDATE {0}".format(update)
 
-
-    #print insertion
-
-
+    #execute the insertion query
     try:
       self.cur.execute(insertion)
       if not bulk:
@@ -105,6 +107,27 @@ class API:
         print str(e) 
 
 
+  #gets every row from the the specified table in the database
+  def getAllData(self, table):
+    insertion = "SELECT * from {0}".format(table)
+
+    try:
+      print insertion
+      self.cur.execute(insertion)
+      rows = self.cur.fetchall()
+      return list(rows)
+    except Exception as e:
+      print e
+      if table not in self.formats.keys():
+        print "ERROR: the inputted table name does not exist"
+      else:
+        print "ERROR: could not execute call"
+        print str(e)
+      return None
+
+
+  #commits the previous execute calls to the database
+  #rolls back changes if there is an error
   def commit(self):
     try:
       self.db.commit()
@@ -114,6 +137,7 @@ class API:
       return False
     return True
 
+  #gets the name of the forex history table based on the interval
   def getTableNameForDataInterval(self, dataInterval):
     table = None
     if dataInterval == "1d":
@@ -124,6 +148,7 @@ class API:
       print "ERROR: unknown data interval: ", dataInterval
     return table
 
+#used for testing
 if __name__ == '__main__':
   db = API()
   db.connect()

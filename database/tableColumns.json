@@ -41,18 +41,15 @@
 		, "rate" 			
 		, "ex_id"
 		, "current_rate"
-  	, "last_rate"
-  	, "change_day"]
+  		, "last_rate"
+  		, "change_day"]
 	, "keys" : [
 		"ticker"]}
 	 
 , "bankRates" : { "cols" : [	
 		"start" 			 	
-		, "start_full" 		  	
 		, "end" 			
-		, "end_full" 		
 		, "bank" 	 		
-		, "bank_full" 		
 		, "rate"	 		
 		, "ex_id"]	
 	, "keys" : [
@@ -60,14 +57,11 @@
 
 , "profitableTrends" :{ "cols" : [
 	"start"	 			
-		, "start_full" 		 	
 		, "end"	 		
-		, "end_full" 		
 		, "profit"  		
 		, "length" 		
 		, "expath"   			
-		, "frequency"		
-		, "path_id"]
+		, "frequency"]		
 	, "keys" : [
 		"path_id"]}
 

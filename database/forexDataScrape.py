@@ -1,12 +1,9 @@
 '''
 forexDataScrape.py
-
 Usage:
 forexDataScrape.py
-
 Description:
 Pulls data from yahoo and stores in local files
-
 '''
 
 import datetime
@@ -67,6 +64,8 @@ def execScrape(ticker, startTime, endTime, interval):
   #print filepath
   with open(filepath, 'w') as f:
     json.dump(data, f)
+
+  return data
   
 
 def tickerScrape(ticker):
