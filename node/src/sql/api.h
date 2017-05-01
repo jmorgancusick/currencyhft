@@ -190,7 +190,8 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
 
       //====TIME LOGIC====
       //get todays date
-      boost::gregorian::date endDate(boost::gregorian::day_clock::universal_day());
+      boost::gregorian::date endDate = getDataEndDate();
+      // boost::gregorian::date endDate(boost::gregorian::day_clock::universal_day());
       //start date (init before subtracting)
       boost::gregorian::date startDate(endDate);
 
@@ -205,7 +206,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
 
         // Initialize days object with 1 day   
         //TODO: change back to 1                                
-        subDays = 2;
+        subDays = 1;
 
 
       } else if(timeframe == "5d"){    // 5 min interval
@@ -213,7 +214,7 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
 
         // Initialize days object with 5 days 
         //TODO: change back to 5                                  
-        subDays = 6;
+        subDays = 5;
 
 
       } else if(timeframe == "ytd"){   // 1 day interval
@@ -464,13 +465,14 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
     vector<long> timestamps;
 
     //get todays date
-    boost::gregorian::date endDate(boost::gregorian::day_clock::universal_day());
+    boost::gregorian::date endDate = getDataEndDate();
+    // boost::gregorian::date endDate(boost::gregorian::day_clock::universal_day());
     //start date (init before subtracting)
     boost::gregorian::date startDate(endDate);
 
     // Calculate start date
     // TODO: CHANGE BACK TO ONE DAY
-    boost::gregorian::days daysObj(2);
+    boost::gregorian::days daysObj(1);
     startDate = startDate - daysObj;
 
     std::cout<<"Start Date: " << startDate << std::endl;
@@ -628,7 +630,48 @@ vector<chart_info> * selectHistoricalTickerData(string ticker, string timeframe)
       cout << "# ERR: could not convert time" << endl;
     }
     return timestamp;
-  }  
+  }
+
+  //return the 1 + latest date with data
+  boost::gregorian::date getDataEndDate(){
+    long timestamp = 0;
+
+    //get the most recent timestamp from the database
+    try{
+      pstmt.reset(con->prepareStatement("select distinct timestamp from forexDashMinute order by timestamp desc limit 1"));
+
+      res.reset(pstmt->executeQuery());
+      while (res->next()) {
+        timestamp = res->getInt("timestamp");
+      }
+    }
+    catch(sql::SQLException &e) {
+      printError(e);
+    }
+
+    // Convert to POSIX
+    boost::posix_time::ptime const time_epoch(boost::gregorian::date(1970, 1, 1));
+    boost::posix_time::seconds timeSeconds(timestamp);
+
+    auto posixDataEndTime = time_epoch + timeSeconds;
+
+
+    boost::gregorian::date endDate(posixDataEndTime.date());
+
+
+    // Add 1 day. This is done because the most recent date with data is at 11:59pm.
+    // The endDate used in SQL queries should be 12:00am the next day, so we add one day.
+    boost::gregorian::days daysObj(1);
+    endDate = endDate + daysObj;
+
+    std::cout<<"END DATE: "<<posixDataEndTime.date()<<std::endl;
+
+    return endDate;
+
+  }
+
+
+
 };
 
 #endif
